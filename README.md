@@ -154,7 +154,7 @@ The `init` command reads this field and groups skills by shared version + name p
 
 - [`npx skills`](https://skills.sh) — registry + installer for Agent Skills
 - `skill-versions` — freshness checker (this tool)
-- [`skills-ref`](https://github.com/anthropics/skills-ref) — format validator
+- [`skills`](https://github.com/anthropics/skills) — official Agent Skills reference
 
 ## License
 
