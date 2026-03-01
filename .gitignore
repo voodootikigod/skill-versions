@@ -2,3 +2,6 @@ node_modules/
 dist/
 skill-versions.json
 *.tgz
+.turbo/
+.next/
+packages/web/public/schema.json

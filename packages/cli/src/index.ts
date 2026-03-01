@@ -1,14 +1,18 @@
+import { createRequire } from "node:module";
 import { Command } from "commander";
 import { checkCommand } from "./commands/check.js";
 import { initCommand } from "./commands/init.js";
 import { reportCommand } from "./commands/report.js";
+
+const require = createRequire(import.meta.url);
+const { version } = require("../package.json") as { version: string };
 
 const program = new Command();
 
 program
 	.name("skill-versions")
 	.description("Freshness checker for Agent Skills — like npm outdated for skill knowledge")
-	.version("0.1.0");
+	.version(version);
 
 program
 	.command("check")

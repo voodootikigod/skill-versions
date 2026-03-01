@@ -1,0 +1,36 @@
+.footer {
+	border-top: 1px solid var(--border);
+	padding: 24px 0;
+	margin-top: 64px;
+}
+
+.container {
+	max-width: 1024px;
+	margin: 0 auto;
+	padding: 0 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 13px;
+}
+
+.left {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.brand {
+	font-family: var(--font-mono);
+	color: var(--text-tertiary);
+	font-size: 13px;
+}
+
+.separator {
+	color: var(--border);
+}
+
+.right {
+	display: flex;
+	gap: 16px;
+}

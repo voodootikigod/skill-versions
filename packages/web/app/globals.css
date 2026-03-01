@@ -1,0 +1,49 @@
+:root {
+	--bg: #0a0a0a;
+	--bg-secondary: #111111;
+	--bg-hover: #1a1a1a;
+	--border: #222222;
+	--border-hover: #333333;
+	--text-primary: #ededed;
+	--text-secondary: #888888;
+	--text-tertiary: #555555;
+	--accent: #ffffff;
+	--accent-dim: #a1a1a1;
+	--success: #50e3c2;
+	--warning: #f5a623;
+	--error: #ee5555;
+	--code-bg: #0d0d0d;
+	--code-border: #1a1a1a;
+}
+
+* {
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+}
+
+html,
+body {
+	max-width: 100vw;
+	overflow-x: hidden;
+	background: var(--bg);
+	color: var(--text-primary);
+}
+
+a {
+	color: var(--text-secondary);
+	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+a:hover {
+	color: var(--text-primary);
+}
+
+code {
+	font-family: var(--font-mono);
+}
+
+::selection {
+	background: rgba(255, 255, 255, 0.15);
+}
