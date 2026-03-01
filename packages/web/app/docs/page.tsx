@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 	description:
 		"CLI reference for skill-versions: init, check, and report commands. Registry format, SKILL.md frontmatter spec, and CI integration guide.",
 	alternates: {
-		canonical: "https://skill-versions.dev/docs",
+		canonical: "https://skill-versions.com/docs",
 	},
 };
 
@@ -107,7 +107,7 @@ npx skill-versions report --format json`}
 						<pre>
 							<code>
 								{`{
-  "$schema": "https://skill-versions.dev/schema.json",
+  "$schema": "https://skill-versions.com/schema.json",
   "version": 1,
   "products": {
     "ai-sdk": {

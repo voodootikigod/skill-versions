@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 	},
 	description:
 		"Keep AI agent skills in sync with the npm packages they describe. Scan SKILL.md files, detect stale product-versions, and generate staleness reports — like npm outdated for skill knowledge.",
-	metadataBase: new URL("https://skill-versions.dev"),
+	metadataBase: new URL("https://skill-versions.com"),
 	keywords: [
 		"agent skills",
 		"skill versions",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 		title: "skill-versions — Freshness checker for Agent Skills",
 		description:
 			"Keep AI agent skills in sync with the npm packages they describe. Like npm outdated for skill knowledge.",
-		url: "https://skill-versions.dev",
+		url: "https://skill-versions.com",
 		siteName: "skill-versions",
 		locale: "en_US",
 		type: "website",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
 		follow: true,
 	},
 	alternates: {
-		canonical: "https://skill-versions.dev",
+		canonical: "https://skill-versions.com",
 	},
 };
 

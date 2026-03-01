@@ -212,7 +212,7 @@ export async function initCommand(dir: string, options: InitOptions): Promise<nu
 	}
 
 	const registry: Registry = {
-		$schema: "https://skill-versions.dev/schema.json",
+		$schema: "https://skill-versions.com/schema.json",
 		version: 1,
 		lastCheck: now,
 		products,
