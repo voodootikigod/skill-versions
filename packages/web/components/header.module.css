@@ -1,0 +1,33 @@
+.header {
+	position: sticky;
+	top: 0;
+	z-index: 100;
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	background: rgba(10, 10, 10, 0.8);
+	border-bottom: 1px solid var(--border);
+}
+
+.nav {
+	max-width: 1024px;
+	margin: 0 auto;
+	padding: 0 24px;
+	height: 56px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.logo {
+	font-family: var(--font-mono);
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--text-primary);
+	letter-spacing: -0.02em;
+}
+
+.links {
+	display: flex;
+	gap: 24px;
+	font-size: 14px;
+}

@@ -1,0 +1,24 @@
+{
+	"name": "@skill-versions/web",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"prebuild": "cp ../schema/dist/schema.json public/schema.json",
+		"build": "next build",
+		"dev": "next dev",
+		"lint": "next lint",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@skill-versions/schema": "*",
+		"next": "^16.1.0",
+		"react": "^19.1.0",
+		"react-dom": "^19.1.0"
+	},
+	"devDependencies": {
+		"@types/node": "^22.0.0",
+		"@types/react": "^19.1.0",
+		"@types/react-dom": "^19.1.0",
+		"typescript": "^5.8.0"
+	}
+}

@@ -1,0 +1,69 @@
+.hero {
+	max-width: 1024px;
+	margin: 0 auto;
+	padding: 80px 24px 64px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+}
+
+.ascii {
+	font-family: var(--font-mono);
+	font-size: 8px;
+	line-height: 1.2;
+	color: var(--text-tertiary);
+	margin-bottom: 32px;
+	overflow-x: auto;
+	max-width: 100%;
+	white-space: pre;
+}
+
+@media (min-width: 640px) {
+	.ascii {
+		font-size: 10px;
+	}
+}
+
+@media (min-width: 900px) {
+	.ascii {
+		font-size: 12px;
+	}
+}
+
+.tagline {
+	font-size: 20px;
+	line-height: 1.6;
+	color: var(--text-primary);
+	margin-bottom: 32px;
+}
+
+.tagline code {
+	font-family: var(--font-mono);
+	font-size: 18px;
+	background: var(--code-bg);
+	border: 1px solid var(--code-border);
+	padding: 2px 8px;
+	border-radius: 4px;
+}
+
+.dim {
+	color: var(--text-secondary);
+	font-size: 16px;
+}
+
+.install {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	background: var(--code-bg);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	padding: 12px 16px;
+}
+
+.command {
+	font-family: var(--font-mono);
+	font-size: 15px;
+	color: var(--success);
+}
