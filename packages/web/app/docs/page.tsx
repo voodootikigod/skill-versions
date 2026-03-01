@@ -5,8 +5,12 @@ import { Footer } from "@/components/footer";
 import styles from "./docs.module.css";
 
 export const metadata: Metadata = {
-	title: "Docs — skill-versions",
-	description: "CLI reference, registry format, and CI integration guide for skill-versions.",
+	title: "Docs",
+	description:
+		"CLI reference for skill-versions: init, check, and report commands. Registry format, SKILL.md frontmatter spec, and CI integration guide.",
+	alternates: {
+		canonical: "https://skill-versions.dev/docs",
+	},
 };
 
 export default function DocsPage() {

@@ -13,16 +13,47 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "skill-versions — Freshness checker for Agent Skills",
+	title: {
+		default: "skill-versions — Freshness checker for Agent Skills",
+		template: "%s | skill-versions",
+	},
 	description:
-		"Like npm outdated for skill knowledge. Keep your AI agent skills in sync with the packages they describe.",
+		"Keep AI agent skills in sync with the npm packages they describe. Scan SKILL.md files, detect stale product-versions, and generate staleness reports — like npm outdated for skill knowledge.",
 	metadataBase: new URL("https://skill-versions.dev"),
+	keywords: [
+		"agent skills",
+		"skill versions",
+		"AI agents",
+		"npm outdated",
+		"freshness checker",
+		"SKILL.md",
+		"version check",
+		"CLI tool",
+	],
+	authors: [{ name: "Chris Williams", url: "https://github.com/voodootikigod" }],
+	creator: "Chris Williams",
 	openGraph: {
-		title: "skill-versions",
-		description: "Freshness checker for Agent Skills — like npm outdated for skill knowledge",
+		title: "skill-versions — Freshness checker for Agent Skills",
+		description:
+			"Keep AI agent skills in sync with the npm packages they describe. Like npm outdated for skill knowledge.",
 		url: "https://skill-versions.dev",
 		siteName: "skill-versions",
+		locale: "en_US",
 		type: "website",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "skill-versions — Freshness checker for Agent Skills",
+		description:
+			"Keep AI agent skills in sync with the npm packages they describe. Like npm outdated for skill knowledge.",
+		creator: "@voodootikigod",
+	},
+	robots: {
+		index: true,
+		follow: true,
+	},
+	alternates: {
+		canonical: "https://skill-versions.dev",
 	},
 };
 
