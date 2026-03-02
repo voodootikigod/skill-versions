@@ -1,6 +1,7 @@
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { Hero } from "@/components/hero";
+import { Problem } from "@/components/problem";
 import { Quickstart } from "@/components/quickstart";
 
 const jsonLd = {
@@ -37,6 +38,7 @@ export default function Home() {
 			<Header />
 			<main>
 				<Hero />
+				<Problem />
 				<Quickstart />
 			</main>
 			<Footer />
