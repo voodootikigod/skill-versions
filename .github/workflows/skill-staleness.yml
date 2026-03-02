@@ -1,0 +1,29 @@
+name: Skill Staleness Check
+
+on:
+  schedule:
+    # Every Monday at 09:00 UTC
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+    inputs:
+      open-issues:
+        description: "Open or update a GitHub issue"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  staleness:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check skill staleness
+        uses: ./
+        with:
+          open-issues: ${{ github.event.inputs.open-issues || 'true' }}
+          fail-on-stale: "false"

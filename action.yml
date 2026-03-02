@@ -1,0 +1,101 @@
+name: "Skill Versions Check"
+description: "Check skill freshness and optionally open GitHub issues for stale products"
+author: "voodootikigod"
+
+branding:
+  icon: "refresh-cw"
+  color: "yellow"
+
+inputs:
+  registry:
+    description: "Path to the skill-versions.json registry file"
+    default: "skill-versions.json"
+  node-version:
+    description: "Node.js version to use"
+    default: "20"
+  open-issues:
+    description: "Open or update a GitHub issue when staleness is detected"
+    default: "true"
+  issue-label:
+    description: "Label used for issue deduplication"
+    default: "skill-staleness"
+  fail-on-stale:
+    description: "Exit with non-zero code when stale products are found"
+    default: "false"
+  token:
+    description: "GitHub token (needs issues: write permission)"
+    default: ${{ github.token }}
+
+outputs:
+  stale-count:
+    description: "Number of stale products (0 if all current)"
+    value: ${{ steps.check.outputs.stale_count }}
+  issue-number:
+    description: "Issue number created or updated (empty if none)"
+    value: ${{ steps.upsert.outputs.issue_number }}
+  report:
+    description: "Full markdown report"
+    value: ${{ steps.report.outputs.report }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Check skill freshness
+      id: check
+      shell: bash
+      run: |
+        set +e
+        OUTPUT=$(npx --yes skill-versions check --registry "${{ inputs.registry }}" --json --ci 2>&1)
+        EXIT_CODE=$?
+        set -e
+
+        if [ "$EXIT_CODE" -eq 2 ]; then
+          echo "::error::skill-versions configuration error"
+          echo "$OUTPUT"
+          exit 2
+        fi
+
+        # Count stale products from JSON output
+        STALE_COUNT=0
+        if [ "$EXIT_CODE" -eq 1 ]; then
+          STALE_COUNT=$(echo "$OUTPUT" | jq '[.[] | select(.stale == true)] | length' 2>/dev/null || echo "1")
+        fi
+
+        echo "stale_count=${STALE_COUNT}" >> "$GITHUB_OUTPUT"
+        echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
+
+    - name: Generate report
+      id: report
+      if: steps.check.outputs.exit_code == '1'
+      shell: bash
+      run: |
+        REPORT=$(npx --yes skill-versions report --registry "${{ inputs.registry }}" --format markdown 2>/dev/null)
+
+        # Write multiline output
+        {
+          echo "report<<SKILL_VERSIONS_EOF"
+          echo "$REPORT"
+          echo "SKILL_VERSIONS_EOF"
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Upsert issue
+      id: upsert
+      if: steps.check.outputs.exit_code == '1' && inputs.open-issues == 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        ISSUE_LABEL: ${{ inputs.issue-label }}
+        REPORT_BODY: ${{ steps.report.outputs.report }}
+      run: bash "${GITHUB_ACTION_PATH}/.github/scripts/upsert-issue.sh"
+
+    - name: Fail on stale
+      if: steps.check.outputs.exit_code == '1' && inputs.fail-on-stale == 'true'
+      shell: bash
+      run: |
+        echo "::error::${{ steps.check.outputs.stale_count }} stale product(s) detected"
+        exit 1

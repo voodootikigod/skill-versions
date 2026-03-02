@@ -189,13 +189,158 @@ Your skill content here...`}
 
 					<section>
 						<h2 id="ci">CI Integration</h2>
+
+						<h3>GitHub Action</h3>
 						<p>
-							Add a staleness check to your CI pipeline using the <code>--ci</code> flag:
+							Use the reusable GitHub Action to check freshness and optionally open issues when
+							skills drift:
 						</p>
 						<pre>
 							<code>
-								{`# GitHub Actions example
-- name: Check skill freshness
+								{`- uses: voodootikigod/skill-versions@v1
+  with:
+    registry: skill-versions.json  # default
+    open-issues: "true"            # create/update issue on staleness
+    fail-on-stale: "false"         # set "true" to block PRs`}
+							</code>
+						</pre>
+						<p>
+							The action requires <code>issues: write</code> permission when{" "}
+							<code>open-issues</code> is enabled. It deduplicates issues using the{" "}
+							<code>issue-label</code> input (default: <code>skill-staleness</code>).
+						</p>
+
+						<h4>Inputs</h4>
+						<table>
+							<thead>
+								<tr>
+									<th>Input</th>
+									<th>Default</th>
+									<th>Description</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										<code>registry</code>
+									</td>
+									<td>
+										<code>skill-versions.json</code>
+									</td>
+									<td>Path to registry file</td>
+								</tr>
+								<tr>
+									<td>
+										<code>node-version</code>
+									</td>
+									<td>
+										<code>20</code>
+									</td>
+									<td>Node.js version</td>
+								</tr>
+								<tr>
+									<td>
+										<code>open-issues</code>
+									</td>
+									<td>
+										<code>true</code>
+									</td>
+									<td>Open/update GitHub issue on staleness</td>
+								</tr>
+								<tr>
+									<td>
+										<code>issue-label</code>
+									</td>
+									<td>
+										<code>skill-staleness</code>
+									</td>
+									<td>Label for issue deduplication</td>
+								</tr>
+								<tr>
+									<td>
+										<code>fail-on-stale</code>
+									</td>
+									<td>
+										<code>false</code>
+									</td>
+									<td>Exit non-zero when stale</td>
+								</tr>
+								<tr>
+									<td>
+										<code>token</code>
+									</td>
+									{/* biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax */}
+									<td>
+										<code>{"${{ github.token }}"}</code>
+									</td>
+									<td>
+										GitHub token (needs <code>issues: write</code>)
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<h4>Outputs</h4>
+						<table>
+							<thead>
+								<tr>
+									<th>Output</th>
+									<th>Description</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										<code>stale-count</code>
+									</td>
+									<td>Number of stale products (0 if current)</td>
+								</tr>
+								<tr>
+									<td>
+										<code>issue-number</code>
+									</td>
+									<td>Issue number created/updated (empty if none)</td>
+								</tr>
+								<tr>
+									<td>
+										<code>report</code>
+									</td>
+									<td>Full markdown report</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<h4>Weekly cron example</h4>
+						<pre>
+							<code>
+								{`name: Skill Staleness Check
+on:
+  schedule:
+    - cron: "0 9 * * 1"   # Monday 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  staleness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: voodootikigod/skill-versions@v1
+        with:
+          fail-on-stale: "false"`}
+							</code>
+						</pre>
+
+						<h3>Inline check</h3>
+						<p>
+							For simpler setups, use the CLI directly with the <code>--ci</code> flag:
+						</p>
+						<pre>
+							<code>
+								{`- name: Check skill freshness
   run: npx skill-versions check --ci`}
 							</code>
 						</pre>
