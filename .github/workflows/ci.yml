@@ -70,4 +70,4 @@ jobs:
         run: npm run build
 
       - name: Check skill freshness
-        run: npx skill-versions check --ci
+        run: node packages/cli/dist/index.js check --ci
