@@ -25,10 +25,15 @@
 		"npm-outdated",
 		"cli"
 	],
-	"author": "Vercel Professional Services <dept-solution-engineering@vercel.com>",
+	"author": "Chris Williams <voodootikigod@gmail.com>",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/voodootikigod/skill-versions.git",
+		"directory": "packages/cli"
+	},
+	"homepage": "https://skill-versions.com",
 	"dependencies": {
-		"@skill-versions/schema": "*",
 		"ai": "^6.0.0",
 		"chalk": "^5.4.1",
 		"commander": "^14.0.0",
@@ -43,6 +48,7 @@
 		"@ai-sdk/openai": "^3.0.0"
 	},
 	"devDependencies": {
+		"@skill-versions/schema": "*",
 		"@types/node": "^22.0.0",
 		"@types/semver": "^7.7.0",
 		"tsup": "^8.5.0",
