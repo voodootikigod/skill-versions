@@ -1,5 +1,5 @@
-import { readdir, stat } from "node:fs/promises";
-import { join } from "node:path";
+import { stat } from "node:fs/promises";
+import { discoverSkillFiles } from "../shared/discovery.js";
 import { readSkillFile } from "../skill-io.js";
 import { advisoryChecker } from "./checkers/advisory.js";
 import { commandsChecker } from "./checkers/commands.js";
@@ -18,41 +18,6 @@ import type {
 	AuditReport,
 	CheckContext,
 } from "./types.js";
-
-async function discoverSkillFiles(dir: string): Promise<string[]> {
-	const files: string[] = [];
-
-	let entries: string[];
-	try {
-		entries = await readdir(dir);
-	} catch {
-		throw new Error(`Cannot read directory: ${dir}`);
-	}
-
-	for (const entry of entries) {
-		const fullPath = join(dir, entry);
-		try {
-			const info = await stat(fullPath);
-			if (info.isDirectory()) {
-				const skillPath = join(fullPath, "SKILL.md");
-				try {
-					await stat(skillPath);
-					files.push(skillPath);
-				} catch {
-					// No SKILL.md here — recurse deeper
-					const nested = await discoverSkillFiles(fullPath);
-					files.push(...nested);
-				}
-			} else if (entry === "SKILL.md") {
-				files.push(fullPath);
-			}
-		} catch {
-			// skip inaccessible entries
-		}
-	}
-
-	return files.sort();
-}
 
 export async function runAudit(paths: string[], options: AuditOptions = {}): Promise<AuditReport> {
 	// Discover all skill files
