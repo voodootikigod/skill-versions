@@ -16,12 +16,15 @@ export async function scanSkills(skillsDir: string): Promise<ScannedSkill[]> {
 	}
 
 	const results = await Promise.all(
+		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 		entries.map(async (entry): Promise<ScannedSkill | null> => {
 			const skillPath = join(skillsDir, entry, "SKILL.md");
 
 			try {
 				const info = await stat(join(skillsDir, entry));
-				if (!info.isDirectory()) return null;
+				if (!info.isDirectory()) {
+					return null;
+				}
 			} catch {
 				return null;
 			}
@@ -70,7 +73,7 @@ export async function scanSkills(skillsDir: string): Promise<ScannedSkill[]> {
 				// Malformed frontmatter, skip with warning
 				return { name: entry, path: skillPath };
 			}
-		}),
+		})
 	);
 
 	return results
@@ -100,7 +103,9 @@ export function groupSkills(skills: ScannedSkill[]): Map<string, ScannedSkill[]>
 	const groups = new Map<string, ScannedSkill[]>();
 
 	for (const skill of skills) {
-		if (!skill.productVersion) continue;
+		if (!skill.productVersion) {
+			continue;
+		}
 
 		const key = inferGroupKey(skill.name, skill.productVersion, allNames, versionMap);
 		const existing = groups.get(key) ?? [];
@@ -119,7 +124,7 @@ function inferGroupKey(
 	name: string,
 	version: string,
 	allNames: string[],
-	versionMap: Map<string, string>,
+	versionMap: Map<string, string>
 ): string {
 	const parts = name.split("-");
 
@@ -135,7 +140,9 @@ function inferGroupKey(
 				break;
 			}
 		}
-		if (hasOther) return prefix;
+		if (hasOther) {
+			return prefix;
+		}
 	}
 
 	// No shared prefix with same version — use the full name

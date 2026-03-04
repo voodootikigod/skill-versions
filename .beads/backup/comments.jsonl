@@ -1,0 +1,5 @@
+{"author":"Chris Williams","created_at":"2026-03-03T18:56:11Z","id":1,"issue_id":"ss-0dh.1","text":"Depends on ss-0dh.6 (shared infrastructure) for skill discovery and frontmatter parsing"}
+{"author":"Chris Williams","created_at":"2026-03-03T18:56:11Z","id":2,"issue_id":"ss-0dh.2","text":"Depends on ss-0dh.6 (shared infrastructure) for skill discovery, frontmatter parsing, and reuses audit extractors"}
+{"author":"Chris Williams","created_at":"2026-03-03T18:56:11Z","id":3,"issue_id":"ss-0dh.3","text":"Depends on ss-0dh.6 (shared infrastructure) for frontmatter parsing. Can reuse audit metadata checker as a base."}
+{"author":"Chris Williams","created_at":"2026-03-03T18:56:11Z","id":4,"issue_id":"ss-0dh.4","text":"Depends on ss-0dh.6 (shared infrastructure) for skill discovery and frontmatter parsing. Integrates with audit command."}
+{"author":"Chris Williams","created_at":"2026-03-03T18:56:11Z","id":5,"issue_id":"ss-0dh.5","text":"Depends on ss-0dh.6 (shared infrastructure), ss-0dh.2 (verify), and existing LLM infrastructure. Phase 3 — build last."}

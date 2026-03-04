@@ -1,4 +1,4 @@
 {
-	"files": [],
-	"references": [{ "path": "packages/cli" }, { "path": "packages/schema" }]
+  "files": [],
+  "references": [{ "path": "packages/cli" }, { "path": "packages/schema" }]
 }

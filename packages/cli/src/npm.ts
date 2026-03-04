@@ -66,7 +66,7 @@ export async function fetchLatestVersion(packageName: string): Promise<string> {
  * Failed lookups are included with an error string.
  */
 export async function fetchLatestVersions(
-	packageNames: string[],
+	packageNames: string[]
 ): Promise<Map<string, string | Error>> {
 	const unique = [...new Set(packageNames)];
 	const results = new Map<string, string | Error>();
@@ -83,7 +83,7 @@ export async function fetchLatestVersions(
 					error: error instanceof Error ? error : new Error(String(error)),
 				};
 			}
-		}),
+		})
 	);
 
 	for (const result of settled) {

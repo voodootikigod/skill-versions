@@ -1,10 +1,10 @@
 import { readFile, writeFile } from "node:fs/promises";
 import type { Registry } from "./types.js";
 
-const REGISTRY_FILENAME = "skill-versions.json";
+const REGISTRY_FILENAME = "skillsafe.json";
 
 /**
- * Load and validate a skill-versions.json registry file.
+ * Load and validate a skillsafe.json registry file.
  */
 export async function loadRegistry(path?: string): Promise<Registry> {
 	const filePath = path ?? REGISTRY_FILENAME;
@@ -13,9 +13,7 @@ export async function loadRegistry(path?: string): Promise<Registry> {
 	try {
 		raw = await readFile(filePath, "utf-8");
 	} catch {
-		throw new Error(
-			`Registry file not found: ${filePath}\nRun "skill-versions init" to create one.`,
-		);
+		throw new Error(`Registry file not found: ${filePath}\nRun "skillsafe init" to create one.`);
 	}
 
 	let data: unknown;

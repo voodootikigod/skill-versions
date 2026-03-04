@@ -7,12 +7,12 @@ export function Footer() {
 		<footer className={styles.footer}>
 			<div className={styles.container}>
 				<div className={styles.left}>
-					<span className={styles.brand}>skill-versions</span>
+					<span className={styles.brand}>skillsafe</span>
 					<span className={styles.separator}>|</span>
 					<a
-						href="https://github.com/voodootikigod/skill-versions"
-						target="_blank"
+						href="https://github.com/voodootikigod/skillsafe"
 						rel="noopener noreferrer"
+						target="_blank"
 					>
 						GitHub
 					</a>
@@ -20,11 +20,7 @@ export function Footer() {
 					<Link href="/schema.json">Schema</Link>
 				</div>
 				<div className={styles.right}>
-					<a
-						href="https://npmjs.com/package/skill-versions"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
+					<a href="https://npmjs.com/package/skillsafe" rel="noopener noreferrer" target="_blank">
 						npm
 					</a>
 				</div>
@@ -32,17 +28,17 @@ export function Footer() {
 			<div className={styles.author}>
 				<span className={styles.authorText}>Made with love from</span>
 				<a
-					href="https://github.com/voodootikigod"
-					target="_blank"
-					rel="noopener noreferrer"
 					className={styles.authorLink}
+					href="https://github.com/voodootikigod"
+					rel="noopener noreferrer"
+					target="_blank"
 				>
 					<Image
-						src="/voodootikigod.webp"
 						alt="@voodootikigod"
-						width={20}
-						height={20}
 						className={styles.avatar}
+						height={20}
+						src="/voodootikigod.webp"
+						width={20}
 					/>
 					@voodootikigod
 				</a>

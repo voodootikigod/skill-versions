@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
 			userAgent: "*",
 			allow: "/",
 		},
-		sitemap: "https://skill-versions.com/sitemap.xml",
+		sitemap: "https://skillsafe.sh/sitemap.xml",
 	};
 }

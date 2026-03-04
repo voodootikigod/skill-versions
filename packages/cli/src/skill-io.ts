@@ -2,9 +2,9 @@ import { readFile, writeFile } from "node:fs/promises";
 import matter from "gray-matter";
 
 export interface SkillFile {
-	path: string;
-	frontmatter: Record<string, unknown>;
 	content: string;
+	frontmatter: Record<string, unknown>;
+	path: string;
 	raw: string;
 }
 

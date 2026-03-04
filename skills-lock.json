@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "beads": {
+      "source": "steveyegge/beads",
+      "sourceType": "github",
+      "computedHash": "10444b40c8c9d10ea36d585273cf1cb0d8e8c5a83df2f2b2e6d5ee4d47a48f7e"
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import { Commands } from "@/components/commands";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { Hero } from "@/components/hero";
@@ -7,13 +8,13 @@ import { Quickstart } from "@/components/quickstart";
 const jsonLd = {
 	"@context": "https://schema.org",
 	"@type": "SoftwareApplication",
-	name: "skill-versions",
+	name: "skillsafe",
 	applicationCategory: "DeveloperApplication",
 	operatingSystem: "Any",
 	description:
-		"Freshness checker for AI Agent Skills — like npm outdated for skill knowledge. Scan SKILL.md files, detect stale product-versions, and generate staleness reports.",
-	url: "https://skill-versions.com",
-	downloadUrl: "https://www.npmjs.com/package/skill-versions",
+		"Quality & integrity layer for AI Agent Skills — check freshness, audit security, lint metadata, enforce policy, measure token budgets, verify semver, and run eval tests across your SKILL.md files.",
+	url: "https://skillsafe.sh",
+	downloadUrl: "https://www.npmjs.com/package/skillsafe",
 	softwareVersion: "1.0.0",
 	author: {
 		"@type": "Person",
@@ -31,14 +32,15 @@ export default function Home() {
 	return (
 		<>
 			<script
-				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structured data requires innerHTML
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+				type="application/ld+json"
 			/>
 			<Header />
 			<main>
 				<Hero />
 				<Problem />
+				<Commands />
 				<Quickstart />
 			</main>
 			<Footer />

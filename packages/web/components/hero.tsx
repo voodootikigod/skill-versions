@@ -6,19 +6,18 @@ export function Hero() {
 		<section className={styles.hero}>
 			<h1 className={styles.title}>
 				<span className={styles.glow}>skill</span>
-				<span className={styles.glowDim}>-</span>
-				<span className={styles.glow}>versions</span>
+				<span className={styles.glow}>safe</span>
 			</h1>
 			<p className={styles.tagline}>
-				Freshness checker for Agent Skills
+				Quality & integrity layer for Agent Skills
 				<br />
 				<span className={styles.dim}>
-					Like <code>npm outdated</code> for skill knowledge
+					Freshness, security, quality, and efficiency &mdash; 10 commands, one toolkit
 				</span>
 			</p>
 			<div className={styles.install}>
-				<code className={styles.command}>npx skill-versions check</code>
-				<CopyButton text="npx skill-versions check" />
+				<code className={styles.command}>npx skillsafe check</code>
+				<CopyButton text="npx skillsafe check" />
 			</div>
 		</section>
 	);

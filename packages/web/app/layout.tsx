@@ -14,38 +14,40 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 	title: {
-		default: "skill-versions — Freshness checker for Agent Skills",
-		template: "%s | skill-versions",
+		default: "Skillsafe — Quality & integrity layer for Agent Skills",
+		template: "%s | Skillsafe",
 	},
 	description:
-		"Keep AI agent skills in sync with the npm packages they describe. Scan SKILL.md files, detect stale product-versions, and generate staleness reports — like npm outdated for skill knowledge.",
-	metadataBase: new URL("https://skill-versions.com"),
+		"Quality & integrity layer for AI Agent Skills — check freshness, audit security, lint metadata, enforce policy, measure token budgets, verify semver, and run eval tests across your SKILL.md files.",
+	metadataBase: new URL("https://skillsafe.sh"),
 	keywords: [
 		"agent skills",
-		"skill versions",
+		"skillsafe",
 		"AI agents",
-		"npm outdated",
-		"freshness checker",
+		"skill audit",
+		"skill lint",
+		"token budget",
 		"SKILL.md",
 		"version check",
+		"policy enforcement",
 		"CLI tool",
 	],
 	authors: [{ name: "Chris Williams", url: "https://github.com/voodootikigod" }],
 	creator: "Chris Williams",
 	openGraph: {
-		title: "skill-versions — Freshness checker for Agent Skills",
+		title: "Skillsafe — Quality & integrity layer for Agent Skills",
 		description:
-			"Keep AI agent skills in sync with the npm packages they describe. Like npm outdated for skill knowledge.",
-		url: "https://skill-versions.com",
-		siteName: "skill-versions",
+			"Quality & integrity layer for AI Agent Skills. 10 commands for freshness, security, quality, and efficiency.",
+		url: "https://skillsafe.sh",
+		siteName: "Skillsafe",
 		locale: "en_US",
 		type: "website",
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "skill-versions — Freshness checker for Agent Skills",
+		title: "Skillsafe — Quality & integrity layer for Agent Skills",
 		description:
-			"Keep AI agent skills in sync with the npm packages they describe. Like npm outdated for skill knowledge.",
+			"Quality & integrity layer for AI Agent Skills. 10 commands for freshness, security, quality, and efficiency.",
 		creator: "@voodootikigod",
 	},
 	robots: {
@@ -53,13 +55,13 @@ export const metadata: Metadata = {
 		follow: true,
 	},
 	alternates: {
-		canonical: "https://skill-versions.com",
+		canonical: "https://skillsafe.sh",
 	},
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+		<html className={`${geistSans.variable} ${geistMono.variable}`} lang="en">
 			<body style={{ fontFamily: "var(--font-sans)" }}>{children}</body>
 		</html>
 	);

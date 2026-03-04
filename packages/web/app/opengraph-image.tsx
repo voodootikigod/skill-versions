@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "skill-versions — Freshness checker for Agent Skills";
+export const alt = "Skillsafe — Quality & integrity layer for Agent Skills";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -30,7 +30,7 @@ export default function OGImage() {
 						"0 0 7px rgba(80,227,194,0.7), 0 0 20px rgba(80,227,194,0.4), 0 0 40px rgba(80,227,194,0.2), 0 0 80px rgba(80,227,194,0.1)",
 				}}
 			>
-				skill-versions
+				skillsafe
 			</div>
 			<div
 				style={{
@@ -40,7 +40,7 @@ export default function OGImage() {
 					display: "flex",
 				}}
 			>
-				Freshness checker for Agent Skills
+				Quality & integrity layer for Agent Skills
 			</div>
 			<div
 				style={{
@@ -54,11 +54,9 @@ export default function OGImage() {
 					padding: "12px 20px",
 				}}
 			>
-				<div style={{ fontSize: 20, color: "#50e3c2", display: "flex" }}>
-					npx skill-versions check
-				</div>
+				<div style={{ fontSize: 20, color: "#50e3c2", display: "flex" }}>npx skillsafe check</div>
 			</div>
 		</div>,
-		{ ...size },
+		{ ...size }
 	);
 }

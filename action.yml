@@ -1,18 +1,69 @@
-name: "Skill Versions Check"
-description: "Check skill freshness and optionally open GitHub issues for stale products"
+name: "Skillsafe"
+description: "Quality & integrity layer for Agent Skills — check freshness, audit security, lint metadata, analyze budgets, enforce policy, and more"
 author: "voodootikigod"
 
 branding:
-  icon: "refresh-cw"
+  icon: "shield"
   color: "yellow"
 
 inputs:
+  # ── Command selection ──────────────────────────────────────────────
+  commands:
+    description: "Comma-separated list of commands to run (e.g. 'check,audit,lint'). Overrides individual command flags when set."
+    default: ""
+
+  # ── Individual command toggles (opt-in, ignored when 'commands' is set) ──
+  check:
+    description: "Run the check command (version drift detection)"
+    default: "true"
+  audit:
+    description: "Run the audit command (security & hallucination detection)"
+    default: "false"
+  lint:
+    description: "Run the lint command (metadata validation)"
+    default: "false"
+  budget:
+    description: "Run the budget command (token cost analysis)"
+    default: "false"
+  policy:
+    description: "Run the policy check command (organizational rule enforcement)"
+    default: "false"
+  verify:
+    description: "Run the verify command (semver bump validation)"
+    default: "false"
+  test:
+    description: "Run the test command (eval test suites)"
+    default: "false"
+
+  # ── Command-specific thresholds ────────────────────────────────────
+  audit-fail-on:
+    description: "Audit severity threshold: critical, high, medium, low"
+    default: "high"
+  lint-fail-on:
+    description: "Lint level threshold: error, warning"
+    default: "error"
+  budget-max-tokens:
+    description: "Budget token ceiling — fail if total exceeds this value"
+    default: ""
+  policy-file:
+    description: "Path to .skill-policy.yml for the policy command"
+    default: ""
+  policy-fail-on:
+    description: "Policy severity threshold: blocked, violation, warning"
+    default: "blocked"
+
+  # ── Shared options ─────────────────────────────────────────────────
+  skills-dir:
+    description: "Directory containing skill files to analyze"
+    default: "."
   registry:
-    description: "Path to the skill-versions.json registry file"
-    default: "skill-versions.json"
+    description: "Path to the skillsafe.json registry file"
+    default: "skillsafe.json"
   node-version:
     description: "Node.js version to use"
     default: "22"
+
+  # ── Check-specific options (backward-compatible) ───────────────────
   open-issues:
     description: "Open or update a GitHub issue when staleness is detected"
     default: "true"
@@ -34,29 +85,59 @@ outputs:
     description: "Issue number created or updated (empty if none)"
     value: ${{ steps.upsert.outputs.issue_number }}
   report:
-    description: "Full markdown report"
+    description: "Full markdown report from the check command"
     value: ${{ steps.report.outputs.report }}
+  results:
+    description: "JSON object with exit codes from each command that was run"
+    value: ${{ steps.summary.outputs.results }}
 
 runs:
   using: "composite"
   steps:
+    # ── Setup ──────────────────────────────────────────────────────────
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
 
+    # ── Resolve which commands to run ──────────────────────────────────
+    - name: Resolve commands
+      id: resolve
+      shell: bash
+      run: |
+        COMMANDS="${{ inputs.commands }}"
+        if [ -n "$COMMANDS" ]; then
+          # Parse comma-separated list into individual flags
+          for CMD in $(echo "$COMMANDS" | tr ',' ' '); do
+            CMD=$(echo "$CMD" | xargs)  # trim whitespace
+            echo "run_${CMD}=true" >> "$GITHUB_OUTPUT"
+          done
+        else
+          # Use individual toggle inputs
+          [ "${{ inputs.check }}" = "true" ]  && echo "run_check=true"  >> "$GITHUB_OUTPUT"
+          [ "${{ inputs.audit }}" = "true" ]  && echo "run_audit=true"  >> "$GITHUB_OUTPUT"
+          [ "${{ inputs.lint }}" = "true" ]   && echo "run_lint=true"   >> "$GITHUB_OUTPUT"
+          [ "${{ inputs.budget }}" = "true" ] && echo "run_budget=true" >> "$GITHUB_OUTPUT"
+          [ "${{ inputs.policy }}" = "true" ] && echo "run_policy=true" >> "$GITHUB_OUTPUT"
+          [ "${{ inputs.verify }}" = "true" ] && echo "run_verify=true" >> "$GITHUB_OUTPUT"
+          [ "${{ inputs.test }}" = "true" ]   && echo "run_test=true"   >> "$GITHUB_OUTPUT"
+        fi
+
+    # ── Check ──────────────────────────────────────────────────────────
     - name: Check skill freshness
       id: check
+      if: steps.resolve.outputs.run_check == 'true'
       shell: bash
       run: |
         set +e
-        OUTPUT=$(npx --yes skill-versions check --registry "${{ inputs.registry }}" --json --ci 2>&1)
+        OUTPUT=$(npx --yes skillsafe check --registry "${{ inputs.registry }}" --json --ci 2>&1)
         EXIT_CODE=$?
         set -e
 
         if [ "$EXIT_CODE" -eq 2 ]; then
-          echo "::error::skill-versions configuration error"
+          echo "::error::skillsafe check: configuration error"
           echo "$OUTPUT"
+          echo "exit_code=2" >> "$GITHUB_OUTPUT"
           exit 2
         fi
 
@@ -71,21 +152,21 @@ runs:
 
     - name: Generate report
       id: report
-      if: steps.check.outputs.exit_code == '1'
+      if: steps.resolve.outputs.run_check == 'true' && steps.check.outputs.exit_code == '1'
       shell: bash
       run: |
-        REPORT=$(npx --yes skill-versions report --registry "${{ inputs.registry }}" --format markdown 2>/dev/null)
+        REPORT=$(npx --yes skillsafe report --registry "${{ inputs.registry }}" --format markdown 2>/dev/null)
 
         # Write multiline output
         {
-          echo "report<<SKILL_VERSIONS_EOF"
+          echo "report<<SKILLSAFE_EOF"
           echo "$REPORT"
-          echo "SKILL_VERSIONS_EOF"
+          echo "SKILLSAFE_EOF"
         } >> "$GITHUB_OUTPUT"
 
     - name: Upsert issue
       id: upsert
-      if: steps.check.outputs.exit_code == '1' && inputs.open-issues == 'true'
+      if: steps.resolve.outputs.run_check == 'true' && steps.check.outputs.exit_code == '1' && inputs.open-issues == 'true'
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.token }}
@@ -94,8 +175,192 @@ runs:
       run: bash "${GITHUB_ACTION_PATH}/.github/scripts/upsert-issue.sh"
 
     - name: Fail on stale
-      if: steps.check.outputs.exit_code == '1' && inputs.fail-on-stale == 'true'
+      if: steps.resolve.outputs.run_check == 'true' && steps.check.outputs.exit_code == '1' && inputs.fail-on-stale == 'true'
       shell: bash
       run: |
         echo "::error::${{ steps.check.outputs.stale_count }} stale product(s) detected"
         exit 1
+
+    # ── Audit ──────────────────────────────────────────────────────────
+    - name: Audit skill security
+      id: audit
+      if: steps.resolve.outputs.run_audit == 'true'
+      shell: bash
+      run: |
+        set +e
+        npx --yes skillsafe audit "${{ inputs.skills-dir }}" \
+          --format json \
+          --fail-on "${{ inputs.audit-fail-on }}" \
+          --quiet
+        EXIT_CODE=$?
+        set -e
+
+        echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
+
+        if [ "$EXIT_CODE" -eq 2 ]; then
+          echo "::error::skillsafe audit: configuration error"
+          exit 2
+        fi
+        if [ "$EXIT_CODE" -eq 1 ]; then
+          echo "::error::skillsafe audit: findings at or above '${{ inputs.audit-fail-on }}' severity"
+          exit 1
+        fi
+
+    # ── Lint ───────────────────────────────────────────────────────────
+    - name: Lint skill metadata
+      id: lint
+      if: steps.resolve.outputs.run_lint == 'true'
+      shell: bash
+      run: |
+        set +e
+        npx --yes skillsafe lint "${{ inputs.skills-dir }}" \
+          --ci \
+          --format json \
+          --fail-on "${{ inputs.lint-fail-on }}"
+        EXIT_CODE=$?
+        set -e
+
+        echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
+
+        if [ "$EXIT_CODE" -eq 2 ]; then
+          echo "::error::skillsafe lint: configuration error"
+          exit 2
+        fi
+        if [ "$EXIT_CODE" -eq 1 ]; then
+          echo "::error::skillsafe lint: issues at or above '${{ inputs.lint-fail-on }}' level"
+          exit 1
+        fi
+
+    # ── Budget ─────────────────────────────────────────────────────────
+    - name: Analyze skill token budget
+      id: budget
+      if: steps.resolve.outputs.run_budget == 'true'
+      shell: bash
+      run: |
+        BUDGET_ARGS=("${{ inputs.skills-dir }}" --format json)
+        if [ -n "${{ inputs.budget-max-tokens }}" ]; then
+          BUDGET_ARGS+=(--max-tokens "${{ inputs.budget-max-tokens }}")
+        fi
+
+        set +e
+        npx --yes skillsafe budget "${BUDGET_ARGS[@]}"
+        EXIT_CODE=$?
+        set -e
+
+        echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
+
+        if [ "$EXIT_CODE" -eq 2 ]; then
+          echo "::error::skillsafe budget: configuration error"
+          exit 2
+        fi
+        if [ "$EXIT_CODE" -eq 1 ]; then
+          echo "::error::skillsafe budget: token count exceeds threshold (${{ inputs.budget-max-tokens }})"
+          exit 1
+        fi
+
+    # ── Policy ─────────────────────────────────────────────────────────
+    - name: Enforce skill policy
+      id: policy
+      if: steps.resolve.outputs.run_policy == 'true'
+      shell: bash
+      run: |
+        POLICY_ARGS=("${{ inputs.skills-dir }}" --ci --format json)
+        if [ -n "${{ inputs.policy-file }}" ]; then
+          POLICY_ARGS+=(--policy "${{ inputs.policy-file }}")
+        fi
+        POLICY_ARGS+=(--fail-on "${{ inputs.policy-fail-on }}")
+
+        set +e
+        npx --yes skillsafe policy check "${POLICY_ARGS[@]}"
+        EXIT_CODE=$?
+        set -e
+
+        echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
+
+        if [ "$EXIT_CODE" -eq 2 ]; then
+          echo "::error::skillsafe policy: configuration error"
+          exit 2
+        fi
+        if [ "$EXIT_CODE" -eq 1 ]; then
+          echo "::error::skillsafe policy: violations at or above '${{ inputs.policy-fail-on }}' severity"
+          exit 1
+        fi
+
+    # ── Verify ─────────────────────────────────────────────────────────
+    - name: Verify skill version bumps
+      id: verify
+      if: steps.resolve.outputs.run_verify == 'true'
+      shell: bash
+      run: |
+        set +e
+        npx --yes skillsafe verify --all --format json --skip-llm --quiet
+        EXIT_CODE=$?
+        set -e
+
+        echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
+
+        if [ "$EXIT_CODE" -eq 2 ]; then
+          echo "::error::skillsafe verify: configuration error"
+          exit 2
+        fi
+        if [ "$EXIT_CODE" -eq 1 ]; then
+          echo "::error::skillsafe verify: version bump mismatches detected"
+          exit 1
+        fi
+
+    # ── Test ───────────────────────────────────────────────────────────
+    - name: Run skill test suites
+      id: test
+      if: steps.resolve.outputs.run_test == 'true'
+      shell: bash
+      run: |
+        set +e
+        npx --yes skillsafe test "${{ inputs.skills-dir }}" --ci --format json
+        EXIT_CODE=$?
+        set -e
+
+        echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
+
+        if [ "$EXIT_CODE" -eq 2 ]; then
+          echo "::error::skillsafe test: configuration error"
+          exit 2
+        fi
+        if [ "$EXIT_CODE" -eq 1 ]; then
+          echo "::error::skillsafe test: regressions detected"
+          exit 1
+        fi
+
+    # ── Summary ────────────────────────────────────────────────────────
+    - name: Collect results
+      id: summary
+      if: always()
+      shell: bash
+      run: |
+        # Build a JSON object of exit codes for each command that ran
+        RESULTS="{"
+        FIRST=true
+
+        for CMD in check audit lint budget policy verify test; do
+          # Read exit code from the corresponding step output
+          case "$CMD" in
+            check)  CODE="${{ steps.check.outputs.exit_code }}"  ;;
+            audit)  CODE="${{ steps.audit.outputs.exit_code }}"  ;;
+            lint)   CODE="${{ steps.lint.outputs.exit_code }}"   ;;
+            budget) CODE="${{ steps.budget.outputs.exit_code }}" ;;
+            policy) CODE="${{ steps.policy.outputs.exit_code }}" ;;
+            verify) CODE="${{ steps.verify.outputs.exit_code }}" ;;
+            test)   CODE="${{ steps.test.outputs.exit_code }}"   ;;
+          esac
+
+          if [ -n "$CODE" ]; then
+            if [ "$FIRST" = true ]; then
+              FIRST=false
+            else
+              RESULTS="${RESULTS},"
+            fi
+            RESULTS="${RESULTS}\"${CMD}\":${CODE}"
+          fi
+        done
+
+        RESULTS="${RESULTS}}"
+        echo "results=${RESULTS}" >> "$GITHUB_OUTPUT"

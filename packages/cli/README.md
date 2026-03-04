@@ -1,19 +1,19 @@
-# skill-versions
+# skillsafe
 
-Freshness checker for [Agent Skills](https://agentskills.io) — like `npm outdated` for skill knowledge.
+Quality & integrity layer for [Agent Skills](https://agentskills.io) — like `npm outdated` for skill knowledge.
 
-Skills that reference versioned products (via `product-version` in frontmatter) can drift as upstream packages ship new releases. `skill-versions` detects this drift and reports which skills need updating.
+Skills that reference versioned products (via `product-version` in frontmatter) can drift as upstream packages ship new releases. `skillsafe` detects this drift and reports which skills need updating.
 
 ## Install
 
 ```bash
-npm install -g skill-versions
+npm install -g skillsafe
 ```
 
 Or run directly:
 
 ```bash
-npx skill-versions check
+npx skillsafe check
 ```
 
 ## Quick Start
@@ -24,22 +24,22 @@ Scan your skills directory and map products to npm packages:
 
 ```bash
 # Interactive — prompts for each mapping
-skill-versions init ./skills
+skillsafe init ./skills
 
 # Non-interactive — auto-detects common packages
-skill-versions init ./skills --yes
+skillsafe init ./skills --yes
 ```
 
-This creates a `skill-versions.json` registry file.
+This creates a `skillsafe.json` registry file.
 
 ### 2. Check for staleness
 
 ```bash
-skill-versions check
+skillsafe check
 ```
 
 ```
-skill-versions
+skillsafe
 ==================================================
 
 STALE (2):
@@ -51,17 +51,17 @@ STALE (2):
 
 CURRENT (15): upstash-redis, next, turbo, ...
 
-Run "skill-versions report --format markdown" for a full report.
+Run "skillsafe report --format markdown" for a full report.
 ```
 
 ### 3. Generate a report
 
 ```bash
 # Markdown (for PRs, issues, dashboards)
-skill-versions report --format markdown > STALENESS.md
+skillsafe report --format markdown > STALENESS.md
 
 # JSON (for automation)
-skill-versions report --format json
+skillsafe report --format json
 ```
 
 ### 4. AI-assisted refresh
@@ -70,13 +70,13 @@ Use an LLM to propose targeted updates to stale skill files:
 
 ```bash
 # Interactive — review each change
-skill-versions refresh ./skills
+skillsafe refresh ./skills
 
 # Auto-apply all changes
-skill-versions refresh -y
+skillsafe refresh -y
 
 # Preview only (no writes)
-skill-versions refresh --dry-run
+skillsafe refresh --dry-run
 ```
 
 Requires a provider SDK and API key:
@@ -97,28 +97,28 @@ export GOOGLE_GENERATIVE_AI_API_KEY=...
 
 ## CLI Reference
 
-### `skill-versions init [dir]`
+### `skillsafe init [dir]`
 
-Scan a skills directory and generate a `skill-versions.json` registry.
+Scan a skills directory and generate a `skillsafe.json` registry.
 
 | Flag | Description |
 |------|-------------|
 | `-y, --yes` | Non-interactive mode, auto-detect package mappings |
 | `-o, --output <path>` | Output path for registry file |
 
-### `skill-versions check`
+### `skillsafe check`
 
 Check skill versions against the npm registry.
 
 | Flag | Description |
 |------|-------------|
-| `-r, --registry <path>` | Path to registry file (default: `./skill-versions.json`) |
+| `-r, --registry <path>` | Path to registry file (default: `./skillsafe.json`) |
 | `-p, --product <name>` | Check a single product |
 | `--json` | Machine-readable JSON output |
 | `-v, --verbose` | Show all products including current |
 | `--ci` | Exit code 1 if any stale products found |
 
-### `skill-versions report`
+### `skillsafe report`
 
 Generate a full staleness report.
 
@@ -127,7 +127,7 @@ Generate a full staleness report.
 | `-r, --registry <path>` | Path to registry file |
 | `-f, --format <type>` | Output format: `json` or `markdown` (default: `markdown`) |
 
-### `skill-versions refresh [skills-dir]`
+### `skillsafe refresh [skills-dir]`
 
 Use an LLM to propose targeted updates to stale skill files.
 
@@ -150,11 +150,11 @@ Use an LLM to propose targeted updates to stale skill files.
 
 ## Registry Format
 
-The `skill-versions.json` file maps products to npm packages:
+The `skillsafe.json` file maps products to npm packages:
 
 ```json
 {
-  "$schema": "https://skill-versions.com/schema.json",
+  "$schema": "https://skillsafe.sh/schema.json",
   "version": 1,
   "products": {
     "ai-sdk": {
@@ -175,10 +175,10 @@ The `skill-versions.json` file maps products to npm packages:
 ```yaml
 # GitHub Actions — fail if any skills are stale
 - name: Check skill freshness
-  run: npx skill-versions check --ci
+  run: npx skillsafe check --ci
 ```
 
-A reusable [GitHub Action](https://github.com/voodootikigod/skill-versions) is also available with automated issue creation and weekly cron support.
+A reusable [GitHub Action](https://github.com/voodootikigod/skillsafe) is also available with automated issue creation and weekly cron support.
 
 ## Skill Frontmatter
 
