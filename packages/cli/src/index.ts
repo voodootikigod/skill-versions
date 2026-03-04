@@ -6,6 +6,7 @@ import { checkCommand } from "./commands/check.js";
 import { initCommand } from "./commands/init.js";
 import { refreshCommand } from "./commands/refresh.js";
 import { reportCommand } from "./commands/report.js";
+import { verifyCommand } from "./commands/verify.js";
 
 const require = createRequire(import.meta.url);
 const { version } = require("../package.json") as { version: string };
@@ -131,6 +132,31 @@ program
 	.action(async (options) => {
 		try {
 			const code = await reportCommand(options);
+			process.exit(code);
+		} catch (error) {
+			console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
+			process.exit(2);
+		}
+	});
+
+program
+	.command("verify")
+	.description("Verify that skill version bumps match content changes")
+	.option("-s, --skill <path>", "verify a single skill file or directory")
+	.option("-a, --all", "verify all discovered skills")
+	.option("--before <path>", "path to previous version of skill")
+	.option("--after <path>", "path to current version of skill")
+	.option("--suggest", "suggest appropriate version bump")
+	.option("-f, --format <type>", "output format: terminal or json", "terminal")
+	.option("-o, --output <path>", "write report to file")
+	.option("--provider <name>", "LLM provider: anthropic, openai, google")
+	.option("--model <id>", "specific model ID")
+	.option("--skip-llm", "disable LLM-assisted analysis")
+	.option("--verbose", "show progress and details")
+	.option("--quiet", "suppress output, exit code only")
+	.action(async (options) => {
+		try {
+			const code = await verifyCommand(options);
 			process.exit(code);
 		} catch (error) {
 			console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
