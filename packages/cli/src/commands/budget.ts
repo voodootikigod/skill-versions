@@ -9,14 +9,14 @@ import { formatComparisonTerminal, formatTerminal } from "../budget/reporters/te
 import type { BudgetOptions } from "../budget/types.js";
 
 interface BudgetCommandOptions {
-	skill?: string;
+	compare?: string;
 	detailed?: boolean;
 	format?: "terminal" | "json" | "markdown";
-	output?: string;
 	maxTokens?: string;
-	save?: string;
-	compare?: string;
 	model?: string;
+	output?: string;
+	save?: string;
+	skill?: string;
 }
 
 export async function budgetCommand(dir: string, options: BudgetCommandOptions): Promise<number> {
@@ -25,7 +25,7 @@ export async function budgetCommand(dir: string, options: BudgetCommandOptions):
 		const available = getAvailableModels();
 		if (!available.includes(options.model)) {
 			console.error(
-				chalk.red(`Unknown model: "${options.model}". Available: ${available.join(", ")}`),
+				chalk.red(`Unknown model: "${options.model}". Available: ${available.join(", ")}`)
 			);
 			return 2;
 		}
@@ -38,7 +38,7 @@ export async function budgetCommand(dir: string, options: BudgetCommandOptions):
 		(Number.isNaN(maxTokens) || (maxTokens !== undefined && maxTokens <= 0))
 	) {
 		console.error(
-			chalk.red(`Invalid --max-tokens value: "${options.maxTokens}". Must be a positive integer.`),
+			chalk.red(`Invalid --max-tokens value: "${options.maxTokens}". Must be a positive integer.`)
 		);
 		return 2;
 	}
@@ -93,8 +93,8 @@ export async function budgetCommand(dir: string, options: BudgetCommandOptions):
 	if (maxTokens !== undefined && report.totalTokens > maxTokens) {
 		console.error(
 			chalk.red(
-				`Budget exceeded: ${report.totalTokens.toLocaleString()} tokens > ${maxTokens.toLocaleString()} max`,
-			),
+				`Budget exceeded: ${report.totalTokens.toLocaleString()} tokens > ${maxTokens.toLocaleString()} max`
+			)
 		);
 		return 1;
 	}

@@ -20,9 +20,11 @@ function meetsThreshold(severity: AuditSeverity, threshold: AuditSeverity): bool
  */
 export async function checkAuditClean(
 	paths: string[],
-	policy: SkillPolicy,
+	policy: SkillPolicy
 ): Promise<PolicyFinding[]> {
-	if (!policy.audit?.require_clean) return [];
+	if (!policy.audit?.require_clean) {
+		return [];
+	}
 
 	const threshold = policy.audit.min_severity_to_block ?? "high";
 

@@ -1,5 +1,5 @@
 import { mkdirSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { resolve } from "node:path";
 import { createGenerator } from "ts-json-schema-generator";
 
 const config = {
@@ -15,6 +15,6 @@ const outDir = resolve(import.meta.dirname, "../dist");
 const outPath = resolve(outDir, "schema.json");
 
 mkdirSync(outDir, { recursive: true });
-writeFileSync(outPath, JSON.stringify(schema, null, 2) + "\n");
+writeFileSync(outPath, `${JSON.stringify(schema, null, 2)}\n`);
 
 console.log(`Generated ${outPath}`);

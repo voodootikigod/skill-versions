@@ -30,7 +30,9 @@ export async function loadIgnoreRules(ignorePath?: string): Promise<IgnoreRule[]
 
 	for (const rawLine of content.split("\n")) {
 		const line = rawLine.trim();
-		if (!line || line.startsWith("#")) continue;
+		if (!line || line.startsWith("#")) {
+			continue;
+		}
 
 		const colonIndex = line.indexOf(":");
 		if (colonIndex > 0) {
@@ -51,13 +53,15 @@ export async function loadIgnoreRules(ignorePath?: string): Promise<IgnoreRule[]
 export function shouldIgnore(
 	finding: AuditFinding,
 	rules: IgnoreRule[],
-	rawContent: string,
+	rawContent: string
 ): boolean {
 	// Check .skillsafeignore rules
 	for (const rule of rules) {
 		const categoryMatch = !rule.category || rule.category === finding.category;
 		const fileMatch = !rule.file || finding.file.includes(rule.file);
-		if (categoryMatch && fileMatch) return true;
+		if (categoryMatch && fileMatch) {
+			return true;
+		}
 	}
 
 	// Check inline <!-- audit-ignore --> comments on the previous line
@@ -68,9 +72,13 @@ export function shouldIgnore(
 		const match = prevLine?.match(INLINE_IGNORE_RE);
 		if (match) {
 			// If no category specified, ignore all findings on this line
-			if (!match[1]) return true;
+			if (!match[1]) {
+				return true;
+			}
 			// If category specified, only ignore matching category
-			if (match[1] === finding.category) return true;
+			if (match[1] === finding.category) {
+				return true;
+			}
 		}
 	}
 

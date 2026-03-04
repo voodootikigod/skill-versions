@@ -1,6 +1,8 @@
 import chalk from "chalk";
 import { diffLines } from "diff";
 
+const TRAILING_NEWLINE_RE = /\n$/;
+
 /**
  * Generate a colored diff between two strings.
  * Returns the formatted diff string for terminal output.
@@ -16,7 +18,7 @@ export function formatDiff(oldContent: string, newContent: string, filePath?: st
 	}
 
 	for (const change of changes) {
-		const text = change.value.replace(/\n$/, "");
+		const text = change.value.replace(TRAILING_NEWLINE_RE, "");
 		const textLines = text.split("\n");
 
 		for (const line of textLines) {
@@ -38,7 +40,7 @@ export function formatDiff(oldContent: string, newContent: string, filePath?: st
  */
 export function diffStats(
 	oldContent: string,
-	newContent: string,
+	newContent: string
 ): { additions: number; removals: number } {
 	const changes = diffLines(oldContent, newContent);
 	let additions = 0;
@@ -46,8 +48,12 @@ export function diffStats(
 
 	for (const change of changes) {
 		const count = change.value.split("\n").length - 1;
-		if (change.added) additions += count;
-		if (change.removed) removals += count;
+		if (change.added) {
+			additions += count;
+		}
+		if (change.removed) {
+			removals += count;
+		}
 	}
 
 	return { additions, removals };

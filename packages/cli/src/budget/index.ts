@@ -22,7 +22,7 @@ const DEFAULT_CONTEXT_WINDOW = 128_000;
  */
 export async function runBudget(
 	paths: string[],
-	options: BudgetOptions = {},
+	options: BudgetOptions = {}
 ): Promise<BudgetReport> {
 	// 1. Discover all skill files
 	const allFiles: string[] = [];

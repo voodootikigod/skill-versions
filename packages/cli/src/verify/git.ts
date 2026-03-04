@@ -41,7 +41,7 @@ export async function getPreviousVersion(filePath: string): Promise<string | nul
 		const { stdout: commitHash } = await execFileAsync(
 			"git",
 			["log", "--follow", "-1", "--skip=1", "--format=%H", "--", relativePath],
-			{ cwd: repoRoot },
+			{ cwd: repoRoot }
 		);
 
 		const hash = commitHash.trim();

@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 // Mock child_process.execFile
 vi.mock("node:child_process", () => ({
-	execFile: vi.fn((cmd, args, opts, cb) => {
+	execFile: vi.fn((_cmd, _args, opts, cb) => {
 		// Simulate successful execution
 		if (typeof opts === "function") {
 			opts(null, "output text", "");
@@ -46,9 +46,9 @@ describe("ClaudeCodeHarness", () => {
 			["--print", "--dangerously-skip-permissions", "Create a file"],
 			expect.objectContaining({
 				cwd: "/tmp/test",
-				timeout: 30000,
+				timeout: 30_000,
 			}),
-			expect.any(Function),
+			expect.any(Function)
 		);
 	});
 

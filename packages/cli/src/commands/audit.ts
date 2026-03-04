@@ -8,16 +8,16 @@ import { formatTerminal } from "../audit/reporters/terminal.js";
 import type { AuditOptions, AuditSeverity } from "../audit/types.js";
 
 interface AuditCommandOptions {
-	format?: "terminal" | "json" | "markdown" | "sarif";
-	output?: string;
 	failOn?: string;
-	packagesOnly?: boolean;
-	skipUrls?: boolean;
+	format?: "terminal" | "json" | "markdown" | "sarif";
 	ignore?: string;
-	verbose?: boolean;
-	quiet?: boolean;
-	uniqueOnly?: boolean;
 	includeRegistryAudits?: boolean;
+	output?: string;
+	packagesOnly?: boolean;
+	quiet?: boolean;
+	skipUrls?: boolean;
+	uniqueOnly?: boolean;
+	verbose?: boolean;
 }
 
 const SEVERITY_ORDER: Record<AuditSeverity, number> = {
@@ -33,6 +33,7 @@ function meetsThreshold(severity: AuditSeverity, threshold: AuditSeverity): bool
 	return SEVERITY_ORDER[severity] <= SEVERITY_ORDER[threshold];
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export async function auditCommand(dir: string, options: AuditCommandOptions): Promise<number> {
 	if (options.verbose && options.quiet) {
 		console.error(chalk.red("Cannot use --verbose and --quiet together"));
@@ -42,7 +43,7 @@ export async function auditCommand(dir: string, options: AuditCommandOptions): P
 	const failOn = (options.failOn ?? "high") as AuditSeverity;
 	if (!VALID_SEVERITIES.has(failOn)) {
 		console.error(
-			chalk.red(`Invalid --fail-on value: "${options.failOn}". Use: critical, high, medium, low`),
+			chalk.red(`Invalid --fail-on value: "${options.failOn}". Use: critical, high, medium, low`)
 		);
 		return 2;
 	}
@@ -50,13 +51,21 @@ export async function auditCommand(dir: string, options: AuditCommandOptions): P
 	if (options.verbose) {
 		console.error(chalk.dim(`Auditing: ${dir}`));
 		console.error(chalk.dim(`Threshold: ${failOn}`));
-		if (options.packagesOnly) console.error(chalk.dim("Mode: packages-only"));
-		if (options.uniqueOnly)
+		if (options.packagesOnly) {
+			console.error(chalk.dim("Mode: packages-only"));
+		}
+		if (options.uniqueOnly) {
 			console.error(chalk.dim("Mode: unique-only (skipping injection/command checkers)"));
-		if (options.includeRegistryAudits)
+		}
+		if (options.includeRegistryAudits) {
 			console.error(chalk.dim("Including skills.sh registry audits"));
-		if (options.skipUrls) console.error(chalk.dim("Skipping URL liveness checks"));
-		if (options.ignore) console.error(chalk.dim(`Ignore file: ${options.ignore}`));
+		}
+		if (options.skipUrls) {
+			console.error(chalk.dim("Skipping URL liveness checks"));
+		}
+		if (options.ignore) {
+			console.error(chalk.dim(`Ignore file: ${options.ignore}`));
+		}
 	}
 
 	const auditOptions: AuditOptions = {
@@ -74,7 +83,7 @@ export async function auditCommand(dir: string, options: AuditCommandOptions): P
 
 	if (options.verbose) {
 		console.error(
-			chalk.dim(`Scanned ${report.files} file(s), found ${report.summary.total} finding(s)`),
+			chalk.dim(`Scanned ${report.files} file(s), found ${report.summary.total} finding(s)`)
 		);
 	}
 

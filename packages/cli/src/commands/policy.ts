@@ -8,12 +8,12 @@ import { formatPolicyTerminal } from "../policy/reporters/terminal.js";
 import type { PolicyOptions, PolicySeverity, SkillPolicy } from "../policy/types.js";
 
 interface PolicyCheckCommandOptions {
-	policy?: string;
-	skill?: string;
 	ci?: boolean;
+	failOn?: string;
 	format?: "terminal" | "json";
 	output?: string;
-	failOn?: string;
+	policy?: string;
+	skill?: string;
 }
 
 const SEVERITY_ORDER: Record<PolicySeverity, number> = {
@@ -33,12 +33,12 @@ function meetsThreshold(severity: PolicySeverity, threshold: PolicySeverity): bo
  */
 export async function policyCheckCommand(
 	dir: string,
-	options: PolicyCheckCommandOptions,
+	options: PolicyCheckCommandOptions
 ): Promise<number> {
 	const failOn = (options.failOn ?? "blocked") as PolicySeverity;
 	if (!VALID_SEVERITIES.has(failOn)) {
 		console.error(
-			chalk.red(`Invalid --fail-on value: "${options.failOn}". Use: blocked, violation, warning`),
+			chalk.red(`Invalid --fail-on value: "${options.failOn}". Use: blocked, violation, warning`)
 		);
 		return 2;
 	}
@@ -51,7 +51,7 @@ export async function policyCheckCommand(
 		const discovered = await discoverPolicyFile(dir);
 		if (!discovered) {
 			console.error(
-				chalk.red("No .skill-policy.yml found. Run `skillsafe policy init` to create one."),
+				chalk.red("No .skill-policy.yml found. Run `skillsafe policy init` to create one.")
 			);
 			return 2;
 		}
@@ -63,7 +63,7 @@ export async function policyCheckCommand(
 		policy = await loadPolicyFile(policyPath);
 	} catch (err) {
 		console.error(
-			chalk.red(`Failed to load policy: ${err instanceof Error ? err.message : String(err)}`),
+			chalk.red(`Failed to load policy: ${err instanceof Error ? err.message : String(err)}`)
 		);
 		return 2;
 	}
@@ -143,7 +143,7 @@ export async function policyValidateCommand(options: { policy?: string }): Promi
 		policy = await loadPolicyFile(policyPath);
 	} catch (err) {
 		console.error(
-			chalk.red(`Failed to parse policy: ${err instanceof Error ? err.message : String(err)}`),
+			chalk.red(`Failed to parse policy: ${err instanceof Error ? err.message : String(err)}`)
 		);
 		return 1;
 	}

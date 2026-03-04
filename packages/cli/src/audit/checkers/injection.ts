@@ -1,8 +1,8 @@
 import type { AuditChecker, AuditFinding, CheckContext } from "../types.js";
 
 interface Pattern {
-	regex: RegExp;
 	message: string;
+	regex: RegExp;
 }
 
 const INJECTION_NOTE =
@@ -71,6 +71,7 @@ const ALL_PATTERNS = [...OVERRIDE_PATTERNS, ...EXFILTRATION_PATTERNS, ...OBFUSCA
 
 export const injectionChecker: AuditChecker = {
 	name: "prompt-injection",
+	// biome-ignore lint/suspicious/useAwait: interface contract requires async
 	async check(context: CheckContext): Promise<AuditFinding[]> {
 		const findings: AuditFinding[] = [];
 		const lines = context.file.raw.split("\n");

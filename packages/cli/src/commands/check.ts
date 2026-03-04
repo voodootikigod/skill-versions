@@ -5,22 +5,33 @@ import { getSeverity, normalizeVersion } from "../severity.js";
 import type { CheckResult } from "../types.js";
 
 interface CheckOptions {
-	registry?: string;
-	product?: string;
-	json?: boolean;
-	verbose?: boolean;
 	ci?: boolean;
+	json?: boolean;
+	product?: string;
+	registry?: string;
+	verbose?: boolean;
+}
+
+function getSeverityColor(severity: string) {
+	if (severity === "major") {
+		return chalk.red;
+	}
+	if (severity === "minor") {
+		return chalk.yellow;
+	}
+	return chalk.blue;
 }
 
 /**
  * Check all products in the registry against npm.
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export async function checkCommand(options: CheckOptions): Promise<number> {
 	const registry = await loadRegistry(options.registry);
 
 	// Filter to single product if requested
 	const productEntries = Object.entries(registry.products).filter(
-		([key]) => !options.product || key === options.product,
+		([key]) => !options.product || key === options.product
 	);
 
 	if (options.product && productEntries.length === 0) {
@@ -51,11 +62,11 @@ export async function checkCommand(options: CheckOptions): Promise<number> {
 		const verifiedNorm = normalizeVersion(product.verifiedVersion);
 		const latestNorm = normalizeVersion(latest);
 
-		if (!verifiedNorm || !latestNorm) {
+		if (!(verifiedNorm && latestNorm)) {
 			console.error(
 				chalk.yellow(
-					`  Warning: Invalid semver for "${key}": verified=${product.verifiedVersion}, latest=${latest}`,
-				),
+					`  Warning: Invalid semver for "${key}": verified=${product.verifiedVersion}, latest=${latest}`
+				)
 			);
 			continue;
 		}
@@ -63,8 +74,8 @@ export async function checkCommand(options: CheckOptions): Promise<number> {
 		if (verifiedNorm.coerced) {
 			console.error(
 				chalk.yellow(
-					`  Warning: "${key}" verified version "${product.verifiedVersion}" was coerced to "${verifiedNorm.version}"`,
-				),
+					`  Warning: "${key}" verified version "${product.verifiedVersion}" was coerced to "${verifiedNorm.version}"`
+				)
 			);
 		}
 
@@ -103,15 +114,10 @@ export async function checkCommand(options: CheckOptions): Promise<number> {
 		console.log(chalk.red.bold(`STALE (${stale.length}):`));
 
 		for (const result of stale) {
-			const severityColor =
-				result.severity === "major"
-					? chalk.red
-					: result.severity === "minor"
-						? chalk.yellow
-						: chalk.blue;
+			const severityColor = getSeverityColor(result.severity);
 
 			console.log(
-				`  ${chalk.bold(result.displayName.padEnd(24))} ${result.verifiedVersion} ${chalk.dim("→")} ${severityColor(result.latestVersion)} ${chalk.dim(`(${result.severity})`)}`,
+				`  ${chalk.bold(result.displayName.padEnd(24))} ${result.verifiedVersion} ${chalk.dim("→")} ${severityColor(result.latestVersion)} ${chalk.dim(`(${result.severity})`)}`
 			);
 			console.log(`    ${chalk.dim("skills:")} ${result.skills.join(", ")}`);
 
@@ -129,7 +135,7 @@ export async function checkCommand(options: CheckOptions): Promise<number> {
 		console.log();
 		console.log(
 			chalk.green(`CURRENT (${current.length}): `) +
-				chalk.dim(current.map((r) => r.product).join(", ")),
+				chalk.dim(current.map((r) => r.product).join(", "))
 		);
 	}
 
@@ -140,6 +146,8 @@ export async function checkCommand(options: CheckOptions): Promise<number> {
 
 	console.log();
 
-	if (options.ci && stale.length > 0) return 1;
+	if (options.ci && stale.length > 0) {
+		return 1;
+	}
 	return 0;
 }

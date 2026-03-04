@@ -12,50 +12,50 @@ export type AuditCategory =
 	| "registry-audit";
 
 export interface AuditFinding {
+	category: AuditCategory;
+	evidence: string;
 	file: string;
 	line: number;
-	severity: AuditSeverity;
-	category: AuditCategory;
 	message: string;
-	evidence: string;
 	note?: string;
+	severity: AuditSeverity;
 }
 
 export interface AuditSummary {
 	critical: number;
 	high: number;
-	medium: number;
 	low: number;
+	medium: number;
 	total: number;
 }
 
 export interface RegistryAuditEntry {
-	auditor: "snyk" | "socket" | "gen";
-	status: string;
-	riskLevel?: string;
 	alertCount?: number;
+	auditor: "snyk" | "socket" | "gen";
 	details?: string;
+	riskLevel?: string;
+	status: string;
 }
 
 export interface RegistryAuditResult {
-	skillName: string;
-	file: string;
 	entries: RegistryAuditEntry[];
+	file: string;
 	raw?: unknown;
+	skillName: string;
 }
 
 export interface AuditReport {
 	files: number;
 	findings: AuditFinding[];
-	summary: AuditSummary;
 	generatedAt: string;
 	registryAudits?: RegistryAuditResult[];
+	summary: AuditSummary;
 }
 
 export interface ExtractedPackage {
-	name: string;
 	ecosystem: "npm" | "pypi" | "crates";
 	line: number;
+	name: string;
 	source: string;
 }
 
@@ -65,30 +65,30 @@ export interface ExtractedCommand {
 }
 
 export interface ExtractedUrl {
-	url: string;
 	line: number;
 	text?: string;
+	url: string;
 }
 
 export interface CheckContext {
+	commands: ExtractedCommand[];
 	file: SkillFile;
 	packages: ExtractedPackage[];
-	commands: ExtractedCommand[];
 	urls: ExtractedUrl[];
 }
 
 export interface AuditChecker {
-	name: string;
 	check(context: CheckContext): Promise<AuditFinding[]>;
+	name: string;
 }
 
 export interface AuditOptions {
-	format?: "terminal" | "json" | "markdown" | "sarif";
-	output?: string;
 	failOn?: AuditSeverity;
+	format?: "terminal" | "json" | "markdown" | "sarif";
+	ignorePath?: string;
+	includeRegistryAudits?: boolean;
+	output?: string;
 	packagesOnly?: boolean;
 	skipUrls?: boolean;
-	ignorePath?: string;
 	uniqueOnly?: boolean;
-	includeRegistryAudits?: boolean;
 }

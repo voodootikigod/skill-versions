@@ -34,7 +34,7 @@ export function buildUserPrompt(params: {
 }): string {
 	const changelogSection = params.changelog
 		? `## Changelog (${params.fromVersion} → ${params.toVersion})\n\n${params.changelog}`
-		: `## Changelog\n\nNo changelog available. Apply the version bump and only make changes you are confident about.`;
+		: "## Changelog\n\nNo changelog available. Apply the version bump and only make changes you are confident about.";
 
 	return `## Product
 ${params.displayName}

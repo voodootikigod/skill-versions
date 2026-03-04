@@ -6,20 +6,21 @@ import { formatVerifyTerminal } from "../verify/reporters/terminal.js";
 import type { VerifyOptions } from "../verify/types.js";
 
 interface VerifyCommandOptions {
-	skill?: string;
+	after?: string;
 	all?: boolean;
 	before?: string;
-	after?: string;
-	suggest?: boolean;
 	format?: "terminal" | "json";
+	model?: string;
 	output?: string;
 	provider?: string;
-	model?: string;
-	skipLlm?: boolean;
-	verbose?: boolean;
 	quiet?: boolean;
+	skill?: string;
+	skipLlm?: boolean;
+	suggest?: boolean;
+	verbose?: boolean;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export async function verifyCommand(options: VerifyCommandOptions): Promise<number> {
 	if (options.verbose && options.quiet) {
 		console.error(chalk.red("Cannot use --verbose and --quiet together"));
@@ -36,7 +37,7 @@ export async function verifyCommand(options: VerifyCommandOptions): Promise<numb
 		return 2;
 	}
 
-	if (!options.before && !options.after && !options.skill && !options.all) {
+	if (!(options.before || options.after || options.skill || options.all)) {
 		console.error(chalk.red("Specify --skill <path>, --all, or --before/--after for comparison"));
 		return 2;
 	}
@@ -49,7 +50,9 @@ export async function verifyCommand(options: VerifyCommandOptions): Promise<numb
 		} else {
 			console.error(chalk.dim("Verifying all skills..."));
 		}
-		if (options.skipLlm) console.error(chalk.dim("LLM analysis disabled"));
+		if (options.skipLlm) {
+			console.error(chalk.dim("LLM analysis disabled"));
+		}
 	}
 
 	const verifyOptions: VerifyOptions = {
@@ -70,8 +73,8 @@ export async function verifyCommand(options: VerifyCommandOptions): Promise<numb
 	if (options.verbose) {
 		console.error(
 			chalk.dim(
-				`Verified ${report.results.length} skill(s): ${report.summary.passed} passed, ${report.summary.failed} failed, ${report.summary.skipped} skipped`,
-			),
+				`Verified ${report.results.length} skill(s): ${report.summary.passed} passed, ${report.summary.failed} failed, ${report.summary.skipped} skipped`
+			)
 		);
 	}
 

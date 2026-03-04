@@ -32,7 +32,9 @@ describe("fetchRegistryAudit", () => {
 		vi.resetAllMocks();
 		mockedGetJsonCached.mockResolvedValue(undefined);
 		mockedSetJsonCached.mockResolvedValue(undefined);
-		vi.spyOn(console, "warn").mockImplementation(() => {});
+		vi.spyOn(console, "warn").mockImplementation(() => {
+			/* intentionally empty */
+		});
 	});
 
 	afterEach(() => {
@@ -71,7 +73,7 @@ describe("fetchRegistryAudit", () => {
 				ok: true,
 				status: 200,
 				json: () => Promise.resolve(apiResponse),
-			}),
+			})
 		);
 
 		const ctx = makeContext();
@@ -112,7 +114,7 @@ describe("fetchRegistryAudit", () => {
 			vi.fn().mockResolvedValue({
 				ok: false,
 				status: 404,
-			}),
+			})
 		);
 
 		const ctx = makeContext();
@@ -131,7 +133,7 @@ describe("fetchRegistryAudit", () => {
 				ok: true,
 				status: 200,
 				json: () => Promise.resolve({ unexpected: "data" }),
-			}),
+			})
 		);
 
 		const ctx = makeContext();
@@ -182,7 +184,7 @@ describe("fetchRegistryAudit", () => {
 				ok: true,
 				status: 200,
 				json: () => Promise.resolve(apiResponse),
-			}),
+			})
 		);
 
 		const ctx = makeContext();
@@ -203,7 +205,7 @@ describe("fetchRegistryAudit", () => {
 				ok: true,
 				status: 200,
 				json: () => Promise.resolve({ audits: [] }),
-			}),
+			})
 		);
 
 		const ctx = makeContext({ repository: "my-repo/skill" });

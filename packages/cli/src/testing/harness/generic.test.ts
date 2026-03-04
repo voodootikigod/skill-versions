@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 // Mock child_process.exec
 vi.mock("node:child_process", () => ({
-	exec: vi.fn((cmd, opts, cb) => {
+	exec: vi.fn((_cmd, opts, cb) => {
 		if (typeof opts === "function") {
 			opts(null, "generic output", "");
 		} else if (typeof cb === "function") {

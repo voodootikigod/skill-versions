@@ -28,7 +28,9 @@ export function packageDiff(before: string, after: string): PackageDiff {
 
 	for (const rem of removedSet) {
 		for (let i = 0; i < addedSet.length; i++) {
-			if (usedAdded.has(i)) continue;
+			if (usedAdded.has(i)) {
+				continue;
+			}
 			const add = addedSet[i];
 			if (add.ecosystem === rem.ecosystem) {
 				renamed.push({ before: rem.name, after: add.name, ecosystem: rem.ecosystem });

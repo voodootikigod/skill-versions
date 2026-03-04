@@ -1,25 +1,25 @@
 .section {
-	border-top: 1px solid var(--border);
 	padding: 64px 0;
+	border-top: 1px solid var(--border);
 }
 
 .container {
 	max-width: 1024px;
-	margin: 0 auto;
 	padding: 0 24px;
+	margin: 0 auto;
 }
 
 .heading {
+	margin-bottom: 16px;
 	font-size: 24px;
 	font-weight: 600;
-	margin-bottom: 16px;
 }
 
 .lead {
+	margin-bottom: 40px;
 	font-size: 18px;
 	line-height: 1.7;
 	color: var(--text-secondary);
-	margin-bottom: 40px;
 }
 
 .points {
@@ -36,42 +36,42 @@
 }
 
 .icon {
-	flex-shrink: 0;
-	width: 32px;
-	height: 32px;
 	display: flex;
+	flex-shrink: 0;
 	align-items: center;
 	justify-content: center;
+	width: 32px;
+	height: 32px;
 	font-size: 18px;
-	border-radius: 50%;
 	border: 1px solid var(--border);
+	border-radius: 50%;
 }
 
 .pointTitle {
+	margin-bottom: 4px;
 	font-size: 16px;
 	font-weight: 600;
-	margin-bottom: 4px;
 }
 
 .pointDescription {
 	font-size: 14px;
-	color: var(--text-secondary);
 	line-height: 1.6;
+	color: var(--text-secondary);
 }
 
 .pointDescription code {
+	padding: 2px 6px;
 	font-family: var(--font-mono);
 	font-size: 13px;
 	background: var(--code-bg);
 	border: 1px solid var(--code-border);
-	padding: 2px 6px;
 	border-radius: 4px;
 }
 
 .blogLink {
 	display: inline-flex;
-	align-items: center;
 	gap: 8px;
+	align-items: center;
 	font-size: 15px;
 	color: var(--success);
 	transition: color 0.15s ease;

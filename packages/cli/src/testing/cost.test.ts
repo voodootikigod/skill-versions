@@ -94,9 +94,7 @@ describe("estimateTestCost", () => {
 		const defaultEstimate = estimateTestCost([suite], {});
 		const overrideEstimate = estimateTestCost([suite], { trials: 10 });
 
-		expect(overrideEstimate.totalEstimatedCost).toBeGreaterThan(
-			defaultEstimate.totalEstimatedCost,
-		);
+		expect(overrideEstimate.totalEstimatedCost).toBeGreaterThan(defaultEstimate.totalEstimatedCost);
 	});
 
 	it("includes per-suite breakdown", () => {

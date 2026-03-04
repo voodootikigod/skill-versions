@@ -44,14 +44,16 @@ function isValidAuditor(auditor: string): auditor is "snyk" | "socket" | "gen" {
 function parseResponse(
 	data: SkillsShAuditResponse,
 	skillName: string,
-	file: string,
+	file: string
 ): { findings: AuditFinding[]; registryAudit: RegistryAuditResult } {
 	const entries: RegistryAuditEntry[] = [];
 	const findings: AuditFinding[] = [];
 
 	for (const audit of data.audits ?? []) {
 		const auditor = audit.auditor?.toLowerCase() ?? "";
-		if (!isValidAuditor(auditor)) continue;
+		if (!isValidAuditor(auditor)) {
+			continue;
+		}
 
 		const entry: RegistryAuditEntry = {
 			auditor,
@@ -82,7 +84,7 @@ function parseResponse(
 }
 
 export async function fetchRegistryAudit(
-	context: CheckContext,
+	context: CheckContext
 ): Promise<{ findings: AuditFinding[]; registryAudit: RegistryAuditResult | null }> {
 	const skillName =
 		(context.file.frontmatter.name as string) ??

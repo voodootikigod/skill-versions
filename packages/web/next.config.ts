@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+	// biome-ignore lint/suspicious/useAwait: Next.js headers() API requires async signature
 	async headers() {
 		return [
 			{

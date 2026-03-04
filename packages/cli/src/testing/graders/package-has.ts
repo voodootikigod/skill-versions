@@ -5,10 +5,11 @@ import type { GraderResult } from "../types.js";
 /**
  * Check that package.json contains specific dependencies and/or devDependencies.
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export async function gradePackageHas(
 	workDir: string,
 	deps?: string[],
-	devDeps?: string[],
+	devDeps?: string[]
 ): Promise<GraderResult> {
 	const pkgPath = join(workDir, "package.json");
 	let content: string;

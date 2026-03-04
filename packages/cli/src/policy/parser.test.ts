@@ -73,7 +73,7 @@ audit:
 
 	it("throws on missing version", async () => {
 		await expect(parsePolicy("sources:\n  allow: []\n")).rejects.toThrow(
-			'must have a numeric "version"',
+			'must have a numeric "version"'
 		);
 	});
 

@@ -36,7 +36,7 @@ describe("discoverTestableSkills", () => {
 		await writeFile(join(skillDir, "SKILL.md"), "# My Skill");
 		await writeFile(
 			join(testsDir, "cases.yaml"),
-			'suite:\n  name: test\ncases:\n  - id: t1\n    type: outcome\n    prompt: "test"',
+			'suite:\n  name: test\ncases:\n  - id: t1\n    type: outcome\n    prompt: "test"'
 		);
 
 		const results = await discoverTestableSkills(tempDir);
@@ -52,7 +52,7 @@ describe("discoverTestableSkills", () => {
 		await writeFile(join(skillDir, "SKILL.md"), "# My Skill");
 		await writeFile(
 			join(testsDir, "cases.yml"),
-			'suite:\n  name: test\ncases:\n  - id: t1\n    type: outcome\n    prompt: "test"',
+			'suite:\n  name: test\ncases:\n  - id: t1\n    type: outcome\n    prompt: "test"'
 		);
 
 		const results = await discoverTestableSkills(tempDir);
@@ -76,7 +76,10 @@ describe("discoverTestableSkills", () => {
 			const testsDir = join(skillDir, "tests");
 			await mkdir(testsDir, { recursive: true });
 			await writeFile(join(skillDir, "SKILL.md"), `# ${name}`);
-			await writeFile(join(testsDir, "cases.yaml"), `suite:\n  name: ${name}\ncases:\n  - id: t1\n    type: outcome\n    prompt: "test"`);
+			await writeFile(
+				join(testsDir, "cases.yaml"),
+				`suite:\n  name: ${name}\ncases:\n  - id: t1\n    type: outcome\n    prompt: "test"`
+			);
 		}
 
 		const results = await discoverTestableSkills(tempDir, "skill-a");

@@ -56,6 +56,7 @@ async function discoverSkillFiles(dir: string): Promise<string[]> {
 	return files.sort();
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export async function runAudit(paths: string[], options: AuditOptions = {}): Promise<AuditReport> {
 	// Discover all skill files
 	const allFiles: string[] = [];

@@ -5,8 +5,8 @@ import { getSeverity, normalizeVersion } from "../severity.js";
 import type { CheckResult } from "../types.js";
 
 interface ReportOptions {
-	registry?: string;
 	format?: "json" | "markdown";
+	registry?: string;
 }
 
 /**
@@ -26,12 +26,16 @@ export async function reportCommand(options: ReportOptions): Promise<number> {
 	for (const [key, product] of productEntries) {
 		const latest = latestVersions.get(product.package);
 
-		if (latest instanceof Error || !latest) continue;
+		if (latest instanceof Error || !latest) {
+			continue;
+		}
 
 		const verifiedNorm = normalizeVersion(product.verifiedVersion);
 		const latestNorm = normalizeVersion(latest);
 
-		if (!verifiedNorm || !latestNorm) continue;
+		if (!(verifiedNorm && latestNorm)) {
+			continue;
+		}
 
 		const severity = getSeverity(verifiedNorm.version, latestNorm.version);
 
@@ -61,11 +65,11 @@ export async function reportCommand(options: ReportOptions): Promise<number> {
 	const now = new Date().toISOString().split("T")[0];
 
 	const lines: string[] = [];
-	lines.push(`# Skillsafe Report`);
+	lines.push("# Skillsafe Report");
 	lines.push("");
 	lines.push(`Generated: ${now}`);
 	lines.push("");
-	lines.push(`## Summary`);
+	lines.push("## Summary");
 	lines.push("");
 	lines.push(`- **Total products**: ${results.length}`);
 	lines.push(`- **Stale**: ${stale.length}`);
@@ -83,7 +87,7 @@ export async function reportCommand(options: ReportOptions): Promise<number> {
 				? `[${result.displayName}](${result.changelog})`
 				: result.displayName;
 			lines.push(
-				`| ${changelogLink} | ${result.verifiedVersion} | ${result.latestVersion} | ${result.severity} | ${result.skills.join(", ")} |`,
+				`| ${changelogLink} | ${result.verifiedVersion} | ${result.latestVersion} | ${result.severity} | ${result.skills.join(", ")} |`
 			);
 		}
 
@@ -98,7 +102,7 @@ export async function reportCommand(options: ReportOptions): Promise<number> {
 
 		for (const result of current) {
 			lines.push(
-				`| ${result.displayName} | ${result.verifiedVersion} | ${result.skills.join(", ")} |`,
+				`| ${result.displayName} | ${result.verifiedVersion} | ${result.skills.join(", ")} |`
 			);
 		}
 
@@ -111,7 +115,7 @@ export async function reportCommand(options: ReportOptions): Promise<number> {
 	// Also print to stderr if stdout is piped
 	if (!process.stdout.isTTY) {
 		console.error(
-			chalk.green(`Report generated: ${results.length} products, ${stale.length} stale.`),
+			chalk.green(`Report generated: ${results.length} products, ${stale.length} stale.`)
 		);
 	}
 

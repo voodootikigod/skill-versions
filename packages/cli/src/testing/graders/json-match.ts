@@ -10,7 +10,7 @@ import type { GraderResult } from "../types.js";
 export async function gradeJsonMatch(
 	workDir: string,
 	file: string,
-	schema: Record<string, unknown>,
+	schema: Record<string, unknown>
 ): Promise<GraderResult> {
 	const fullPath = join(workDir, file);
 	let content: string;
@@ -63,11 +63,12 @@ export async function gradeJsonMatch(
 	};
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 function validateStructure(
 	actual: Record<string, unknown>,
 	expected: Record<string, unknown>,
 	prefix: string,
-	errors: string[],
+	errors: string[]
 ): void {
 	for (const [key, expectedValue] of Object.entries(expected)) {
 		const path = prefix ? `${prefix}.${key}` : key;
@@ -97,13 +98,15 @@ function validateStructure(
 			!Array.isArray(expectedValue)
 		) {
 			if (typeof actualValue !== "object" || actualValue === null || Array.isArray(actualValue)) {
-				errors.push(`"${path}" expected object, got ${Array.isArray(actualValue) ? "array" : typeof actualValue}`);
+				errors.push(
+					`"${path}" expected object, got ${Array.isArray(actualValue) ? "array" : typeof actualValue}`
+				);
 			} else {
 				validateStructure(
 					actualValue as Record<string, unknown>,
 					expectedValue as Record<string, unknown>,
 					path,
-					errors,
+					errors
 				);
 			}
 		}

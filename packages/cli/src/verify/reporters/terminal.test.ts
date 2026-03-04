@@ -42,7 +42,7 @@ describe("formatVerifyTerminal", () => {
 					},
 				],
 				summary: { passed: 1, failed: 0, skipped: 0 },
-			}),
+			})
 		);
 
 		expect(output).toContain("test-skill");
@@ -76,7 +76,7 @@ describe("formatVerifyTerminal", () => {
 					},
 				],
 				summary: { passed: 0, failed: 1, skipped: 0 },
-			}),
+			})
 		);
 
 		expect(output).toContain("deploy-helper");
@@ -109,7 +109,7 @@ describe("formatVerifyTerminal", () => {
 					},
 				],
 				summary: { passed: 1, failed: 0, skipped: 0 },
-			}),
+			})
 		);
 
 		expect(output).toContain("LLM-assisted");
@@ -133,7 +133,7 @@ describe("formatVerifyTerminal", () => {
 					},
 				],
 				summary: { passed: 2, failed: 1, skipped: 1 },
-			}),
+			})
 		);
 
 		expect(output).toContain("2");

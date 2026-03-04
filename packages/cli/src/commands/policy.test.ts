@@ -45,8 +45,12 @@ describe("policyCheckCommand", () => {
 		mockedDiscoverPolicyFile.mockResolvedValue("/project/.skill-policy.yml");
 		mockedLoadPolicyFile.mockResolvedValue({ version: 1 });
 		mockedRunPolicyCheck.mockResolvedValue(makeReport());
-		vi.spyOn(console, "log").mockImplementation(() => {});
-		vi.spyOn(console, "error").mockImplementation(() => {});
+		vi.spyOn(console, "log").mockImplementation(() => {
+			/* intentionally empty */
+		});
+		vi.spyOn(console, "error").mockImplementation(() => {
+			/* intentionally empty */
+		});
 	});
 
 	afterEach(() => {
@@ -70,7 +74,7 @@ describe("policyCheckCommand", () => {
 					},
 				],
 				summary: { blocked: 1, violations: 0, warnings: 0 },
-			}),
+			})
 		);
 		const code = await policyCheckCommand(".", {});
 		expect(code).toBe(1);
@@ -88,7 +92,7 @@ describe("policyCheckCommand", () => {
 					},
 				],
 				summary: { blocked: 0, violations: 0, warnings: 1 },
-			}),
+			})
 		);
 		// Default threshold is "blocked", warning doesn't trigger exit 1
 		const code = await policyCheckCommand(".", {});
@@ -118,7 +122,7 @@ describe("policyCheckCommand", () => {
 					},
 				],
 				summary: { blocked: 0, violations: 1, warnings: 0 },
-			}),
+			})
 		);
 		const code = await policyCheckCommand(".", { failOn: "violation" });
 		expect(code).toBe(1);
@@ -152,8 +156,12 @@ describe("policyCheckCommand", () => {
 
 describe("policyInitCommand", () => {
 	beforeEach(() => {
-		vi.spyOn(console, "log").mockImplementation(() => {});
-		vi.spyOn(console, "error").mockImplementation(() => {});
+		vi.spyOn(console, "log").mockImplementation(() => {
+			/* intentionally empty */
+		});
+		vi.spyOn(console, "error").mockImplementation(() => {
+			/* intentionally empty */
+		});
 	});
 
 	afterEach(() => {
@@ -178,12 +186,15 @@ describe("policyValidateCommand", () => {
 	beforeEach(async () => {
 		vi.clearAllMocks();
 		// Use the real loadPolicyFile for validate tests
-		const realParser = await vi.importActual<typeof import("../policy/parser.js")>(
-			"../policy/parser.js",
-		);
+		const realParser =
+			await vi.importActual<typeof import("../policy/parser.js")>("../policy/parser.js");
 		mockedLoadPolicyFile.mockImplementation(realParser.loadPolicyFile);
-		vi.spyOn(console, "log").mockImplementation(() => {});
-		vi.spyOn(console, "error").mockImplementation(() => {});
+		vi.spyOn(console, "log").mockImplementation(() => {
+			/* intentionally empty */
+		});
+		vi.spyOn(console, "error").mockImplementation(() => {
+			/* intentionally empty */
+		});
 	});
 
 	afterEach(async () => {

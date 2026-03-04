@@ -4,10 +4,10 @@
 	justify-content: center;
 	width: 32px;
 	height: 32px;
+	cursor: pointer;
 	background: transparent;
 	border: 1px solid var(--border);
 	border-radius: 6px;
-	cursor: pointer;
 	transition: border-color 0.15s ease;
 }
 

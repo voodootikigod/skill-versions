@@ -4,15 +4,15 @@ export type { Registry, RegistryProduct } from "@skillsafe/schema";
  * Result of checking a single product against npm
  */
 export interface CheckResult {
-	product: string;
-	displayName: string;
-	package: string;
-	verifiedVersion: string;
-	latestVersion: string;
-	skills: string[];
 	changelog?: string;
-	stale: boolean;
+	displayName: string;
+	latestVersion: string;
+	package: string;
+	product: string;
 	severity: "major" | "minor" | "patch" | "current";
+	skills: string[];
+	stale: boolean;
+	verifiedVersion: string;
 }
 
 /**
@@ -21,8 +21,8 @@ export interface CheckResult {
 export interface ScannedSkill {
 	name: string;
 	path: string;
-	productVersion?: string;
 	product?: string;
+	productVersion?: string;
 }
 
 /**
@@ -37,14 +37,14 @@ export interface NpmDistTags {
  * Result of refreshing a single skill file via LLM
  */
 export interface RefreshResult {
-	product: string;
-	skillPath: string;
-	updatedContent: string;
-	summary: string;
+	applied: boolean;
+	breakingChanges: boolean;
 	changes: Array<{ section: string; description: string }>;
 	confidence: "high" | "medium" | "low";
-	breakingChanges: boolean;
-	applied: boolean;
+	product: string;
+	skillPath: string;
+	summary: string;
+	updatedContent: string;
 }
 
 /**

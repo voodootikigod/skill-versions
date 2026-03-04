@@ -3,6 +3,8 @@ import type { SkillFile } from "../../skill-io.js";
 import { isValidSpdx } from "../spdx.js";
 import type { LintFinding } from "../types.js";
 
+const NAME_PATTERN_RE = /^[@a-zA-Z0-9][\w./-]*$/;
+
 /**
  * Check the format/validity of frontmatter field values.
  *
@@ -20,16 +22,18 @@ export function checkFormats(file: SkillFile): LintFinding[] {
 	const fm = file.frontmatter;
 
 	// product-version: valid semver
-	if (fm["product-version"] && typeof fm["product-version"] === "string") {
-		if (!semverValid(fm["product-version"])) {
-			findings.push({
-				file: file.path,
-				field: "product-version",
-				level: "error",
-				message: `Invalid semver for 'product-version': "${fm["product-version"]}"`,
-				fixable: false,
-			});
-		}
+	if (
+		fm["product-version"] &&
+		typeof fm["product-version"] === "string" &&
+		!semverValid(fm["product-version"])
+	) {
+		findings.push({
+			file: file.path,
+			field: "product-version",
+			level: "error",
+			message: `Invalid semver for 'product-version': "${fm["product-version"]}"`,
+			fixable: false,
+		});
 	}
 
 	// repository: valid URL
@@ -48,30 +52,25 @@ export function checkFormats(file: SkillFile): LintFinding[] {
 	}
 
 	// license: valid SPDX
-	if (fm.license && typeof fm.license === "string") {
-		if (!isValidSpdx(fm.license)) {
-			findings.push({
-				file: file.path,
-				field: "license",
-				level: "error",
-				message: `Invalid SPDX license identifier: "${fm.license}"`,
-				fixable: false,
-			});
-		}
+	if (fm.license && typeof fm.license === "string" && !isValidSpdx(fm.license)) {
+		findings.push({
+			file: file.path,
+			field: "license",
+			level: "error",
+			message: `Invalid SPDX license identifier: "${fm.license}"`,
+			fixable: false,
+		});
 	}
 
 	// name: no special characters beyond hyphens, dots, slashes, and @
-	if (fm.name && typeof fm.name === "string") {
-		const namePattern = /^[@a-zA-Z0-9][\w./-]*$/;
-		if (!namePattern.test(fm.name)) {
-			findings.push({
-				file: file.path,
-				field: "name",
-				level: "error",
-				message: `Field 'name' contains invalid characters: "${fm.name}" (use only letters, numbers, hyphens, dots)`,
-				fixable: false,
-			});
-		}
+	if (fm.name && typeof fm.name === "string" && !NAME_PATTERN_RE.test(fm.name)) {
+		findings.push({
+			file: file.path,
+			field: "name",
+			level: "error",
+			message: `Field 'name' contains invalid characters: "${fm.name}" (use only letters, numbers, hyphens, dots)`,
+			fixable: false,
+		});
 	}
 
 	return findings;

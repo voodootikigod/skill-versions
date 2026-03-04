@@ -13,7 +13,7 @@ function makeReport(overrides?: Partial<BudgetReport>): BudgetReport {
 			},
 		],
 		totalTokens: 1000,
-		contextWindow: 128000,
+		contextWindow: 128_000,
 		cost: { model: "claude-sonnet", costPer1KLoads: 0.003, tokens: 1000 },
 		redundancy: [],
 		generatedAt: "2026-03-03T00:00:00.000Z",
@@ -32,7 +32,7 @@ describe("formatJson", () => {
 		const parsed = JSON.parse(output);
 		expect(parsed.skills).toBeDefined();
 		expect(parsed.totalTokens).toBe(1000);
-		expect(parsed.contextWindow).toBe(128000);
+		expect(parsed.contextWindow).toBe(128_000);
 		expect(parsed.cost).toBeDefined();
 		expect(parsed.redundancy).toEqual([]);
 		expect(parsed.generatedAt).toBeDefined();

@@ -1,29 +1,29 @@
 .footer {
-	border-top: 1px solid var(--border);
 	padding: 24px 0;
 	margin-top: 64px;
+	border-top: 1px solid var(--border);
 }
 
 .container {
-	max-width: 1024px;
-	margin: 0 auto;
-	padding: 0 24px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	max-width: 1024px;
+	padding: 0 24px;
+	margin: 0 auto;
 	font-size: 13px;
 }
 
 .left {
 	display: flex;
-	align-items: center;
 	gap: 16px;
+	align-items: center;
 }
 
 .brand {
 	font-family: var(--font-mono);
-	color: var(--text-tertiary);
 	font-size: 13px;
+	color: var(--text-tertiary);
 }
 
 .separator {
@@ -36,17 +36,17 @@
 }
 
 .author {
-	max-width: 1024px;
-	margin: 0 auto;
-	padding: 16px 24px 0;
 	display: flex;
+	gap: 6px;
 	align-items: center;
 	justify-content: center;
-	gap: 6px;
+	max-width: 1024px;
+	padding: 16px 24px 0;
+	padding-top: 16px;
+	margin: 0 auto;
+	margin-top: 16px;
 	font-size: 13px;
 	border-top: 1px solid var(--border);
-	margin-top: 16px;
-	padding-top: 16px;
 }
 
 .authorText {
@@ -55,8 +55,8 @@
 
 .authorLink {
 	display: inline-flex;
-	align-items: center;
 	gap: 6px;
+	align-items: center;
 	color: var(--text-secondary);
 }
 

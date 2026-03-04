@@ -39,7 +39,7 @@ describe("loadRegistry", () => {
 
 	it("throws for missing file", async () => {
 		await expect(loadRegistry(join(tempDir, "missing.json"))).rejects.toThrow(
-			"Registry file not found",
+			"Registry file not found"
 		);
 	});
 
@@ -64,7 +64,7 @@ describe("loadRegistry", () => {
 			JSON.stringify({
 				version: 1,
 				products: { bad: { displayName: "Bad" } },
-			}),
+			})
 		);
 
 		await expect(loadRegistry(filePath)).rejects.toThrow("missing required field");
@@ -85,7 +85,7 @@ describe("loadRegistry", () => {
 						skills: "not-an-array",
 					},
 				},
-			}),
+			})
 		);
 
 		await expect(loadRegistry(filePath)).rejects.toThrow("skills must be an array");

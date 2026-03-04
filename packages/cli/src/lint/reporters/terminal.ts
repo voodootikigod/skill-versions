@@ -9,6 +9,8 @@ function levelColor(level: LintFinding["level"]) {
 			return chalk.yellow;
 		case "info":
 			return chalk.blue;
+		default:
+			return chalk.dim;
 	}
 }
 
@@ -20,6 +22,8 @@ function levelIcon(level: LintFinding["level"]): string {
 			return "\u26A0";
 		case "info":
 			return "\u2139";
+		default:
+			return " ";
 	}
 }
 
@@ -63,7 +67,7 @@ export function formatLintTerminal(report: LintReport): string {
 
 		// Sort by level (error first), then by field name
 		findings.sort(
-			(a, b) => levelOrder[a.level] - levelOrder[b.level] || a.field.localeCompare(b.field),
+			(a, b) => levelOrder[a.level] - levelOrder[b.level] || a.field.localeCompare(b.field)
 		);
 
 		for (const f of findings) {
@@ -71,7 +75,7 @@ export function formatLintTerminal(report: LintReport): string {
 			const icon = levelIcon(f.level);
 			const fixTag = f.fixable ? chalk.dim(" [fixable]") : "";
 			lines.push(
-				`  ${color(icon)} ${color(f.level.toUpperCase().padEnd(7))} ${chalk.cyan(f.field.padEnd(16))} ${chalk.dim("|")} ${f.message}${fixTag}`,
+				`  ${color(icon)} ${color(f.level.toUpperCase().padEnd(7))} ${chalk.cyan(f.field.padEnd(16))} ${chalk.dim("|")} ${f.message}${fixTag}`
 			);
 		}
 		lines.push("");
@@ -80,10 +84,18 @@ export function formatLintTerminal(report: LintReport): string {
 	// Summary
 	lines.push(chalk.bold("Summary"));
 	lines.push("=".repeat(50));
-	if (report.errors > 0) lines.push(chalk.red(`  Errors:   ${report.errors}`));
-	if (report.warnings > 0) lines.push(chalk.yellow(`  Warnings: ${report.warnings}`));
-	if (report.infos > 0) lines.push(chalk.blue(`  Info:     ${report.infos}`));
-	if (report.fixed > 0) lines.push(chalk.green(`  Fixed:    ${report.fixed}`));
+	if (report.errors > 0) {
+		lines.push(chalk.red(`  Errors:   ${report.errors}`));
+	}
+	if (report.warnings > 0) {
+		lines.push(chalk.yellow(`  Warnings: ${report.warnings}`));
+	}
+	if (report.infos > 0) {
+		lines.push(chalk.blue(`  Info:     ${report.infos}`));
+	}
+	if (report.fixed > 0) {
+		lines.push(chalk.green(`  Fixed:    ${report.fixed}`));
+	}
 	lines.push(`  Total:    ${report.errors + report.warnings + report.infos}`);
 	lines.push("");
 	lines.push(`  ${report.files} file(s) scanned`);

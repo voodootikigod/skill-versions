@@ -6,7 +6,9 @@ import type { PolicyFinding, SkillPolicy } from "../types.js";
  * Check that a skill file meets metadata requirements from the policy.
  */
 export function checkMetadata(file: SkillFile, policy: SkillPolicy): PolicyFinding[] {
-	if (!policy.metadata) return [];
+	if (!policy.metadata) {
+		return [];
+	}
 
 	const findings: PolicyFinding[] = [];
 	const fm = file.frontmatter;
@@ -49,16 +51,18 @@ export function checkMetadata(file: SkillFile, policy: SkillPolicy): PolicyFindi
 	// Check allowed licenses
 	if (policy.metadata.allowed_licenses && policy.metadata.allowed_licenses.length > 0) {
 		const license = fm.license;
-		if (typeof license === "string" && license.length > 0) {
-			if (!policy.metadata.allowed_licenses.includes(license)) {
-				findings.push({
-					file: file.path,
-					severity: "violation",
-					rule: "metadata.allowed_licenses",
-					message: `License "${license}" is not in the allowed list`,
-					detail: `Allowed: ${policy.metadata.allowed_licenses.join(", ")}`,
-				});
-			}
+		if (
+			typeof license === "string" &&
+			license.length > 0 &&
+			!policy.metadata.allowed_licenses.includes(license)
+		) {
+			findings.push({
+				file: file.path,
+				severity: "violation",
+				rule: "metadata.allowed_licenses",
+				message: `License "${license}" is not in the allowed list`,
+				detail: `Allowed: ${policy.metadata.allowed_licenses.join(", ")}`,
+			});
 		}
 	}
 

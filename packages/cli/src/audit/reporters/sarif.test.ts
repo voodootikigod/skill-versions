@@ -168,7 +168,7 @@ describe("formatSarif", () => {
 
 		const auditorRuns = parsed.runs.slice(1);
 		const auditorNames = auditorRuns.map(
-			(r: { tool: { driver: { name: string } } }) => r.tool.driver.name,
+			(r: { tool: { driver: { name: string } } }) => r.tool.driver.name
 		);
 		expect(auditorNames).toContain("skills.sh/snyk");
 		expect(auditorNames).toContain("skills.sh/socket");

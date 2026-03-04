@@ -4,10 +4,7 @@ import type { GraderResult } from "../types.js";
  * Load and execute a custom grader module.
  * The module should export a `grade(context)` function that returns a GraderResult.
  */
-export async function gradeCustom(
-	workDir: string,
-	modulePath: string,
-): Promise<GraderResult> {
+export async function gradeCustom(workDir: string, modulePath: string): Promise<GraderResult> {
 	try {
 		const mod = (await import(modulePath)) as {
 			grade?: (context: { workDir: string }) => GraderResult | Promise<GraderResult>;

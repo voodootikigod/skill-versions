@@ -11,6 +11,8 @@ function severityColor(severity: AuditSeverity) {
 			return chalk.yellow;
 		case "low":
 			return chalk.blue;
+		default:
+			return chalk.dim;
 	}
 }
 
@@ -24,6 +26,8 @@ function severityIcon(severity: AuditSeverity): string {
 			return "* ";
 		case "low":
 			return "- ";
+		default:
+			return "  ";
 	}
 }
 
@@ -37,6 +41,7 @@ function groupByFile(findings: AuditFinding[]): Map<string, AuditFinding[]> {
 	return groups;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export function formatTerminal(report: AuditReport): string {
 	const lines: string[] = [];
 
@@ -78,14 +83,14 @@ export function formatTerminal(report: AuditReport): string {
 			low: 3,
 		};
 		findings.sort(
-			(a, b) => severityOrder[a.severity] - severityOrder[b.severity] || a.line - b.line,
+			(a, b) => severityOrder[a.severity] - severityOrder[b.severity] || a.line - b.line
 		);
 
 		for (const f of findings) {
 			const color = severityColor(f.severity);
 			const icon = severityIcon(f.severity);
 			lines.push(
-				`  ${color(icon)} ${color(f.severity.toUpperCase().padEnd(8))} line ${String(f.line).padStart(4)} ${chalk.dim("|")} ${f.message}`,
+				`  ${color(icon)} ${color(f.severity.toUpperCase().padEnd(8))} line ${String(f.line).padStart(4)} ${chalk.dim("|")} ${f.message}`
 			);
 			if (f.evidence) {
 				lines.push(`    ${chalk.dim(f.evidence)}`);
@@ -107,7 +112,7 @@ export function formatTerminal(report: AuditReport): string {
 						? chalk.green
 						: chalk.yellow;
 				lines.push(
-					`    ${chalk.dim(entry.auditor.padEnd(8))} ${statusColor(entry.status)}${entry.riskLevel ? chalk.dim(` (${entry.riskLevel})`) : ""}`,
+					`    ${chalk.dim(entry.auditor.padEnd(8))} ${statusColor(entry.status)}${entry.riskLevel ? chalk.dim(` (${entry.riskLevel})`) : ""}`
 				);
 			}
 		}
@@ -119,10 +124,18 @@ export function formatTerminal(report: AuditReport): string {
 	lines.push(chalk.bold("Summary"));
 	lines.push("=".repeat(50));
 	const { summary } = report;
-	if (summary.critical > 0) lines.push(chalk.red.bold(`  Critical: ${summary.critical}`));
-	if (summary.high > 0) lines.push(chalk.red(`  High:     ${summary.high}`));
-	if (summary.medium > 0) lines.push(chalk.yellow(`  Medium:   ${summary.medium}`));
-	if (summary.low > 0) lines.push(chalk.blue(`  Low:      ${summary.low}`));
+	if (summary.critical > 0) {
+		lines.push(chalk.red.bold(`  Critical: ${summary.critical}`));
+	}
+	if (summary.high > 0) {
+		lines.push(chalk.red(`  High:     ${summary.high}`));
+	}
+	if (summary.medium > 0) {
+		lines.push(chalk.yellow(`  Medium:   ${summary.medium}`));
+	}
+	if (summary.low > 0) {
+		lines.push(chalk.blue(`  Low:      ${summary.low}`));
+	}
 	lines.push(`  Total:    ${summary.total}`);
 	lines.push("");
 	lines.push(`  ${report.files} file(s) scanned`);
@@ -134,7 +147,7 @@ export function formatTerminal(report: AuditReport): string {
 		(!report.registryAudits || report.registryAudits.length === 0)
 	) {
 		lines.push(
-			chalk.dim("Tip: Run with --include-registry-audits for Snyk/Socket/Gen security analysis."),
+			chalk.dim("Tip: Run with --include-registry-audits for Snyk/Socket/Gen security analysis.")
 		);
 		lines.push("");
 	}

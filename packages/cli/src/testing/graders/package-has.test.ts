@@ -22,7 +22,7 @@ describe("gradePackageHas", () => {
 			JSON.stringify({
 				dependencies: { express: "^4.0.0" },
 				devDependencies: { vitest: "^1.0.0" },
-			}),
+			})
 		);
 
 		const result = await gradePackageHas(workDir, ["express"], ["vitest"]);
@@ -32,7 +32,7 @@ describe("gradePackageHas", () => {
 	it("fails when dependency is missing", async () => {
 		await writeFile(
 			join(workDir, "package.json"),
-			JSON.stringify({ dependencies: { express: "^4.0.0" } }),
+			JSON.stringify({ dependencies: { express: "^4.0.0" } })
 		);
 
 		const result = await gradePackageHas(workDir, ["express", "react"]);
@@ -41,10 +41,7 @@ describe("gradePackageHas", () => {
 	});
 
 	it("fails when devDependency is missing", async () => {
-		await writeFile(
-			join(workDir, "package.json"),
-			JSON.stringify({ devDependencies: {} }),
-		);
+		await writeFile(join(workDir, "package.json"), JSON.stringify({ devDependencies: {} }));
 
 		const result = await gradePackageHas(workDir, undefined, ["vitest"]);
 		expect(result.passed).toBe(false);

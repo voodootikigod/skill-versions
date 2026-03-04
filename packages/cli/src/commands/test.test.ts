@@ -33,8 +33,12 @@ describe("testCommand", () => {
 			reports: [makeReport({ passed: 1 })],
 			baselineDiffs: new Map(),
 		});
-		vi.spyOn(console, "log").mockImplementation(() => {});
-		vi.spyOn(console, "error").mockImplementation(() => {});
+		vi.spyOn(console, "log").mockImplementation(() => {
+			/* intentionally empty */
+		});
+		vi.spyOn(console, "error").mockImplementation(() => {
+			/* intentionally empty */
+		});
 	});
 
 	afterEach(() => {
@@ -120,7 +124,7 @@ describe("testCommand", () => {
 				type: "trigger",
 				agent: "claude-code",
 				trials: 5,
-			}),
+			})
 		);
 	});
 

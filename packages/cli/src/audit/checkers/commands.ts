@@ -1,8 +1,8 @@
 import type { AuditChecker, AuditFinding, CheckContext } from "../types.js";
 
 interface CommandPattern {
-	regex: RegExp;
 	message: string;
+	regex: RegExp;
 	severity: "critical" | "medium";
 }
 
@@ -117,6 +117,7 @@ const ALL_COMMAND_PATTERNS = [
 
 export const commandsChecker: AuditChecker = {
 	name: "dangerous-command",
+	// biome-ignore lint/suspicious/useAwait: interface contract requires async
 	async check(context: CheckContext): Promise<AuditFinding[]> {
 		const findings: AuditFinding[] = [];
 

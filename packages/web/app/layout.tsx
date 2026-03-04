@@ -61,7 +61,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+		<html className={`${geistSans.variable} ${geistMono.variable}`} lang="en">
 			<body style={{ fontFamily: "var(--font-sans)" }}>{children}</body>
 		</html>
 	);

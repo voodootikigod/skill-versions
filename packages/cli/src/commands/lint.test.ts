@@ -31,8 +31,12 @@ describe("lintCommand", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockedRunLint.mockResolvedValue(makeReport());
-		vi.spyOn(console, "log").mockImplementation(() => {});
-		vi.spyOn(console, "error").mockImplementation(() => {});
+		vi.spyOn(console, "log").mockImplementation(() => {
+			/* intentionally empty */
+		});
+		vi.spyOn(console, "error").mockImplementation(() => {
+			/* intentionally empty */
+		});
 	});
 
 	afterEach(() => {
@@ -57,7 +61,7 @@ describe("lintCommand", () => {
 					},
 				],
 				errors: 1,
-			}),
+			})
 		);
 
 		const code = await lintCommand(".", {});
@@ -77,7 +81,7 @@ describe("lintCommand", () => {
 					},
 				],
 				warnings: 1,
-			}),
+			})
 		);
 
 		const code = await lintCommand(".", {});
@@ -97,7 +101,7 @@ describe("lintCommand", () => {
 					},
 				],
 				warnings: 1,
-			}),
+			})
 		);
 
 		const code = await lintCommand(".", { failOn: "warning" });
@@ -158,7 +162,7 @@ describe("lintCommand", () => {
 					},
 				],
 				infos: 1,
-			}),
+			})
 		);
 
 		const code = await lintCommand(".", {});

@@ -6,11 +6,11 @@ import { formatLintTerminal } from "../lint/reporters/terminal.js";
 import type { LintOptions } from "../lint/types.js";
 
 interface LintCommandOptions {
-	fix?: boolean;
 	ci?: boolean;
+	failOn?: string;
+	fix?: boolean;
 	format?: "terminal" | "json";
 	output?: string;
-	failOn?: string;
 }
 
 const LEVEL_ORDER: Record<string, number> = {

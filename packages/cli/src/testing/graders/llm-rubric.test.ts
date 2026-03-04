@@ -30,7 +30,7 @@ describe("gradeLlmRubric", () => {
 			workDir,
 			["Uses TypeScript", "Has proper types"],
 			undefined,
-			"Create a typed module",
+			"Create a typed module"
 		);
 
 		// Should not throw, should return a skip result

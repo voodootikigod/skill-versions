@@ -3,18 +3,18 @@
  */
 export interface Registry {
 	$schema?: string;
-	version: number;
 	lastCheck?: string;
-	skillsDir?: string;
 	products: Record<string, RegistryProduct>;
+	skillsDir?: string;
+	version: number;
 }
 
 export interface RegistryProduct {
+	agents?: string[];
+	changelog?: string;
 	displayName: string;
 	package: string;
-	verifiedVersion: string;
-	verifiedAt: string;
-	changelog?: string;
 	skills: string[];
-	agents?: string[];
+	verifiedAt: string;
+	verifiedVersion: string;
 }

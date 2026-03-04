@@ -32,9 +32,13 @@ function extractSource(file: SkillFile): string | null {
  * Check a skill file's source against policy allow/deny lists.
  */
 export function checkSources(file: SkillFile, policy: SkillPolicy): PolicyFinding[] {
-	if (!policy.sources) return [];
+	if (!policy.sources) {
+		return [];
+	}
 	const { allow, deny } = policy.sources;
-	if (!allow && !deny) return [];
+	if (!(allow || deny)) {
+		return [];
+	}
 
 	const source = extractSource(file);
 
@@ -50,7 +54,9 @@ export function checkSources(file: SkillFile, policy: SkillPolicy): PolicyFindin
 		];
 	}
 
-	if (!source) return [];
+	if (!source) {
+		return [];
+	}
 
 	const findings: PolicyFinding[] = [];
 

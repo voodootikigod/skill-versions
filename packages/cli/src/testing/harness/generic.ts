@@ -41,20 +41,21 @@ async function listFilesRecursive(dir: string): Promise<Set<string>> {
  * Uses a configurable command template where {prompt} is replaced with the actual prompt.
  */
 export class GenericHarness implements AgentHarness {
-	name = "generic";
-	private commandTemplate: string;
+	readonly name = "generic";
+	private readonly commandTemplate: string;
 
 	constructor(commandTemplate?: string) {
 		this.commandTemplate = commandTemplate ?? 'echo "{prompt}"';
 	}
 
+	// biome-ignore lint/suspicious/useAwait: interface contract requires async
 	async available(): Promise<boolean> {
 		return true; // Shell is always available
 	}
 
 	async execute(
 		prompt: string,
-		options: { workDir: string; timeout: number; skills?: string[] },
+		options: { workDir: string; timeout: number; skills?: string[] }
 	): Promise<AgentExecution> {
 		const beforeFiles = await listFilesRecursive(options.workDir);
 		const start = Date.now();
@@ -74,13 +75,13 @@ export class GenericHarness implements AgentHarness {
 					},
 					(error, stdout, stderr) => {
 						resolve({
-							exitCode: error ? (error as { code?: number }).code ?? 1 : 0,
+							exitCode: error ? ((error as { code?: number }).code ?? 1) : 0,
 							stdout: stdout ?? "",
 							stderr: stderr ?? "",
 						});
-					},
+					}
 				);
-			},
+			}
 		);
 
 		const duration = Date.now() - start;

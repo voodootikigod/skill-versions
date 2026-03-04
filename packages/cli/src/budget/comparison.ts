@@ -47,8 +47,14 @@ export function compareSnapshots(before: BudgetSnapshot, after: BudgetSnapshot):
 		const beforeTokens = beforeMap.get(name) ?? 0;
 		const afterTokens = afterMap.get(name) ?? 0;
 		const delta = afterTokens - beforeTokens;
-		const percentChange =
-			beforeTokens > 0 ? (delta / beforeTokens) * 100 : afterTokens > 0 ? 100 : 0;
+		let percentChange: number;
+		if (beforeTokens > 0) {
+			percentChange = (delta / beforeTokens) * 100;
+		} else if (afterTokens > 0) {
+			percentChange = 100;
+		} else {
+			percentChange = 0;
+		}
 
 		diffs.push({
 			skill: name,

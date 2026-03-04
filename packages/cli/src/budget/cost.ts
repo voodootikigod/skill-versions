@@ -34,7 +34,7 @@ export function estimateCost(tokens: number, model?: string, calls = 1000): Cost
 
 	if (pricePerMillion === undefined) {
 		throw new Error(
-			`Unknown model: "${selectedModel}". Available models: ${Object.keys(MODEL_PRICING).join(", ")}`,
+			`Unknown model: "${selectedModel}". Available models: ${Object.keys(MODEL_PRICING).join(", ")}`
 		);
 	}
 

@@ -23,7 +23,7 @@ describe("checkConditional", () => {
 	it("does not warn about product-version when it is present", () => {
 		const file = makeFile(
 			{ "product-version": "4.18.0" },
-			"Run `npm install express` to get started.",
+			"Run `npm install express` to get started."
 		);
 		const findings = checkConditional(file);
 		const pvFinding = findings.find((f) => f.field === "product-version");

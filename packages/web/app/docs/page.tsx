@@ -585,10 +585,10 @@ Your skill content here...`}
 
 						<h3>GitHub Action</h3>
 						<p>
-							The <code>voodootikigod/skillsafe</code> action runs one or more skillsafe commands
-							in your CI pipeline. By default it runs <code>check</code> only
-							(backward-compatible). Enable additional commands via the <code>commands</code>{" "}
-							input or individual toggle flags.
+							The <code>voodootikigod/skillsafe</code> action runs one or more skillsafe commands in
+							your CI pipeline. By default it runs <code>check</code> only (backward-compatible).
+							Enable additional commands via the <code>commands</code> input or individual toggle
+							flags.
 						</p>
 						<pre>
 							<code>
@@ -619,8 +619,8 @@ Your skill content here...`}
 										<code>&quot;&quot;</code>
 									</td>
 									<td>
-										Comma-separated list (e.g. <code>check,audit,lint</code>). Overrides
-										toggle flags.
+										Comma-separated list (e.g. <code>check,audit,lint</code>). Overrides toggle
+										flags.
 									</td>
 								</tr>
 								<tr>
@@ -707,8 +707,7 @@ Your skill content here...`}
 										<code>high</code>
 									</td>
 									<td>
-										<code>critical</code>, <code>high</code>, <code>medium</code>,{" "}
-										<code>low</code>
+										<code>critical</code>, <code>high</code>, <code>medium</code>, <code>low</code>
 									</td>
 								</tr>
 								<tr>
@@ -868,7 +867,7 @@ Your skill content here...`}
 									</td>
 									<td>
 										JSON with per-command exit codes (e.g.{" "}
-										<code>{"'{\"check\":0,\"audit\":1}'"}</code>)
+										<code>{'\'{"check":0,"audit":1}\''}</code>)
 									</td>
 								</tr>
 							</tbody>
@@ -929,9 +928,7 @@ jobs:
 						</pre>
 
 						<h3>Inline CLI</h3>
-						<p>
-							For simpler setups, run individual commands directly:
-						</p>
+						<p>For simpler setups, run individual commands directly:</p>
 						<pre>
 							<code>
 								{`- name: Check skill freshness

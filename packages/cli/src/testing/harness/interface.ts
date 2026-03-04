@@ -6,7 +6,6 @@ import type { AgentExecution } from "../types.js";
  * or provide mock responses for testing.
  */
 export interface AgentHarness {
-	name: string;
 	available(): Promise<boolean>;
 	execute(
 		prompt: string,
@@ -14,6 +13,7 @@ export interface AgentHarness {
 			workDir: string;
 			timeout: number;
 			skills?: string[];
-		},
+		}
 	): Promise<AgentExecution>;
+	name: string;
 }

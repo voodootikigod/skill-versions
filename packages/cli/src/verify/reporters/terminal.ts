@@ -27,7 +27,7 @@ function formatResult(result: VerifyResult): string[] {
 
 	if (result.declaredBump) {
 		lines.push(
-			`  Declared change: ${result.declaredBefore ?? "?"} -> ${result.declaredAfter ?? "?"} (${bumpColor(result.declaredBump)})`,
+			`  Declared change: ${result.declaredBefore ?? "?"} -> ${result.declaredAfter ?? "?"} (${bumpColor(result.declaredBump)})`
 		);
 	} else {
 		lines.push(chalk.dim("  No previous version for comparison"));
@@ -49,13 +49,13 @@ function formatResult(result: VerifyResult): string[] {
 			lines.push(`  Assessment: ${icon} ${bumpLabel} bump is appropriate`);
 		} else {
 			lines.push(
-				`  Assessment: ${icon} ${result.declaredBump.toUpperCase()} bump appears ${result.assessedBump > result.declaredBump ? "INSUFFICIENT" : "EXCESSIVE"}`,
+				`  Assessment: ${icon} ${result.declaredBump.toUpperCase()} bump appears ${result.assessedBump > result.declaredBump ? "INSUFFICIENT" : "EXCESSIVE"}`
 			);
 			lines.push(`    Recommended: ${bumpColor(result.assessedBump)} bump`);
 		}
 	} else {
 		lines.push(
-			`  Suggested bump: ${bumpColor(result.assessedBump)} (${result.assessedBump.toUpperCase()})`,
+			`  Suggested bump: ${bumpColor(result.assessedBump)} (${result.assessedBump.toUpperCase()})`
 		);
 	}
 
@@ -92,11 +92,17 @@ export function formatVerifyTerminal(report: VerifyReport): string {
 	// Summary
 	lines.push(chalk.bold("Summary"));
 	lines.push("-".repeat(50));
-	if (report.summary.passed > 0) lines.push(chalk.green(`  Passed:  ${report.summary.passed}`));
-	if (report.summary.failed > 0) lines.push(chalk.red(`  Failed:  ${report.summary.failed}`));
-	if (report.summary.skipped > 0) lines.push(chalk.dim(`  Skipped: ${report.summary.skipped}`));
+	if (report.summary.passed > 0) {
+		lines.push(chalk.green(`  Passed:  ${report.summary.passed}`));
+	}
+	if (report.summary.failed > 0) {
+		lines.push(chalk.red(`  Failed:  ${report.summary.failed}`));
+	}
+	if (report.summary.skipped > 0) {
+		lines.push(chalk.dim(`  Skipped: ${report.summary.skipped}`));
+	}
 	lines.push(
-		`  Total:   ${report.summary.passed + report.summary.failed + report.summary.skipped}`,
+		`  Total:   ${report.summary.passed + report.summary.failed + report.summary.skipped}`
 	);
 	lines.push("");
 

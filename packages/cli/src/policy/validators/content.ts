@@ -18,7 +18,9 @@ function findLineNumber(content: string, pattern: RegExp): number | undefined {
  * Check skill file content against deny/require pattern rules.
  */
 export function checkContent(file: SkillFile, policy: SkillPolicy): PolicyFinding[] {
-	if (!policy.content) return [];
+	if (!policy.content) {
+		return [];
+	}
 
 	const findings: PolicyFinding[] = [];
 	const content = file.raw;

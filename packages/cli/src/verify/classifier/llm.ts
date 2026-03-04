@@ -9,7 +9,7 @@ export async function classifyWithLLM(
 	before: string,
 	after: string,
 	providerFlag?: string,
-	modelFlag?: string,
+	modelFlag?: string
 ): Promise<ChangeSignal | null> {
 	try {
 		// Dynamic imports to avoid module-level evaluation issues
@@ -35,7 +35,7 @@ Classify the change between two versions as:
 Return a JSON object with classification, reasoning, and confidence (0.0 to 1.0).`;
 
 		// Truncate content if too large (keep under ~8000 tokens ~ 32000 chars)
-		const maxChars = 16000;
+		const maxChars = 16_000;
 		const beforeTruncated =
 			before.length > maxChars ? `${before.slice(0, maxChars)}\n... (truncated)` : before;
 		const afterTruncated =

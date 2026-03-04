@@ -28,8 +28,12 @@ describe("auditCommand", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockedRunAudit.mockResolvedValue(makeReport());
-		vi.spyOn(console, "log").mockImplementation(() => {});
-		vi.spyOn(console, "error").mockImplementation(() => {});
+		vi.spyOn(console, "log").mockImplementation(() => {
+			/* intentionally empty */
+		});
+		vi.spyOn(console, "error").mockImplementation(() => {
+			/* intentionally empty */
+		});
 	});
 
 	afterEach(() => {
@@ -55,7 +59,7 @@ describe("auditCommand", () => {
 					},
 				],
 				summary: { critical: 1, high: 0, medium: 0, low: 0, total: 1 },
-			}),
+			})
 		);
 
 		const code = await auditCommand(".", {});
@@ -76,7 +80,7 @@ describe("auditCommand", () => {
 					},
 				],
 				summary: { critical: 0, high: 0, medium: 0, low: 1, total: 1 },
-			}),
+			})
 		);
 
 		// Default threshold is "high", so low findings should not trigger exit 1
@@ -108,7 +112,7 @@ describe("auditCommand", () => {
 					},
 				],
 				summary: { critical: 0, high: 0, medium: 1, low: 0, total: 1 },
-			}),
+			})
 		);
 
 		// With threshold at "medium", medium findings trigger exit 1
@@ -125,7 +129,7 @@ describe("auditCommand", () => {
 		await auditCommand(".", { packagesOnly: true });
 		expect(mockedRunAudit).toHaveBeenCalledWith(
 			["."],
-			expect.objectContaining({ packagesOnly: true }),
+			expect.objectContaining({ packagesOnly: true })
 		);
 	});
 
@@ -133,7 +137,7 @@ describe("auditCommand", () => {
 		await auditCommand(".", { ignore: ".myignore" });
 		expect(mockedRunAudit).toHaveBeenCalledWith(
 			["."],
-			expect.objectContaining({ ignorePath: ".myignore" }),
+			expect.objectContaining({ ignorePath: ".myignore" })
 		);
 	});
 
@@ -141,7 +145,7 @@ describe("auditCommand", () => {
 		await auditCommand(".", { uniqueOnly: true });
 		expect(mockedRunAudit).toHaveBeenCalledWith(
 			["."],
-			expect.objectContaining({ uniqueOnly: true }),
+			expect.objectContaining({ uniqueOnly: true })
 		);
 	});
 
@@ -149,7 +153,7 @@ describe("auditCommand", () => {
 		await auditCommand(".", { includeRegistryAudits: true });
 		expect(mockedRunAudit).toHaveBeenCalledWith(
 			["."],
-			expect.objectContaining({ includeRegistryAudits: true }),
+			expect.objectContaining({ includeRegistryAudits: true })
 		);
 	});
 

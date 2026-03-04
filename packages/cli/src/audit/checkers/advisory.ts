@@ -52,11 +52,14 @@ function getAdvisoryDb(ecosystem: "npm" | "pypi" | "crates"): Set<string> {
 			return KNOWN_HALLUCINATED_PYPI;
 		case "crates":
 			return KNOWN_HALLUCINATED_CRATES;
+		default:
+			return new Set<string>();
 	}
 }
 
 export const advisoryChecker: AuditChecker = {
 	name: "advisory-match",
+	// biome-ignore lint/suspicious/useAwait: interface contract requires async
 	async check(context: CheckContext): Promise<AuditFinding[]> {
 		const findings: AuditFinding[] = [];
 

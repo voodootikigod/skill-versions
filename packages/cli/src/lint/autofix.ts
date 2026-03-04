@@ -32,7 +32,7 @@ async function resolveGitValue(command: string, args: string[]): Promise<string 
  */
 export async function autofix(
 	file: SkillFile,
-	findings: LintFinding[],
+	findings: LintFinding[]
 ): Promise<{ content: string; fixed: string[] } | null> {
 	const fixableFindings = findings.filter((f) => f.fixable && f.file === file.path);
 	if (fixableFindings.length === 0) {
@@ -65,6 +65,8 @@ export async function autofix(
 				fixedFields.push("license");
 				break;
 			}
+			default:
+				break;
 		}
 	}
 

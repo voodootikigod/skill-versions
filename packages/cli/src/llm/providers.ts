@@ -1,11 +1,11 @@
 import type { LanguageModel } from "ai";
 
 interface ProviderConfig {
-	id: string;
-	envVar: string;
-	pkg: string;
-	factory: string;
 	defaultModel: string;
+	envVar: string;
+	factory: string;
+	id: string;
+	pkg: string;
 }
 
 const PROVIDERS: ProviderConfig[] = [
@@ -33,9 +33,9 @@ const PROVIDERS: ProviderConfig[] = [
 ];
 
 export interface DetectedProvider {
-	id: string;
 	hasApiKey: boolean;
 	hasSdk: boolean;
+	id: string;
 }
 
 /**
@@ -69,7 +69,7 @@ export async function detectProviders(): Promise<DetectedProvider[]> {
  */
 export async function resolveModel(
 	providerFlag?: string,
-	modelFlag?: string,
+	modelFlag?: string
 ): Promise<LanguageModel> {
 	// Find the provider config
 	let config: ProviderConfig | undefined;
@@ -104,7 +104,7 @@ export async function resolveModel(
 					"  2. Set the API key environment variable:\n" +
 					"     export ANTHROPIC_API_KEY=sk-...\n" +
 					"     export OPENAI_API_KEY=sk-...\n" +
-					"     export GOOGLE_GENERATIVE_AI_API_KEY=...\n",
+					"     export GOOGLE_GENERATIVE_AI_API_KEY=...\n"
 			);
 		}
 	}
@@ -112,7 +112,7 @@ export async function resolveModel(
 	// Verify API key is set
 	if (!process.env[config.envVar]) {
 		throw new Error(
-			`API key not found. Set ${config.envVar} environment variable for ${config.id}.`,
+			`API key not found. Set ${config.envVar} environment variable for ${config.id}.`
 		);
 	}
 

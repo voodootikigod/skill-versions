@@ -27,7 +27,7 @@ describe("classifyWithLLM", () => {
 
 	it("returns classification when LLM is available", async () => {
 		mockResolveModel.mockResolvedValue(
-			{} as ReturnType<typeof resolveModel> extends Promise<infer T> ? T : never,
+			{} as ReturnType<typeof resolveModel> extends Promise<infer T> ? T : never
 		);
 		mockGenerateObject.mockResolvedValue({
 			object: {
@@ -54,7 +54,7 @@ describe("classifyWithLLM", () => {
 
 	it("returns null when generateObject fails", async () => {
 		mockResolveModel.mockResolvedValue(
-			{} as ReturnType<typeof resolveModel> extends Promise<infer T> ? T : never,
+			{} as ReturnType<typeof resolveModel> extends Promise<infer T> ? T : never
 		);
 		mockGenerateObject.mockRejectedValue(new Error("API error"));
 
@@ -64,7 +64,7 @@ describe("classifyWithLLM", () => {
 
 	it("passes provider and model flags through", async () => {
 		mockResolveModel.mockResolvedValue(
-			{} as ReturnType<typeof resolveModel> extends Promise<infer T> ? T : never,
+			{} as ReturnType<typeof resolveModel> extends Promise<infer T> ? T : never
 		);
 		mockGenerateObject.mockResolvedValue({
 			object: {

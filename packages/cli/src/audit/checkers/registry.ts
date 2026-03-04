@@ -49,7 +49,9 @@ async function checkExists(pkg: ExtractedPackage): Promise<boolean> {
 
 	// Check in-memory cache first
 	const memoryCached = memoryCache.get(key);
-	if (memoryCached !== undefined) return memoryCached;
+	if (memoryCached !== undefined) {
+		return memoryCached;
+	}
 
 	// Check persistent disk cache
 	const diskCached = await getCached(pkg.ecosystem, pkg.name);
@@ -69,6 +71,8 @@ async function checkExists(pkg: ExtractedPackage): Promise<boolean> {
 		case "crates":
 			exists = await checkCratesExists(pkg.name);
 			break;
+		default:
+			break;
 	}
 
 	memoryCache.set(key, exists);
@@ -76,10 +80,10 @@ async function checkExists(pkg: ExtractedPackage): Promise<boolean> {
 	return exists;
 }
 
-async function withConcurrencyLimit<T>(
+function withConcurrencyLimit<T>(
 	items: T[],
 	limit: number,
-	fn: (item: T) => Promise<void>,
+	fn: (item: T) => Promise<void>
 ): Promise<void> {
 	let running = 0;
 	let index = 0;
@@ -100,7 +104,9 @@ async function withConcurrencyLimit<T>(
 					})
 					.catch(reject);
 			}
-			if (items.length === 0) resolve();
+			if (items.length === 0) {
+				resolve();
+			}
 		}
 		next();
 	});
@@ -127,7 +133,7 @@ export const registryChecker: AuditChecker = {
 			if (!exists) {
 				// Find all lines where this package appears
 				const allOccurrences = context.packages.filter(
-					(p) => p.ecosystem === pkg.ecosystem && p.name === pkg.name,
+					(p) => p.ecosystem === pkg.ecosystem && p.name === pkg.name
 				);
 				for (const occurrence of allOccurrences) {
 					findings.push({

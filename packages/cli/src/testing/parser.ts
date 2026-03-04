@@ -58,6 +58,7 @@ export async function parseTestSuite(content: string): Promise<TestSuite> {
 	return suite;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 function parseGraders(raw: unknown): GraderConfig[] {
 	if (!Array.isArray(raw)) {
 		return [];
@@ -100,9 +101,10 @@ function parseGraders(raw: unknown): GraderConfig[] {
 				configs.push({
 					type: "json-match",
 					file: String(g.file ?? ""),
-					schema: typeof g.schema === "object" && g.schema !== null
-						? (g.schema as Record<string, unknown>)
-						: {},
+					schema:
+						typeof g.schema === "object" && g.schema !== null
+							? (g.schema as Record<string, unknown>)
+							: {},
 				});
 				break;
 			case "package-has":
@@ -140,6 +142,7 @@ function parseGraders(raw: unknown): GraderConfig[] {
  * Validate a parsed TestSuite and return an array of error messages.
  * An empty array means the suite is valid.
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export function validateTestSuite(suite: TestSuite): string[] {
 	const errors: string[] = [];
 

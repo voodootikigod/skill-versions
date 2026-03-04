@@ -17,7 +17,7 @@ function skillName(file: SkillFile): string {
 	if (mdIndex > 0) {
 		return parts[mdIndex - 1];
 	}
-	return parts[parts.length - 1];
+	return parts.at(-1) as string;
 }
 
 /**

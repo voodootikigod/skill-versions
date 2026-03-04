@@ -6,10 +6,10 @@ import type { AgentHarness } from "./interface.js";
  * Returns preconfigured responses for deterministic test behavior.
  */
 export class MockHarness implements AgentHarness {
-	name = "mock";
-	private responses: Map<string, AgentExecution> = new Map();
-	private defaultResponse: AgentExecution;
-	public executionLog: Array<{ prompt: string; options: Record<string, unknown> }> = [];
+	readonly name = "mock";
+	private readonly responses: Map<string, AgentExecution> = new Map();
+	private readonly defaultResponse: AgentExecution;
+	executionLog: Array<{ prompt: string; options: Record<string, unknown> }> = [];
 
 	constructor(defaultResponse?: Partial<AgentExecution>) {
 		this.defaultResponse = {
@@ -28,13 +28,15 @@ export class MockHarness implements AgentHarness {
 		this.responses.set(prompt, { ...this.defaultResponse, ...response });
 	}
 
+	// biome-ignore lint/suspicious/useAwait: interface contract requires async
 	async available(): Promise<boolean> {
 		return true;
 	}
 
+	// biome-ignore lint/suspicious/useAwait: interface contract requires async
 	async execute(
 		prompt: string,
-		options: { workDir: string; timeout: number; skills?: string[] },
+		options: { workDir: string; timeout: number; skills?: string[] }
 	): Promise<AgentExecution> {
 		this.executionLog.push({ prompt, options: { ...options } });
 		return this.responses.get(prompt) ?? this.defaultResponse;

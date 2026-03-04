@@ -6,8 +6,8 @@ import { groupSkills, scanSkills } from "../scanner.js";
 import type { Registry, RegistryProduct } from "../types.js";
 
 interface InitOptions {
-	yes?: boolean;
 	output?: string;
+	yes?: boolean;
 }
 
 /**
@@ -45,13 +45,17 @@ const KNOWN_MAPPINGS: Record<string, { displayName: string; package: string }> =
  */
 function autoDetect(productKey: string): { displayName: string; package: string } | undefined {
 	// Direct match
-	if (KNOWN_MAPPINGS[productKey]) return KNOWN_MAPPINGS[productKey];
+	if (KNOWN_MAPPINGS[productKey]) {
+		return KNOWN_MAPPINGS[productKey];
+	}
 
 	// Try progressively shorter prefixes
 	const parts = productKey.split("-");
 	for (let len = parts.length - 1; len >= 1; len--) {
 		const prefix = parts.slice(0, len).join("-");
-		if (KNOWN_MAPPINGS[prefix]) return KNOWN_MAPPINGS[prefix];
+		if (KNOWN_MAPPINGS[prefix]) {
+			return KNOWN_MAPPINGS[prefix];
+		}
 	}
 
 	return undefined;
@@ -60,6 +64,7 @@ function autoDetect(productKey: string): { displayName: string; package: string 
 /**
  * Initialize a skillsafe.json registry by scanning a skills directory.
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export async function initCommand(dir: string, options: InitOptions): Promise<number> {
 	console.log();
 	console.log(chalk.bold("skillsafe init"));
@@ -78,14 +83,14 @@ export async function initCommand(dir: string, options: InitOptions): Promise<nu
 	const withoutVersion = skills.filter((s) => !s.productVersion);
 
 	console.log(
-		`Found ${chalk.bold(String(skills.length))} skills, ${chalk.bold(String(withVersion.length))} with product-version.`,
+		`Found ${chalk.bold(String(skills.length))} skills, ${chalk.bold(String(withVersion.length))} with product-version.`
 	);
 
 	if (withoutVersion.length > 0) {
 		console.log(
 			chalk.dim(
-				`  Skipping ${withoutVersion.length} without product-version: ${withoutVersion.map((s) => s.name).join(", ")}`,
-			),
+				`  Skipping ${withoutVersion.length} without product-version: ${withoutVersion.map((s) => s.name).join(", ")}`
+			)
 		);
 	}
 
@@ -107,7 +112,7 @@ export async function initCommand(dir: string, options: InitOptions): Promise<nu
 
 			if (!detected) {
 				console.log(
-					chalk.yellow(`  Skipping "${productKey}" (v${version}) — cannot auto-detect npm package`),
+					chalk.yellow(`  Skipping "${productKey}" (v${version}) — cannot auto-detect npm package`)
 				);
 				continue;
 			}
@@ -122,7 +127,7 @@ export async function initCommand(dir: string, options: InitOptions): Promise<nu
 					}
 				}
 				console.log(
-					`  ${chalk.green("✓")} ${detected.displayName} v${version} → ${chalk.cyan(detected.package)} (+${groupSkillsList.length} skills, merged)`,
+					`  ${chalk.green("✓")} ${detected.displayName} v${version} → ${chalk.cyan(detected.package)} (+${groupSkillsList.length} skills, merged)`
 				);
 				continue;
 			}
@@ -137,7 +142,7 @@ export async function initCommand(dir: string, options: InitOptions): Promise<nu
 			};
 
 			console.log(
-				`  ${chalk.green("✓")} ${detected.displayName} v${version} → ${chalk.cyan(detected.package)} (${groupSkillsList.length} skills)`,
+				`  ${chalk.green("✓")} ${detected.displayName} v${version} → ${chalk.cyan(detected.package)} (${groupSkillsList.length} skills)`
 			);
 		}
 	} else {
@@ -154,14 +159,14 @@ export async function initCommand(dir: string, options: InitOptions): Promise<nu
 				const skillNames = groupSkillsList.map((s) => s.name).join(", ");
 
 				console.log(
-					`  ${chalk.bold(defaultName)} v${version} (${groupSkillsList.length} skills: ${chalk.dim(skillNames)})`,
+					`  ${chalk.bold(defaultName)} v${version} (${groupSkillsList.length} skills: ${chalk.dim(skillNames)})`
 				);
 
 				const answer = await rl.question(`    npm package${hint}: `);
 				const packageName = answer.trim() || defaultPkg;
 
 				if (!packageName) {
-					console.log(chalk.yellow(`    Skipping — no package specified`));
+					console.log(chalk.yellow("    Skipping — no package specified"));
 					console.log();
 					continue;
 				}
@@ -192,7 +197,7 @@ export async function initCommand(dir: string, options: InitOptions): Promise<nu
 					skills: groupSkillsList.map((s) => s.name),
 				};
 
-				console.log(chalk.green(`    ✓ Mapped`));
+				console.log(chalk.green("    ✓ Mapped"));
 				console.log();
 			}
 		} finally {

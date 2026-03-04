@@ -17,10 +17,7 @@ describe("gradeJsonMatch", () => {
 	});
 
 	it("passes when structure matches", async () => {
-		await writeFile(
-			join(workDir, "config.json"),
-			JSON.stringify({ name: "test", version: "1.0" }),
-		);
+		await writeFile(join(workDir, "config.json"), JSON.stringify({ name: "test", version: "1.0" }));
 
 		const result = await gradeJsonMatch(workDir, "config.json", {
 			name: "string",
@@ -43,7 +40,7 @@ describe("gradeJsonMatch", () => {
 	it("fails when type does not match", async () => {
 		await writeFile(
 			join(workDir, "config.json"),
-			JSON.stringify({ name: "test", count: "not-a-number" }),
+			JSON.stringify({ name: "test", count: "not-a-number" })
 		);
 
 		const result = await gradeJsonMatch(workDir, "config.json", {
@@ -55,10 +52,7 @@ describe("gradeJsonMatch", () => {
 	});
 
 	it("handles nested objects", async () => {
-		await writeFile(
-			join(workDir, "config.json"),
-			JSON.stringify({ meta: { author: "me" } }),
-		);
+		await writeFile(join(workDir, "config.json"), JSON.stringify({ meta: { author: "me" } }));
 
 		const result = await gradeJsonMatch(workDir, "config.json", {
 			meta: { author: "string" },

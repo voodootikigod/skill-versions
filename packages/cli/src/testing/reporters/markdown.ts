@@ -3,9 +3,10 @@ import type { BaselineDiff, TestReport } from "../types.js";
 /**
  * Format test reports as Markdown for PR comments.
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export function formatMarkdown(
 	reports: TestReport[],
-	baselineDiffs?: Map<string, BaselineDiff>,
+	baselineDiffs?: Map<string, BaselineDiff>
 ): string {
 	const lines: string[] = [];
 
@@ -60,7 +61,7 @@ export function formatMarkdown(
 				lines.push("");
 				for (const r of diff.regressions) {
 					lines.push(
-						`- **${r.caseId}**: ${Math.round(r.wasPassRate * 100)}% -> ${Math.round(r.nowPassRate * 100)}%`,
+						`- **${r.caseId}**: ${Math.round(r.wasPassRate * 100)}% -> ${Math.round(r.nowPassRate * 100)}%`
 					);
 				}
 				lines.push("");
@@ -70,7 +71,7 @@ export function formatMarkdown(
 				lines.push("");
 				for (const imp of diff.improvements) {
 					lines.push(
-						`- **${imp.caseId}**: ${Math.round(imp.wasPassRate * 100)}% -> ${Math.round(imp.nowPassRate * 100)}%`,
+						`- **${imp.caseId}**: ${Math.round(imp.wasPassRate * 100)}% -> ${Math.round(imp.nowPassRate * 100)}%`
 					);
 				}
 				lines.push("");

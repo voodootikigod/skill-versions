@@ -5,8 +5,11 @@ import type { PolicyFinding, SkillPolicy } from "../types.js";
 /**
  * Check staleness/freshness policy rules for a skill file.
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export function checkFreshness(file: SkillFile, policy: SkillPolicy): PolicyFinding[] {
-	if (!policy.freshness) return [];
+	if (!policy.freshness) {
+		return [];
+	}
 
 	const findings: PolicyFinding[] = [];
 	const fm = file.frontmatter;

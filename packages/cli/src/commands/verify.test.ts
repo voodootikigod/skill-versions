@@ -27,8 +27,12 @@ describe("verifyCommand", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockedRunVerify.mockResolvedValue(makeReport());
-		vi.spyOn(console, "log").mockImplementation(() => {});
-		vi.spyOn(console, "error").mockImplementation(() => {});
+		vi.spyOn(console, "log").mockImplementation(() => {
+			/* intentionally empty */
+		});
+		vi.spyOn(console, "error").mockImplementation(() => {
+			/* intentionally empty */
+		});
 	});
 
 	afterEach(() => {
@@ -58,7 +62,7 @@ describe("verifyCommand", () => {
 					},
 				],
 				summary: { passed: 0, failed: 1, skipped: 0 },
-			}),
+			})
 		);
 
 		const code = await verifyCommand({ all: true });
@@ -93,7 +97,7 @@ describe("verifyCommand", () => {
 	it("passes before/after options to runVerify", async () => {
 		await verifyCommand({ before: "a.md", after: "b.md" });
 		expect(mockedRunVerify).toHaveBeenCalledWith(
-			expect.objectContaining({ before: "a.md", after: "b.md" }),
+			expect.objectContaining({ before: "a.md", after: "b.md" })
 		);
 	});
 

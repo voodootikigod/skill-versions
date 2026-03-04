@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import matter from "gray-matter";
-import * as semver from "semver";
+import { major, minor, patch } from "semver";
 import { normalizeVersion } from "../severity.js";
 import { discoverSkillFiles } from "../shared/discovery.js";
 import { readSkillFile } from "../skill-io.js";
@@ -19,14 +19,22 @@ import type { VerifyOptions, VerifyReport, VerifyResult, VersionBump } from "./t
 function computeBump(before: string, after: string): VersionBump | null {
 	const normBefore = normalizeVersion(before);
 	const normAfter = normalizeVersion(after);
-	if (!normBefore || !normAfter) return null;
+	if (!(normBefore && normAfter)) {
+		return null;
+	}
 
 	const bv = normBefore.version;
 	const av = normAfter.version;
 
-	if (semver.major(av) > semver.major(bv)) return "major";
-	if (semver.minor(av) > semver.minor(bv)) return "minor";
-	if (semver.patch(av) > semver.patch(bv)) return "patch";
+	if (major(av) > major(bv)) {
+		return "major";
+	}
+	if (minor(av) > minor(bv)) {
+		return "minor";
+	}
+	if (patch(av) > patch(bv)) {
+		return "patch";
+	}
 
 	// Same version or downgrade — treat as patch
 	return "patch";
@@ -50,7 +58,7 @@ async function verifyPair(
 	beforeContent: string,
 	afterContent: string,
 	filePath: string,
-	options: VerifyOptions,
+	options: VerifyOptions
 ): Promise<VerifyResult> {
 	const afterParsed = matter(afterContent);
 	const beforeParsed = matter(beforeContent);

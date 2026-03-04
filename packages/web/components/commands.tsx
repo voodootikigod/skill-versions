@@ -93,11 +93,11 @@ export function Commands() {
 				</p>
 				<div className={styles.groups}>
 					{commandGroups.map((group) => (
-						<div key={group.label} className={styles.group}>
+						<div className={styles.group} key={group.label}>
 							<span className={styles.groupLabel}>{group.label}</span>
 							<div className={styles.cards}>
 								{group.commands.map((cmd) => (
-									<div key={cmd.name} className={styles.card}>
+									<div className={styles.card} key={cmd.name}>
 										<div className={styles.cardIcon}>{cmd.icon}</div>
 										<div className={styles.cardBody}>
 											<div className={styles.cardName}>{cmd.name}</div>

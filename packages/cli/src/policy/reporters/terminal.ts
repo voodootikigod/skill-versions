@@ -11,6 +11,7 @@ function groupByFile(findings: PolicyFinding[]): Map<string, PolicyFinding[]> {
 	return groups;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export function formatPolicyTerminal(report: PolicyReport): string {
 	const lines: string[] = [];
 
@@ -103,7 +104,7 @@ export function formatPolicyTerminal(report: PolicyReport): string {
 
 	lines.push(
 		`Summary: ${summary.blocked} blocked, ${summary.violations} violation(s), ${summary.warnings} warning(s). ` +
-			`Policy check ${passed ? chalk.green("PASSED") : chalk.red("FAILED")}.`,
+			`Policy check ${passed ? chalk.green("PASSED") : chalk.red("FAILED")}.`
 	);
 	lines.push("");
 

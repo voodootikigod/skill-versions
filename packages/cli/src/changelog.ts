@@ -1,13 +1,15 @@
-import * as semver from "semver";
+import { coerce, compare, gt, lte, valid } from "semver";
 import { fetchPackageMetadata } from "./npm.js";
 
 const MAX_CHANGELOG_LENGTH = 8000;
+const GITHUB_URL_RE = /github\.com[/:]([\w.-]+)\/([\w.-]+?)(?:\.git)?$/;
+const CHANGELOG_HEADING_RE = /^#{1,3}\s+.*?(\d+\.\d+\.\d+)/;
 
 interface GitHubRelease {
-	tag_name: string;
-	name: string;
 	body: string;
+	name: string;
 	published_at: string;
+	tag_name: string;
 }
 
 /**
@@ -23,25 +25,33 @@ export async function fetchChangelog(
 	packageName: string,
 	fromVersion: string,
 	toVersion: string,
-	changelogUrl?: string,
+	changelogUrl?: string
 ): Promise<string | null> {
 	// Strategy 1: Direct changelog URL from registry
 	if (changelogUrl) {
 		const content = await fetchUrl(changelogUrl);
-		if (content) return truncate(content);
+		if (content) {
+			return truncate(content);
+		}
 	}
 
 	// Strategy 2 & 3: Derive GitHub repo from npm metadata
 	const repo = await resolveGitHubRepo(packageName);
-	if (!repo) return null;
+	if (!repo) {
+		return null;
+	}
 
 	// Strategy 2: GitHub Releases API
 	const releases = await fetchGitHubReleases(repo.owner, repo.repo, fromVersion, toVersion);
-	if (releases) return truncate(releases);
+	if (releases) {
+		return truncate(releases);
+	}
 
 	// Strategy 3: Raw CHANGELOG.md
 	const changelog = await fetchRawChangelog(repo.owner, repo.repo, fromVersion, toVersion);
-	if (changelog) return truncate(changelog);
+	if (changelog) {
+		return truncate(changelog);
+	}
 
 	return null;
 }
@@ -50,11 +60,13 @@ export async function fetchChangelog(
  * Resolve a GitHub owner/repo from npm package metadata.
  */
 export async function resolveGitHubRepo(
-	packageName: string,
+	packageName: string
 ): Promise<{ owner: string; repo: string } | null> {
 	try {
 		const metadata = await fetchPackageMetadata(packageName);
-		if (!metadata.repository?.url) return null;
+		if (!metadata.repository?.url) {
+			return null;
+		}
 
 		return parseGitHubUrl(metadata.repository.url);
 	} catch {
@@ -67,8 +79,10 @@ export async function resolveGitHubRepo(
  * Handles: git+https://github.com/owner/repo.git, https://github.com/owner/repo, etc.
  */
 export function parseGitHubUrl(url: string): { owner: string; repo: string } | null {
-	const match = url.match(/github\.com[/:]([\w.-]+)\/([\w.-]+?)(?:\.git)?$/);
-	if (!match) return null;
+	const match = url.match(GITHUB_URL_RE);
+	if (!match) {
+		return null;
+	}
 	return { owner: match[1], repo: match[2] };
 }
 
@@ -79,7 +93,7 @@ async function fetchGitHubReleases(
 	owner: string,
 	repo: string,
 	fromVersion: string,
-	toVersion: string,
+	toVersion: string
 ): Promise<string | null> {
 	try {
 		const headers: Record<string, string> = {
@@ -93,25 +107,31 @@ async function fetchGitHubReleases(
 
 		const response = await fetch(
 			`https://api.github.com/repos/${owner}/${repo}/releases?per_page=50`,
-			{ headers },
+			{ headers }
 		);
 
-		if (!response.ok) return null;
+		if (!response.ok) {
+			return null;
+		}
 
 		const releases = (await response.json()) as GitHubRelease[];
 		const relevant = releases.filter((r) => {
-			const version = semver.valid(semver.coerce(r.tag_name));
-			if (!version) return false;
-			return semver.gt(version, fromVersion) && semver.lte(version, toVersion);
+			const version = valid(coerce(r.tag_name));
+			if (!version) {
+				return false;
+			}
+			return gt(version, fromVersion) && lte(version, toVersion);
 		});
 
-		if (relevant.length === 0) return null;
+		if (relevant.length === 0) {
+			return null;
+		}
 
 		return relevant
 			.sort((a, b) => {
-				const va = semver.valid(semver.coerce(a.tag_name)) ?? "0.0.0";
-				const vb = semver.valid(semver.coerce(b.tag_name)) ?? "0.0.0";
-				return semver.compare(vb, va);
+				const va = valid(coerce(a.tag_name)) ?? "0.0.0";
+				const vb = valid(coerce(b.tag_name)) ?? "0.0.0";
+				return compare(vb, va);
 			})
 			.map((r) => `## ${r.tag_name}\n\n${r.body}`)
 			.join("\n\n---\n\n");
@@ -127,7 +147,7 @@ async function fetchRawChangelog(
 	owner: string,
 	repo: string,
 	fromVersion: string,
-	toVersion: string,
+	toVersion: string
 ): Promise<string | null> {
 	try {
 		const headers: Record<string, string> = {};
@@ -138,10 +158,12 @@ async function fetchRawChangelog(
 
 		const response = await fetch(
 			`https://raw.githubusercontent.com/${owner}/${repo}/main/CHANGELOG.md`,
-			{ headers },
+			{ headers }
 		);
 
-		if (!response.ok) return null;
+		if (!response.ok) {
+			return null;
+		}
 
 		const content = await response.text();
 		return extractChangelogSection(content, fromVersion, toVersion);
@@ -154,10 +176,11 @@ async function fetchRawChangelog(
  * Extract the relevant section from a CHANGELOG.md between two versions.
  * Looks for markdown headings that contain version numbers.
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export function extractChangelogSection(
 	changelog: string,
 	fromVersion: string,
-	toVersion: string,
+	toVersion: string
 ): string | null {
 	const lines = changelog.split("\n");
 	const sections: string[] = [];
@@ -165,21 +188,21 @@ export function extractChangelogSection(
 	let currentSection: string[] = [];
 
 	for (const line of lines) {
-		const headingMatch = line.match(/^#{1,3}\s+.*?(\d+\.\d+\.\d+)/);
+		const headingMatch = line.match(CHANGELOG_HEADING_RE);
 		if (headingMatch) {
 			// Save previous section if we were capturing
 			if (capturing && currentSection.length > 0) {
 				sections.push(currentSection.join("\n"));
 			}
 
-			const version = semver.valid(semver.coerce(headingMatch[1]));
+			const version = valid(coerce(headingMatch[1]));
 			if (version) {
-				if (semver.gt(version, fromVersion) && semver.lte(version, toVersion)) {
+				if (gt(version, fromVersion) && lte(version, toVersion)) {
 					capturing = true;
 					currentSection = [line];
 					continue;
 				}
-				if (semver.lte(version, fromVersion)) {
+				if (lte(version, fromVersion)) {
 					// Past our range, stop
 					break;
 				}
@@ -208,7 +231,9 @@ export function extractChangelogSection(
 async function fetchUrl(url: string): Promise<string | null> {
 	try {
 		const response = await fetch(url);
-		if (!response.ok) return null;
+		if (!response.ok) {
+			return null;
+		}
 		return await response.text();
 	} catch {
 		return null;
@@ -219,6 +244,8 @@ async function fetchUrl(url: string): Promise<string | null> {
  * Truncate changelog to stay within context budgets.
  */
 function truncate(content: string): string {
-	if (content.length <= MAX_CHANGELOG_LENGTH) return content;
+	if (content.length <= MAX_CHANGELOG_LENGTH) {
+		return content;
+	}
 	return `${content.slice(0, MAX_CHANGELOG_LENGTH)}\n\n... (truncated)`;
 }

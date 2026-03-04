@@ -43,7 +43,7 @@ describe("formatLintTerminal", () => {
 				],
 				errors: 1,
 				infos: 1,
-			}),
+			})
 		);
 		expect(output).toContain("skills/test/SKILL.md");
 		expect(output).toContain("name");
@@ -65,7 +65,7 @@ describe("formatLintTerminal", () => {
 					},
 				],
 				errors: 1,
-			}),
+			})
 		);
 		expect(output).toContain("[fixable]");
 	});
@@ -85,7 +85,7 @@ describe("formatLintTerminal", () => {
 				errors: 1,
 				warnings: 0,
 				infos: 0,
-			}),
+			})
 		);
 		expect(output).toContain("Summary");
 		expect(output).toContain("Errors");
@@ -96,7 +96,7 @@ describe("formatLintTerminal", () => {
 		const output = formatLintTerminal(
 			makeReport({
 				fixed: 2,
-			}),
+			})
 		);
 		expect(output).toContain("Fixed");
 		expect(output).toContain("2");

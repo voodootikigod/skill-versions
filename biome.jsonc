@@ -1,0 +1,14 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.5/schema.json",
+  "extends": ["ultracite/biome/core"],
+  "formatter": {
+    // Override ultracite defaults (space/2/80) with project conventions
+    "indentStyle": "tab",
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double"
+    }
+  }
+}

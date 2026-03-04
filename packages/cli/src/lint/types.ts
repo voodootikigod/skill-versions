@@ -1,25 +1,25 @@
 export interface LintFinding {
-	file: string;
 	field: string;
+	file: string;
+	fixable: boolean;
 	level: "error" | "warning" | "info";
 	message: string;
-	fixable: boolean;
 }
 
 export interface LintReport {
+	errors: number;
 	files: number;
 	findings: LintFinding[];
-	errors: number;
-	warnings: number;
-	infos: number;
 	fixed: number;
 	generatedAt: string;
+	infos: number;
+	warnings: number;
 }
 
 export interface LintOptions {
-	fix?: boolean;
 	ci?: boolean;
 	failOn?: "error" | "warning";
+	fix?: boolean;
 	format?: "terminal" | "json";
 	output?: string;
 }

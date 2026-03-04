@@ -1,12 +1,13 @@
 const SEMVER_RE = /\b\d+\.\d+(?:\.\d+)?(?:-[\w.]+)?(?:\+[\w.]+)?\b/g;
 const URL_RE = /https?:\/\/[^\s)>\]]+/g;
+const WHITESPACE_RE = /\s+/;
 
 function tokenize(text: string): Set<string> {
 	return new Set(
 		text
 			.toLowerCase()
-			.split(/\s+/)
-			.filter((w) => w.length > 0),
+			.split(WHITESPACE_RE)
+			.filter((w) => w.length > 0)
 	);
 }
 
@@ -30,7 +31,9 @@ export function contentSimilarity(before: string, after: string): number {
 	}
 
 	const union = new Set([...wordsA, ...wordsB]).size;
-	if (union === 0) return 1.0;
+	if (union === 0) {
+		return 1.0;
+	}
 
 	return intersection / union;
 }

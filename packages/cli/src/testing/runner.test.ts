@@ -93,13 +93,13 @@ describe("runCase", () => {
 
 		// First two trials pass, third fails
 		let callCount = 0;
-		mockedGrade.mockImplementation(async () => {
+		mockedGrade.mockImplementation(() => {
 			callCount++;
-			return {
+			return Promise.resolve({
 				grader: "file-exists",
 				passed: callCount <= 2,
 				message: callCount <= 2 ? "exists" : "missing",
-			};
+			});
 		});
 
 		const testCase: TestCase = {
@@ -156,13 +156,13 @@ describe("runCase", () => {
 		const mockedGrade = vi.mocked(gradeFileExists);
 
 		let callCount = 0;
-		mockedGrade.mockImplementation(async () => {
+		mockedGrade.mockImplementation(() => {
 			callCount++;
-			return {
+			return Promise.resolve({
 				grader: "file-exists",
 				passed: callCount === 1, // Only first trial passes
 				message: callCount === 1 ? "exists" : "missing",
-			};
+			});
 		});
 
 		const testCase: TestCase = {

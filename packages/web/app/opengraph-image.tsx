@@ -57,6 +57,6 @@ export default function OGImage() {
 				<div style={{ fontSize: 20, color: "#50e3c2", display: "flex" }}>npx skillsafe check</div>
 			</div>
 		</div>,
-		{ ...size },
+		{ ...size }
 	);
 }

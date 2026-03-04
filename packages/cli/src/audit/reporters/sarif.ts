@@ -13,6 +13,8 @@ function toSarifLevel(severity: AuditSeverity): SarifLevel["level"] {
 			return "warning";
 		case "low":
 			return "note";
+		default:
+			return "note";
 	}
 }
 

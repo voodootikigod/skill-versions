@@ -14,21 +14,26 @@ import { getSeverity, normalizeVersion } from "../severity.js";
 import { readSkillFile, writeSkillFile } from "../skill-io.js";
 import type { CheckResult } from "../types.js";
 
+function getRefreshSeverityColor(severity: string) {
+	return severity === "minor" ? chalk.yellow : chalk.blue;
+}
+
 interface RefreshOptions {
-	registry?: string;
+	dryRun?: boolean;
+	model?: string;
 	product?: string;
 	provider?: string;
-	model?: string;
+	registry?: string;
 	yes?: boolean;
-	dryRun?: boolean;
 }
 
 /**
  * Refresh stale skill files using an LLM to propose targeted updates.
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export async function refreshCommand(
 	skillsDir: string | undefined,
-	options: RefreshOptions,
+	options: RefreshOptions
 ): Promise<number> {
 	// Load registry
 	const registry = await loadRegistry(options.registry);
@@ -38,7 +43,7 @@ export async function refreshCommand(
 
 	// Filter to single product if requested
 	const productEntries = Object.entries(registry.products).filter(
-		([key]) => !options.product || key === options.product,
+		([key]) => !options.product || key === options.product
 	);
 
 	if (options.product && productEntries.length === 0) {
@@ -75,10 +80,14 @@ export async function refreshCommand(
 		const verifiedNorm = normalizeVersion(product.verifiedVersion);
 		const latestNorm = normalizeVersion(latest);
 
-		if (!verifiedNorm || !latestNorm) continue;
+		if (!(verifiedNorm && latestNorm)) {
+			continue;
+		}
 
 		const severity = getSeverity(verifiedNorm.version, latestNorm.version);
-		if (severity === "current") continue;
+		if (severity === "current") {
+			continue;
+		}
 
 		staleResults.push({
 			product: key,
@@ -101,13 +110,9 @@ export async function refreshCommand(
 	console.log(chalk.bold(`\nFound ${staleResults.length} stale product(s) to refresh:\n`));
 	for (const result of staleResults) {
 		const severityColor =
-			result.severity === "major"
-				? chalk.red
-				: result.severity === "minor"
-					? chalk.yellow
-					: chalk.blue;
+			result.severity === "major" ? chalk.red : getRefreshSeverityColor(result.severity);
 		console.log(
-			`  ${chalk.bold(result.displayName.padEnd(24))} ${result.verifiedVersion} ${chalk.dim("→")} ${severityColor(result.latestVersion)} ${chalk.dim(`(${result.severity})`)}`,
+			`  ${chalk.bold(result.displayName.padEnd(24))} ${result.verifiedVersion} ${chalk.dim("→")} ${severityColor(result.latestVersion)} ${chalk.dim(`(${result.severity})`)}`
 		);
 	}
 	console.log();
@@ -126,7 +131,7 @@ export async function refreshCommand(
 	for (const result of staleResults) {
 		console.log(chalk.bold.underline(`\n${result.displayName}`));
 		console.log(
-			chalk.dim(`  ${result.package}: ${result.verifiedVersion} → ${result.latestVersion}`),
+			chalk.dim(`  ${result.package}: ${result.verifiedVersion} → ${result.latestVersion}`)
 		);
 
 		// Fetch changelog
@@ -135,7 +140,7 @@ export async function refreshCommand(
 			result.package,
 			result.verifiedVersion,
 			result.latestVersion,
-			result.changelog,
+			result.changelog
 		);
 
 		if (changelog) {
@@ -179,7 +184,7 @@ export async function refreshCommand(
 			console.log();
 			console.log(`  ${chalk.bold("Summary:")} ${llmResult.summary}`);
 			console.log(
-				`  ${chalk.bold("Confidence:")} ${confidenceColor(llmResult.confidence)(llmResult.confidence)}`,
+				`  ${chalk.bold("Confidence:")} ${confidenceColor(llmResult.confidence)(llmResult.confidence)}`
 			);
 			if (llmResult.breakingChanges) {
 				console.log(`  ${chalk.red.bold("⚠ Breaking changes detected")}`);
@@ -200,7 +205,7 @@ export async function refreshCommand(
 			}
 
 			console.log(
-				`\n  ${chalk.green(`+${stats.additions}`)} ${chalk.red(`-${stats.removals}`)} lines changed\n`,
+				`\n  ${chalk.green(`+${stats.additions}`)} ${chalk.red(`-${stats.removals}`)} lines changed\n`
 			);
 			console.log(formatDiff(skillFile.raw, llmResult.updatedContent, skillPath));
 
@@ -215,7 +220,7 @@ export async function refreshCommand(
 
 			if (!shouldApply) {
 				const answer = await promptUser(
-					"\n  Apply this change? [y]es / [n]o / [a]ll / [s]kip product: ",
+					"\n  Apply this change? [y]es / [n]o / [a]ll / [s]kip product: "
 				);
 
 				if (answer === "a") {
@@ -242,8 +247,8 @@ export async function refreshCommand(
 				if (writtenVersion !== result.latestVersion) {
 					console.log(
 						chalk.yellow(
-							`  ⚠ LLM did not bump product-version (got "${writtenVersion ?? "missing"}", expected "${result.latestVersion}") — patching`,
-						),
+							`  ⚠ LLM did not bump product-version (got "${writtenVersion ?? "missing"}", expected "${result.latestVersion}") — patching`
+						)
 					);
 					written.frontmatter["product-version"] = result.latestVersion;
 					const patched = matter.stringify(written.content, written.frontmatter);
@@ -292,6 +297,8 @@ function confidenceColor(confidence: "high" | "medium" | "low") {
 			return chalk.yellow;
 		case "low":
 			return chalk.red;
+		default:
+			return chalk.dim;
 	}
 }
 

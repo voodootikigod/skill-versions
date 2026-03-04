@@ -129,7 +129,7 @@ cases:
 suite:
   name: test
 cases: "not an array"
-`),
+`)
 		).rejects.toThrow("'cases' must be an array");
 	});
 });
@@ -226,7 +226,7 @@ cases:
 		expect(errors.some((e) => e.includes("at least one criterion"))).toBe(true);
 	});
 
-	it("detects empty suite", async () => {
+	it("detects empty suite", () => {
 		const errors = validateTestSuite({
 			name: "test",
 			timeout: 120,

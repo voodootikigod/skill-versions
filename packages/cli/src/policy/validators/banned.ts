@@ -14,10 +14,14 @@ function matchesGlob(name: string, pattern: string): boolean {
  * Check if a skill is banned by the policy.
  */
 export function checkBanned(file: SkillFile, policy: SkillPolicy): PolicyFinding[] {
-	if (!policy.banned || policy.banned.length === 0) return [];
+	if (!policy.banned || policy.banned.length === 0) {
+		return [];
+	}
 
 	const name = file.frontmatter.name;
-	if (typeof name !== "string" || name.length === 0) return [];
+	if (typeof name !== "string" || name.length === 0) {
+		return [];
+	}
 
 	const findings: PolicyFinding[] = [];
 

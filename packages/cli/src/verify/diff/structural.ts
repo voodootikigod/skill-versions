@@ -1,12 +1,12 @@
 import { parseSections, type SkillSection } from "../../shared/sections.js";
 
 export interface StructuralDiff {
-	sectionsAdded: string[];
-	sectionsRemoved: string[];
-	sectionsModified: string[];
-	codeBlocksBefore: number;
 	codeBlocksAfter: number;
+	codeBlocksBefore: number;
 	codeBlocksDelta: number;
+	sectionsAdded: string[];
+	sectionsModified: string[];
+	sectionsRemoved: string[];
 }
 
 const FENCE_RE = /^```\w*/;

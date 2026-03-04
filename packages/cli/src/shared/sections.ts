@@ -2,16 +2,16 @@
  * Represents a section of a SKILL.md file delimited by markdown headings.
  */
 export interface SkillSection {
+	/** The body content of this section (excluding the heading line itself). */
+	content: string;
+	/** 1-based line number where this section ends (inclusive). */
+	endLine: number;
 	/** The heading text (without the leading `#` characters), or empty string for preamble. */
 	heading: string;
 	/** Heading level: 1 for `#`, 2 for `##`, etc. Level 0 indicates preamble (content before first heading). */
 	level: number;
-	/** The body content of this section (excluding the heading line itself). */
-	content: string;
 	/** 1-based line number where this section starts. */
 	startLine: number;
-	/** 1-based line number where this section ends (inclusive). */
-	endLine: number;
 }
 
 const HEADING_RE = /^(#{1,6})\s+(.+)$/;
@@ -41,7 +41,7 @@ export function parseSections(content: string): SkillSection[] {
 		if (match) {
 			// Finalize the previous section
 			sections.push(
-				buildSection(currentHeading, currentLevel, contentLines, currentStartLine, lineNumber - 1),
+				buildSection(currentHeading, currentLevel, contentLines, currentStartLine, lineNumber - 1)
 			);
 
 			// Start a new section
@@ -56,7 +56,7 @@ export function parseSections(content: string): SkillSection[] {
 
 	// Finalize the last section
 	sections.push(
-		buildSection(currentHeading, currentLevel, contentLines, currentStartLine, lines.length),
+		buildSection(currentHeading, currentLevel, contentLines, currentStartLine, lines.length)
 	);
 
 	return sections;
@@ -67,7 +67,7 @@ function buildSection(
 	level: number,
 	contentLines: string[],
 	startLine: number,
-	endLine: number,
+	endLine: number
 ): SkillSection {
 	return {
 		heading,

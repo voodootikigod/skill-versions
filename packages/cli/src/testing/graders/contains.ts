@@ -10,7 +10,7 @@ export async function gradeContains(
 	workDir: string,
 	file: string,
 	patterns: string[],
-	negate?: boolean,
+	negate?: boolean
 ): Promise<GraderResult> {
 	const fullPath = join(workDir, file);
 	let content: string;
@@ -34,7 +34,7 @@ export async function gradeContains(
 
 			if (negate && matches) {
 				failedPatterns.push(pattern);
-			} else if (!negate && !matches) {
+			} else if (!(negate || matches)) {
 				failedPatterns.push(pattern);
 			}
 		} catch {

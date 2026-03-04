@@ -86,7 +86,7 @@ program
 	.option("--skip-urls", "skip URL liveness checks")
 	.option(
 		"--unique-only",
-		"skip injection and command checkers (use when Snyk/Socket/Gen cover these)",
+		"skip injection and command checkers (use when Snyk/Socket/Gen cover these)"
 	)
 	.option("--include-registry-audits", "fetch Snyk/Socket/Gen results from skills.sh")
 	.option("--ignore <path>", "path to .skillsafeignore file")
@@ -115,7 +115,7 @@ program
 	.option("--compare <path>", "compare current budget against a saved snapshot")
 	.option(
 		"--model <name>",
-		"model for cost estimation: claude-opus, claude-sonnet, claude-haiku, gpt-4o",
+		"model for cost estimation: claude-opus, claude-sonnet, claude-haiku, gpt-4o"
 	)
 	.action(async (dir, options) => {
 		try {

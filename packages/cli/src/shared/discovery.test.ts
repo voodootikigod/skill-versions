@@ -98,7 +98,7 @@ describe("discoverSkillFiles", () => {
 
 	it("throws for nonexistent directory", async () => {
 		await expect(discoverSkillFiles("/nonexistent/path/xyz")).rejects.toThrow(
-			"Cannot read directory",
+			"Cannot read directory"
 		);
 	});
 });

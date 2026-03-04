@@ -44,7 +44,7 @@ export function Quickstart() {
 				</p>
 				<div className={styles.steps}>
 					{steps.map((step) => (
-						<div key={step.number} className={styles.step}>
+						<div className={styles.step} key={step.number}>
 							<div className={styles.stepNumber}>{step.number}</div>
 							<div className={styles.stepContent}>
 								<h3 className={styles.stepTitle}>{step.title}</h3>

@@ -1,5 +1,7 @@
 import type { RedundancyMatch, SkillBudget } from "./types.js";
 
+const WHITESPACE_RE = /\s+/;
+
 /**
  * Tokenize text into word-level n-grams for Jaccard similarity comparison.
  */
@@ -7,7 +9,7 @@ function extractNgrams(text: string, n: number): Set<string> {
 	const words = text
 		.toLowerCase()
 		.replace(/[^a-z0-9\s]/g, " ")
-		.split(/\s+/)
+		.split(WHITESPACE_RE)
 		.filter((w) => w.length > 0);
 
 	const ngrams = new Set<string>();
@@ -49,7 +51,7 @@ function jaccardSimilarity(a: Set<string>, b: Set<string>): number {
 export function detectRedundancy(
 	skills: SkillBudget[],
 	contentMap: Map<string, string>,
-	threshold = 0.2,
+	threshold = 0.2
 ): RedundancyMatch[] {
 	if (skills.length < 2) {
 		return [];

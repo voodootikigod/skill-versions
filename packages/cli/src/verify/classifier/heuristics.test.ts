@@ -43,7 +43,7 @@ describe("classifyHeuristic", () => {
 				packages: {
 					renamed: [{ before: "@vercel/deploy", after: "vercel-deploy", ecosystem: "npm" }],
 				},
-			}),
+			})
 		);
 
 		const majorSignals = signals.filter((s) => s.type === "major");
@@ -58,7 +58,7 @@ describe("classifyHeuristic", () => {
 				packages: {
 					removed: [{ name: "old-pkg", ecosystem: "npm", line: 1, source: "npm install old-pkg" }],
 				},
-			}),
+			})
 		);
 
 		const majorSignals = signals.filter((s) => s.type === "major");
@@ -70,7 +70,7 @@ describe("classifyHeuristic", () => {
 		const signals = classifyHeuristic(
 			makeInput({
 				structural: { sectionsRemoved: ["Getting Started"] },
-			}),
+			})
 		);
 
 		const majorSignals = signals.filter((s) => s.type === "major");
@@ -82,7 +82,7 @@ describe("classifyHeuristic", () => {
 			makeInput({
 				beforeContent: "# My Skill\n\nUse this function.\n",
 				afterContent: "# My Skill\n\nThis function is deprecated. Use the new one.\n",
-			}),
+			})
 		);
 
 		const majorSignals = signals.filter((s) => s.type === "major");
@@ -94,7 +94,7 @@ describe("classifyHeuristic", () => {
 		const signals = classifyHeuristic(
 			makeInput({
 				structural: { sectionsAdded: ["Server Actions", "Edge Runtime"] },
-			}),
+			})
 		);
 
 		const minorSignals = signals.filter((s) => s.type === "minor");
@@ -106,7 +106,7 @@ describe("classifyHeuristic", () => {
 		const signals = classifyHeuristic(
 			makeInput({
 				structural: { codeBlocksDelta: 3 },
-			}),
+			})
 		);
 
 		const minorSignals = signals.filter((s) => s.type === "minor");
@@ -119,7 +119,7 @@ describe("classifyHeuristic", () => {
 			makeInput({
 				onlyVersions: true,
 				similarity: 0.99,
-			}),
+			})
 		);
 
 		const patchSignals = signals.filter((s) => s.type === "patch");
@@ -131,7 +131,7 @@ describe("classifyHeuristic", () => {
 		const signals = classifyHeuristic(
 			makeInput({
 				onlyUrls: true,
-			}),
+			})
 		);
 
 		const patchSignals = signals.filter((s) => s.type === "patch");
@@ -142,7 +142,7 @@ describe("classifyHeuristic", () => {
 		const signals = classifyHeuristic(
 			makeInput({
 				similarity: 0.98,
-			}),
+			})
 		);
 
 		const patchSignals = signals.filter((s) => s.type === "patch");
@@ -156,7 +156,7 @@ describe("classifyHeuristic", () => {
 				similarity: 0.5,
 				beforeContent: "alpha",
 				afterContent: "beta",
-			}),
+			})
 		);
 
 		expect(signals.length).toBeGreaterThan(0);
@@ -174,7 +174,7 @@ describe("classifyHeuristic", () => {
 				packages: {
 					renamed: [{ before: "old-pkg", after: "new-pkg", ecosystem: "npm" }],
 				},
-			}),
+			})
 		);
 
 		const majorSignals = signals.filter((s) => s.type === "major");

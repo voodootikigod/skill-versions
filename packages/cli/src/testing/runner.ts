@@ -12,13 +12,13 @@ import type { AgentHarness } from "./harness/interface.js";
 import type { CaseResult, GraderConfig, GraderResult, TestCase, TrialResult } from "./types.js";
 
 export interface RunCaseOptions {
-	workDir: string;
+	modelFlag?: string;
+	passThreshold: number;
+	providerFlag?: string;
+	testsDir?: string;
 	timeout: number;
 	trials: number;
-	passThreshold: number;
-	testsDir?: string;
-	providerFlag?: string;
-	modelFlag?: string;
+	workDir: string;
 }
 
 /**
@@ -28,7 +28,7 @@ export interface RunCaseOptions {
 export async function runCase(
 	testCase: TestCase,
 	harness: AgentHarness,
-	options: RunCaseOptions,
+	options: RunCaseOptions
 ): Promise<CaseResult> {
 	const trialResults: TrialResult[] = [];
 
@@ -61,7 +61,7 @@ export async function runCase(
 				trialWorkDir,
 				testCase.prompt,
 				execution.transcript,
-				options,
+				options
 			);
 
 			const allPassed = graderResults.every((g) => g.passed);
@@ -113,7 +113,7 @@ async function runGraders(
 	workDir: string,
 	prompt: string,
 	_transcript: string,
-	options: RunCaseOptions,
+	options: RunCaseOptions
 ): Promise<GraderResult[]> {
 	const results: GraderResult[] = [];
 
@@ -125,11 +125,12 @@ async function runGraders(
 	return results;
 }
 
+// biome-ignore lint/suspicious/useAwait: grader implementations may use await
 async function runSingleGrader(
 	grader: GraderConfig,
 	workDir: string,
 	prompt: string,
-	options: RunCaseOptions,
+	options: RunCaseOptions
 ): Promise<GraderResult> {
 	switch (grader.type) {
 		case "file-exists":
@@ -151,16 +152,15 @@ async function runSingleGrader(
 			return gradePackageHas(workDir, grader.dependencies, grader.devDependencies);
 
 		case "llm-rubric": {
-			const rubricPath = grader.rubric && options.testsDir
-				? join(options.testsDir, "..", grader.rubric)
-				: undefined;
+			const rubricPath =
+				grader.rubric && options.testsDir ? join(options.testsDir, "..", grader.rubric) : undefined;
 			return gradeLlmRubric(
 				workDir,
 				grader.criteria,
 				rubricPath,
 				prompt,
 				options.providerFlag,
-				options.modelFlag,
+				options.modelFlag
 			);
 		}
 

@@ -25,10 +25,10 @@ async function checkUrlLiveness(url: string): Promise<{ ok: boolean; status?: nu
 	}
 }
 
-async function withConcurrencyLimit<T>(
+function withConcurrencyLimit<T>(
 	items: T[],
 	limit: number,
-	fn: (item: T) => Promise<void>,
+	fn: (item: T) => Promise<void>
 ): Promise<void> {
 	let running = 0;
 	let index = 0;
@@ -49,7 +49,9 @@ async function withConcurrencyLimit<T>(
 					})
 					.catch(reject);
 			}
-			if (items.length === 0) resolve();
+			if (items.length === 0) {
+				resolve();
+			}
 		}
 		next();
 	});
@@ -63,7 +65,7 @@ export const urlChecker: AuditChecker = {
 		// Only check http(s) URLs, skip localhost/127.0.0.1
 		const checkable = context.urls.filter(
 			(u) =>
-				u.url.startsWith("http") && !u.url.includes("localhost") && !u.url.includes("127.0.0.1"),
+				u.url.startsWith("http") && !u.url.includes("localhost") && !u.url.includes("127.0.0.1")
 		);
 
 		// Deduplicate by URL

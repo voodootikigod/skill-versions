@@ -3,18 +3,18 @@ import { highestBump } from "./heuristics.js";
 import { classifyWithLLM } from "./llm.js";
 
 interface CombinedInput {
-	heuristicSignals: ChangeSignal[];
-	beforeContent: string;
 	afterContent: string;
-	skipLlm?: boolean;
-	providerFlag?: string;
+	beforeContent: string;
+	heuristicSignals: ChangeSignal[];
 	modelFlag?: string;
+	providerFlag?: string;
+	skipLlm?: boolean;
 }
 
 interface CombinedResult {
 	assessedBump: VersionBump;
-	signals: ChangeSignal[];
 	llmUsed: boolean;
+	signals: ChangeSignal[];
 }
 
 /**

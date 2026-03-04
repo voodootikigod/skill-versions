@@ -7,7 +7,7 @@ import type { GraderResult } from "../types.js";
 export async function gradeCommand(
 	workDir: string,
 	run: string,
-	expectExit: number,
+	expectExit: number
 ): Promise<GraderResult> {
 	try {
 		const result = await new Promise<{ exitCode: number; stdout: string; stderr: string }>(
@@ -21,13 +21,13 @@ export async function gradeCommand(
 					},
 					(error, stdout, stderr) => {
 						resolve({
-							exitCode: error ? (error as { code?: number }).code ?? 1 : 0,
+							exitCode: error ? ((error as { code?: number }).code ?? 1) : 0,
 							stdout: stdout ?? "",
 							stderr: stderr ?? "",
 						});
-					},
+					}
 				);
-			},
+			}
 		);
 
 		if (result.exitCode === expectExit) {

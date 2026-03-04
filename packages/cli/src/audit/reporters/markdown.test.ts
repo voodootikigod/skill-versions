@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { AuditReport } from "../types.js";
 import { formatMarkdown } from "./markdown.js";
 
+const DATE_PATTERN_RE = /Generated: \d{4}-\d{2}-\d{2}/;
+
 function makeReport(overrides?: Partial<AuditReport>): AuditReport {
 	return {
 		files: 1,
@@ -16,7 +18,7 @@ describe("formatMarkdown", () => {
 	it("includes title and date", () => {
 		const output = formatMarkdown(makeReport());
 		expect(output).toContain("# Skillsafe Audit Report");
-		expect(output).toMatch(/Generated: \d{4}-\d{2}-\d{2}/);
+		expect(output).toMatch(DATE_PATTERN_RE);
 	});
 
 	it("shows summary table", () => {

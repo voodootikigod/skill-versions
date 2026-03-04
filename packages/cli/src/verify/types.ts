@@ -1,40 +1,40 @@
 export type VersionBump = "major" | "minor" | "patch";
 
 export interface ChangeSignal {
-	type: VersionBump;
-	reason: string;
 	confidence: number;
+	reason: string;
 	source: "heuristic" | "llm";
+	type: VersionBump;
 }
 
 export interface VerifyResult {
-	skill: string;
-	file: string;
-	declaredBefore: string | null;
-	declaredAfter: string | null;
-	declaredBump: VersionBump | null;
 	assessedBump: VersionBump;
+	declaredAfter: string | null;
+	declaredBefore: string | null;
+	declaredBump: VersionBump | null;
+	explanation: string;
+	file: string;
+	llmUsed: boolean;
 	match: boolean;
 	signals: ChangeSignal[];
-	explanation: string;
-	llmUsed: boolean;
+	skill: string;
 }
 
 export interface VerifyReport {
+	generatedAt: string;
 	results: VerifyResult[];
 	summary: { passed: number; failed: number; skipped: number };
-	generatedAt: string;
 }
 
 export interface VerifyOptions {
-	skill?: string;
+	after?: string;
 	all?: boolean;
 	before?: string;
-	after?: string;
-	suggest?: boolean;
 	format?: "terminal" | "json";
+	model?: string;
 	output?: string;
 	provider?: string;
-	model?: string;
+	skill?: string;
 	skipLlm?: boolean;
+	suggest?: boolean;
 }

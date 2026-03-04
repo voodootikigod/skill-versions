@@ -5,6 +5,7 @@ const RECOMMENDED_FIELDS = ["version", "author"] as const;
 
 export const metadataChecker: AuditChecker = {
 	name: "metadata-completeness",
+	// biome-ignore lint/suspicious/useAwait: interface contract requires async
 	async check(context: CheckContext): Promise<AuditFinding[]> {
 		const findings: AuditFinding[] = [];
 		const fm = context.file.frontmatter;

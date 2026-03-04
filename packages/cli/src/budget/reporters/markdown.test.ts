@@ -6,7 +6,7 @@ function makeReport(overrides?: Partial<BudgetReport>): BudgetReport {
 	return {
 		skills: [],
 		totalTokens: 0,
-		contextWindow: 128000,
+		contextWindow: 128_000,
 		cost: { model: "claude-sonnet", costPer1KLoads: 0, tokens: 0 },
 		redundancy: [],
 		generatedAt: "2026-03-03T00:00:00.000Z",

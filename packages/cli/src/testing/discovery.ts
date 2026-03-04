@@ -1,14 +1,14 @@
 import { stat } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 import { discoverSkillFiles } from "../shared/discovery.js";
-import { readSkillFile } from "../skill-io.js";
 import type { SkillFile } from "../skill-io.js";
+import { readSkillFile } from "../skill-io.js";
 
 export interface TestableSkill {
-	skillPath: string;
-	skillFile: SkillFile;
-	testsDir: string;
 	casesPath: string;
+	skillFile: SkillFile;
+	skillPath: string;
+	testsDir: string;
 }
 
 /**
@@ -17,7 +17,7 @@ export interface TestableSkill {
  */
 export async function discoverTestableSkills(
 	dir: string,
-	skillFilter?: string,
+	skillFilter?: string
 ): Promise<TestableSkill[]> {
 	const skillPaths = await discoverSkillFiles(dir);
 	const results: TestableSkill[] = [];

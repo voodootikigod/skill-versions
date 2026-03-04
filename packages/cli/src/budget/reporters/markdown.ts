@@ -39,13 +39,13 @@ export function formatMarkdown(report: BudgetReport, detailed = false): string {
 		const perSkillCost = (skill.totalTokens / 1_000_000) * getModelPrice(report.cost.model) * 1000;
 
 		lines.push(
-			`| ${skill.name} | ${formatNumber(skill.totalTokens)} | ${pct} | ${formatCost(perSkillCost)} |`,
+			`| ${skill.name} | ${formatNumber(skill.totalTokens)} | ${pct} | ${formatCost(perSkillCost)} |`
 		);
 
 		if (detailed) {
 			for (const section of skill.sections) {
 				lines.push(
-					`| -- ${section.heading} | ${formatNumber(section.tokens)} | ${section.percentage}% | |`,
+					`| -- ${section.heading} | ${formatNumber(section.tokens)} | ${section.percentage}% | |`
 				);
 			}
 		}
@@ -54,7 +54,7 @@ export function formatMarkdown(report: BudgetReport, detailed = false): string {
 	// Total row
 	const totalPct = formatPercent(report.totalTokens, report.contextWindow);
 	lines.push(
-		`| **Total** | **${formatNumber(report.totalTokens)}** | **${totalPct}** | **${formatCost(report.cost.costPer1KLoads)}** |`,
+		`| **Total** | **${formatNumber(report.totalTokens)}** | **${totalPct}** | **${formatCost(report.cost.costPer1KLoads)}** |`
 	);
 	lines.push("");
 
@@ -76,7 +76,7 @@ export function formatMarkdown(report: BudgetReport, detailed = false): string {
 	lines.push("## Summary");
 	lines.push("");
 	lines.push(
-		`Budget: ${formatNumber(report.totalTokens)} / ${formatNumber(report.contextWindow)} tokens (${totalPct} of context used by skills)`,
+		`Budget: ${formatNumber(report.totalTokens)} / ${formatNumber(report.contextWindow)} tokens (${totalPct} of context used by skills)`
 	);
 	lines.push("");
 
@@ -101,7 +101,7 @@ export function formatComparisonMarkdown(diffs: BudgetDiff[]): string {
 	for (const diff of diffs) {
 		const sign = diff.delta > 0 ? "+" : "";
 		lines.push(
-			`| ${diff.skill} | ${formatNumber(diff.before)} | ${formatNumber(diff.after)} | ${sign}${formatNumber(diff.delta)} | ${sign}${diff.percentChange}% |`,
+			`| ${diff.skill} | ${formatNumber(diff.before)} | ${formatNumber(diff.after)} | ${sign}${formatNumber(diff.delta)} | ${sign}${diff.percentChange}% |`
 		);
 	}
 
@@ -113,7 +113,7 @@ export function formatComparisonMarkdown(diffs: BudgetDiff[]): string {
 	const totalPctChange = totalBefore > 0 ? (totalDelta / totalBefore) * 100 : 0;
 
 	lines.push(
-		`| **Total** | **${formatNumber(totalBefore)}** | **${formatNumber(totalAfter)}** | **${totalSign}${formatNumber(totalDelta)}** | **${totalSign}${totalPctChange.toFixed(1)}%** |`,
+		`| **Total** | **${formatNumber(totalBefore)}** | **${formatNumber(totalAfter)}** | **${totalSign}${formatNumber(totalDelta)}** | **${totalSign}${totalPctChange.toFixed(1)}%** |`
 	);
 	lines.push("");
 

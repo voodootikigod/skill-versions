@@ -18,11 +18,11 @@ type ExecFileCallback = (error: Error | null, result: { stdout: string; stderr: 
 
 function mockExecFileImpl(
 	responses: Map<string, string>,
-	errors?: Map<string, Error>,
+	errors?: Map<string, Error>
 ): (...args: unknown[]) => void {
 	return (...args: unknown[]) => {
 		const gitArgs = args[1] as string[];
-		const callback = args[args.length - 1] as ExecFileCallback;
+		const callback = args.at(-1) as ExecFileCallback;
 
 		// Build a key from the git arguments
 		const key = gitArgs.join(" ");
@@ -65,8 +65,8 @@ describe("getPreviousVersion", () => {
 					["--show-toplevel", "/repo\n"],
 					["--follow", "abc123\n"],
 					["show abc123:", previousContent],
-				]),
-			) as typeof execFile,
+				])
+			) as typeof execFile
 		);
 
 		const result = await getPreviousVersion("/repo/skills/test/SKILL.md");
@@ -77,8 +77,8 @@ describe("getPreviousVersion", () => {
 		mockExecFile.mockImplementation(
 			mockExecFileImpl(
 				new Map(),
-				new Map([["--show-toplevel", new Error("not a git repository")]]),
-			) as typeof execFile,
+				new Map([["--show-toplevel", new Error("not a git repository")]])
+			) as typeof execFile
 		);
 
 		const result = await getPreviousVersion("/not-a-repo/SKILL.md");
@@ -92,8 +92,8 @@ describe("getPreviousVersion", () => {
 					["--show-toplevel", "/repo\n"],
 					["--follow", "\n"],
 				]),
-				new Map([["show HEAD~1:", new Error("path not found")]]),
-			) as typeof execFile,
+				new Map([["show HEAD~1:", new Error("path not found")]])
+			) as typeof execFile
 		);
 
 		const result = await getPreviousVersion("/repo/skills/new/SKILL.md");
@@ -109,8 +109,8 @@ describe("getPreviousVersion", () => {
 					["--show-toplevel", "/repo\n"],
 					["--follow", "\n"],
 					["show HEAD~1:", content],
-				]),
-			) as typeof execFile,
+				])
+			) as typeof execFile
 		);
 
 		const result = await getPreviousVersion("/repo/skills/test/SKILL.md");
@@ -126,8 +126,8 @@ describe("getPreviousVersion", () => {
 					["--show-toplevel", "/repo with spaces\n"],
 					["--follow", "def456\n"],
 					["show def456:", previousContent],
-				]),
-			) as typeof execFile,
+				])
+			) as typeof execFile
 		);
 
 		const result = await getPreviousVersion("/repo with spaces/my skills/test/SKILL.md");

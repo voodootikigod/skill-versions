@@ -56,13 +56,14 @@ async function listFilesRecursive(dir: string): Promise<Set<string>> {
 export class ClaudeCodeHarness implements AgentHarness {
 	name = "claude-code";
 
+	// biome-ignore lint/suspicious/useAwait: interface contract requires async
 	async available(): Promise<boolean> {
 		return commandExists("claude");
 	}
 
 	async execute(
 		prompt: string,
-		options: { workDir: string; timeout: number; skills?: string[] },
+		options: { workDir: string; timeout: number; skills?: string[] }
 	): Promise<AgentExecution> {
 		const beforeFiles = await listFilesRecursive(options.workDir);
 		const start = Date.now();
@@ -81,11 +82,13 @@ export class ClaudeCodeHarness implements AgentHarness {
 					},
 					(error, stdout, stderr) => {
 						resolve({
-							exitCode: error ? (error as NodeJS.ErrnoException & { code?: number }).code ?? 1 : 0,
+							exitCode: error
+								? ((error as NodeJS.ErrnoException & { code?: number }).code ?? 1)
+								: 0,
 							stdout: stdout ?? "",
 							stderr: stderr ?? "",
 						});
-					},
+					}
 				);
 
 				// Handle timeout via AbortSignal if timeout fires
@@ -98,7 +101,7 @@ export class ClaudeCodeHarness implements AgentHarness {
 						}
 					}, options.timeout * 1000);
 				}
-			},
+			}
 		);
 
 		const duration = Date.now() - start;

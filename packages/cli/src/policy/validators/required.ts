@@ -7,27 +7,34 @@ import type { SkillPolicy } from "../types.js";
  */
 export function checkRequired(
 	discoveredSkills: SkillFile[],
-	policy: SkillPolicy,
+	policy: SkillPolicy
 ): Array<{ skill: string; satisfied: boolean }> {
 	if (!policy.required || policy.required.length === 0) {
 		return [];
 	}
 
 	return policy.required.map((req) => {
+		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 		const satisfied = discoveredSkills.some((file) => {
 			const name = file.frontmatter.name;
-			if (typeof name !== "string") return false;
-			if (name !== req.skill) return false;
+			if (typeof name !== "string") {
+				return false;
+			}
+			if (name !== req.skill) {
+				return false;
+			}
 
 			// If source is specified in the requirement, also match source
 			if (req.source) {
-				const fileSource =
-					typeof file.frontmatter.source === "string"
-						? file.frontmatter.source
-						: typeof file.frontmatter.repository === "string"
-							? file.frontmatter.repository
-							: null;
-				if (fileSource !== req.source) return false;
+				let fileSource: string | null = null;
+				if (typeof file.frontmatter.source === "string") {
+					fileSource = file.frontmatter.source;
+				} else if (typeof file.frontmatter.repository === "string") {
+					fileSource = file.frontmatter.repository;
+				}
+				if (fileSource !== req.source) {
+					return false;
+				}
 			}
 
 			return true;

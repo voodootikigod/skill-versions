@@ -45,7 +45,9 @@ export function formatMarkdown(report: AuditReport): string {
 
 	for (const severity of severityOrder) {
 		const findings = grouped.get(severity);
-		if (!findings || findings.length === 0) continue;
+		if (!findings || findings.length === 0) {
+			continue;
+		}
 
 		lines.push(`## ${severity.charAt(0).toUpperCase() + severity.slice(1)} (${findings.length})`);
 		lines.push("");
@@ -73,7 +75,7 @@ export function formatMarkdown(report: AuditReport): string {
 			const gen = ra.entries.find((e) => e.auditor === "gen");
 
 			lines.push(
-				`| ${ra.skillName} | ${snyk?.status ?? "—"} | ${socket?.status ?? "—"} | ${gen?.status ?? "—"} |`,
+				`| ${ra.skillName} | ${snyk?.status ?? "—"} | ${socket?.status ?? "—"} | ${gen?.status ?? "—"} |`
 			);
 		}
 

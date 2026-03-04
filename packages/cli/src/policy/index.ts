@@ -14,11 +14,12 @@ import { checkSources } from "./validators/sources.js";
 /**
  * Run a policy check against discovered skill files.
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export async function runPolicyCheck(
 	paths: string[],
 	policy: SkillPolicy,
 	policyFile: string,
-	options: PolicyOptions = {},
+	options: PolicyOptions = {}
 ): Promise<PolicyReport> {
 	// Discover all skill files
 	const allFiles: string[] = [];

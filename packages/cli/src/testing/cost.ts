@@ -56,7 +56,7 @@ export function estimateTestCost(suites: TestSuite[], options: TestOptions): Cos
 
 		perSuite.push({
 			suiteName: suite.name,
-			estimatedCost: Math.round(suiteCost * 10000) / 10000,
+			estimatedCost: Math.round(suiteCost * 10_000) / 10_000,
 			caseCount: suite.cases.length,
 			trials,
 		});
@@ -65,7 +65,7 @@ export function estimateTestCost(suites: TestSuite[], options: TestOptions): Cos
 	}
 
 	return {
-		totalEstimatedCost: Math.round(totalEstimatedCost * 10000) / 10000,
+		totalEstimatedCost: Math.round(totalEstimatedCost * 10_000) / 10_000,
 		perSuite,
 	};
 }

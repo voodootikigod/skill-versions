@@ -1,13 +1,9 @@
 export interface SkillPolicy {
-	version: number;
-	sources?: { allow?: string[]; deny?: string[] };
-	required?: Array<{ source?: string; skill: string }>;
-	banned?: Array<{ skill: string; reason?: string }>;
-	metadata?: {
-		required_fields?: string[];
-		require_license?: boolean;
-		allowed_licenses?: string[];
+	audit?: {
+		require_clean?: boolean;
+		min_severity_to_block?: "critical" | "high" | "medium" | "low";
 	};
+	banned?: Array<{ skill: string; reason?: string }>;
 	content?: {
 		deny_patterns?: Array<{ pattern: string; reason: string }>;
 		require_patterns?: Array<{ pattern: string; reason: string }>;
@@ -17,37 +13,41 @@ export interface SkillPolicy {
 		max_version_drift?: "major" | "minor" | "patch";
 		require_product_version?: boolean;
 	};
-	audit?: {
-		require_clean?: boolean;
-		min_severity_to_block?: "critical" | "high" | "medium" | "low";
+	metadata?: {
+		required_fields?: string[];
+		require_license?: boolean;
+		allowed_licenses?: string[];
 	};
+	required?: Array<{ source?: string; skill: string }>;
+	sources?: { allow?: string[]; deny?: string[] };
+	version: number;
 }
 
 export type PolicySeverity = "blocked" | "violation" | "warning";
 
 export interface PolicyFinding {
-	file: string;
-	severity: PolicySeverity;
-	rule: string;
-	message: string;
 	detail?: string;
+	file: string;
 	line?: number;
+	message: string;
+	rule: string;
+	severity: PolicySeverity;
 }
 
 export interface PolicyReport {
-	policyFile: string;
 	files: number;
 	findings: PolicyFinding[];
+	generatedAt: string;
+	policyFile: string;
 	required: Array<{ skill: string; satisfied: boolean }>;
 	summary: { blocked: number; violations: number; warnings: number };
-	generatedAt: string;
 }
 
 export interface PolicyOptions {
-	policy?: string;
-	skill?: string;
 	ci?: boolean;
+	failOn?: PolicySeverity;
 	format?: "terminal" | "json";
 	output?: string;
-	failOn?: PolicySeverity;
+	policy?: string;
+	skill?: string;
 }

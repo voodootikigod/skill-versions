@@ -36,7 +36,7 @@ function makeReport(overrides?: Partial<BudgetReport>): BudgetReport {
 			},
 		],
 		totalTokens: 2000,
-		contextWindow: 128000,
+		contextWindow: 128_000,
 		cost: { model: "claude-sonnet", costPer1KLoads: 0.006, tokens: 2000 },
 		redundancy: [],
 		generatedAt: "2026-03-03T00:00:00.000Z",
@@ -48,8 +48,12 @@ describe("budgetCommand", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockedRunBudget.mockResolvedValue(makeReport());
-		vi.spyOn(console, "log").mockImplementation(() => {});
-		vi.spyOn(console, "error").mockImplementation(() => {});
+		vi.spyOn(console, "log").mockImplementation(() => {
+			/* intentionally empty */
+		});
+		vi.spyOn(console, "error").mockImplementation(() => {
+			/* intentionally empty */
+		});
 	});
 
 	afterEach(() => {
@@ -87,7 +91,7 @@ describe("budgetCommand", () => {
 		await budgetCommand(".", { skill: "my-skill" });
 		expect(mockedRunBudget).toHaveBeenCalledWith(
 			["."],
-			expect.objectContaining({ skill: "my-skill" }),
+			expect.objectContaining({ skill: "my-skill" })
 		);
 	});
 
@@ -95,7 +99,7 @@ describe("budgetCommand", () => {
 		await budgetCommand(".", { model: "claude-opus" });
 		expect(mockedRunBudget).toHaveBeenCalledWith(
 			["."],
-			expect.objectContaining({ model: "claude-opus" }),
+			expect.objectContaining({ model: "claude-opus" })
 		);
 	});
 
@@ -132,7 +136,7 @@ describe("budgetCommand", () => {
 		await budgetCommand(".", { save: "/tmp/snapshot.json" });
 		expect(mockedSaveSnapshot).toHaveBeenCalledWith(
 			expect.objectContaining({ totalTokens: 2000 }),
-			"/tmp/snapshot.json",
+			"/tmp/snapshot.json"
 		);
 	});
 

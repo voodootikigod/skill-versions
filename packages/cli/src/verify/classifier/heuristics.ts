@@ -3,13 +3,13 @@ import type { StructuralDiff } from "../diff/structural.js";
 import type { ChangeSignal, VersionBump } from "../types.js";
 
 interface HeuristicInput {
-	structural: StructuralDiff;
+	afterContent: string;
+	beforeContent: string;
+	onlyUrls: boolean;
+	onlyVersions: boolean;
 	packages: PackageDiff;
 	similarity: number;
-	onlyVersions: boolean;
-	onlyUrls: boolean;
-	beforeContent: string;
-	afterContent: string;
+	structural: StructuralDiff;
 }
 
 // Text patterns that indicate breaking/major changes
@@ -75,17 +75,17 @@ export function classifyHeuristic(input: HeuristicInput): ChangeSignal[] {
 	// Check for major text patterns in added content
 	const addedText = findAddedText(input.beforeContent, input.afterContent);
 	for (const pattern of MAJOR_PATTERNS) {
-		if (pattern.test(addedText) || pattern.test(input.afterContent)) {
-			// Only flag if the pattern is new (not already in before)
-			if (!pattern.test(input.beforeContent) || pattern.test(addedText)) {
-				signals.push({
-					type: "major",
-					reason: `Major change indicator: "${pattern.source}" found in changes`,
-					confidence: 0.7,
-					source: "heuristic",
-				});
-				break; // One text pattern signal is enough
-			}
+		if (
+			(pattern.test(addedText) || pattern.test(input.afterContent)) &&
+			(!pattern.test(input.beforeContent) || pattern.test(addedText))
+		) {
+			signals.push({
+				type: "major",
+				reason: `Major change indicator: "${pattern.source}" found in changes`,
+				confidence: 0.7,
+				source: "heuristic",
+			});
+			break; // One text pattern signal is enough
 		}
 	}
 

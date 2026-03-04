@@ -1,24 +1,24 @@
 .section {
-	border-top: 1px solid var(--border);
 	padding: 64px 0;
+	border-top: 1px solid var(--border);
 }
 
 .container {
 	max-width: 1024px;
-	margin: 0 auto;
 	padding: 0 24px;
+	margin: 0 auto;
 }
 
 .heading {
+	margin-bottom: 8px;
 	font-size: 24px;
 	font-weight: 600;
-	margin-bottom: 8px;
 }
 
 .subtitle {
-	color: var(--text-secondary);
-	font-size: 16px;
 	margin-bottom: 40px;
+	font-size: 16px;
+	color: var(--text-secondary);
 }
 
 .groups {
@@ -36,9 +36,9 @@
 .groupLabel {
 	font-size: 12px;
 	font-weight: 600;
+	color: var(--text-tertiary);
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
-	color: var(--text-tertiary);
 }
 
 .cards {
@@ -52,30 +52,30 @@
 	gap: 14px;
 	align-items: flex-start;
 	padding: 16px;
+	background: var(--bg-secondary);
 	border: 1px solid var(--border);
 	border-radius: 8px;
-	background: var(--bg-secondary);
 	transition:
 		border-color 0.15s ease,
 		background 0.15s ease;
 }
 
 .card:hover {
-	border-color: var(--border-hover);
 	background: var(--bg-hover);
+	border-color: var(--border-hover);
 }
 
 .cardIcon {
-	flex-shrink: 0;
-	width: 28px;
-	height: 28px;
 	display: flex;
+	flex-shrink: 0;
 	align-items: center;
 	justify-content: center;
+	width: 28px;
+	height: 28px;
 	font-size: 14px;
-	border-radius: 6px;
-	border: 1px solid var(--border);
 	background: var(--bg);
+	border: 1px solid var(--border);
+	border-radius: 6px;
 }
 
 .cardBody {
@@ -84,17 +84,17 @@
 }
 
 .cardName {
+	margin-bottom: 4px;
 	font-family: var(--font-mono);
 	font-size: 14px;
 	font-weight: 600;
-	margin-bottom: 4px;
 	color: var(--text-primary);
 }
 
 .cardDescription {
 	font-size: 13px;
-	color: var(--text-secondary);
 	line-height: 1.5;
+	color: var(--text-secondary);
 }
 
 .statusShipped {

@@ -1,12 +1,14 @@
 import type { ExtractedPackage } from "../types.js";
 
+const PIP_VERSION_SPLIT_RE = /[=<>!~]/;
+
 // npm/pnpm/yarn/bun package name: @scope/name or name, followed by optional @version
 const NPM_PKG = /(?:@[\w.-]+\/)?[\w.-]+/;
 
 // Patterns for npm-ecosystem installs
 const NPM_INSTALL_RE = new RegExp(
 	`(?:npm\\s+install|npm\\s+i|npx|pnpm\\s+add|pnpm\\s+dlx|yarn\\s+add|bunx|bun\\s+add)\\s+(?:(?:-[\\w-]+\\s+)*)(${NPM_PKG.source}(?:@\\S*)?)`,
-	"g",
+	"g"
 );
 
 // pip install patterns
@@ -54,7 +56,7 @@ export function extractPackages(content: string): ExtractedPackage[] {
 			const raw = match[1];
 			if (raw && !isFlag(raw)) {
 				// pip uses == for version pinning
-				const name = raw.split(/[=<>!~]/)[0];
+				const name = raw.split(PIP_VERSION_SPLIT_RE)[0];
 				results.push({
 					name,
 					ecosystem: "pypi",

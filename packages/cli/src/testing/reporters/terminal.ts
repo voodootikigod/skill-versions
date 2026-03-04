@@ -1,12 +1,13 @@
 import chalk from "chalk";
-import type { BaselineDiff, CaseResult, TestReport } from "../types.js";
+import type { BaselineDiff, TestReport } from "../types.js";
 
 /**
  * Format test results for terminal output with colors and icons.
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export function formatTerminal(
 	reports: TestReport[],
-	options?: { verbose?: boolean; baselineDiffs?: Map<string, BaselineDiff> },
+	options?: { verbose?: boolean; baselineDiffs?: Map<string, BaselineDiff> }
 ): string {
 	const lines: string[] = [];
 
@@ -56,9 +57,14 @@ export function formatTerminal(
 				}
 			}
 
-			if (c.passed) totalPassed++;
-			else totalFailed++;
-			if (c.flaky) totalFlaky++;
+			if (c.passed) {
+				totalPassed++;
+			} else {
+				totalFailed++;
+			}
+			if (c.flaky) {
+				totalFlaky++;
+			}
 		}
 
 		totalSkipped += report.skipped;
@@ -72,8 +78,8 @@ export function formatTerminal(
 				for (const r of diff.regressions) {
 					lines.push(
 						chalk.red(
-							`    ${r.caseId}: ${Math.round(r.wasPassRate * 100)}% -> ${Math.round(r.nowPassRate * 100)}%`,
-						),
+							`    ${r.caseId}: ${Math.round(r.wasPassRate * 100)}% -> ${Math.round(r.nowPassRate * 100)}%`
+						)
 					);
 				}
 			}
@@ -83,8 +89,8 @@ export function formatTerminal(
 				for (const imp of diff.improvements) {
 					lines.push(
 						chalk.green(
-							`    ${imp.caseId}: ${Math.round(imp.wasPassRate * 100)}% -> ${Math.round(imp.nowPassRate * 100)}%`,
-						),
+							`    ${imp.caseId}: ${Math.round(imp.wasPassRate * 100)}% -> ${Math.round(imp.nowPassRate * 100)}%`
+						)
 					);
 				}
 			}
@@ -97,9 +103,15 @@ export function formatTerminal(
 	lines.push(chalk.bold("Summary"));
 	lines.push("=".repeat(50));
 	lines.push(chalk.green(`  Passed:  ${totalPassed}`));
-	if (totalFailed > 0) lines.push(chalk.red(`  Failed:  ${totalFailed}`));
-	if (totalSkipped > 0) lines.push(chalk.yellow(`  Skipped: ${totalSkipped}`));
-	if (totalFlaky > 0) lines.push(chalk.yellow(`  Flaky:   ${totalFlaky}`));
+	if (totalFailed > 0) {
+		lines.push(chalk.red(`  Failed:  ${totalFailed}`));
+	}
+	if (totalSkipped > 0) {
+		lines.push(chalk.yellow(`  Skipped: ${totalSkipped}`));
+	}
+	if (totalFlaky > 0) {
+		lines.push(chalk.yellow(`  Flaky:   ${totalFlaky}`));
+	}
 
 	const totalDuration = reports.reduce((sum, r) => sum + r.totalDuration, 0);
 	lines.push(`  Time:    ${(totalDuration / 1000).toFixed(1)}s`);

@@ -42,6 +42,7 @@ export async function parsePolicy(content: string): Promise<SkillPolicy> {
  * Validate a parsed SkillPolicy for structural issues.
  * Returns an array of validation error strings (empty = valid).
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export function validatePolicy(policy: SkillPolicy): string[] {
 	const errors: string[] = [];
 
@@ -61,29 +62,29 @@ export function validatePolicy(policy: SkillPolicy): string[] {
 
 	// Validate required
 	if (policy.required) {
-		if (!Array.isArray(policy.required)) {
-			errors.push("required must be an array");
-		} else {
+		if (Array.isArray(policy.required)) {
 			for (let i = 0; i < policy.required.length; i++) {
 				const req = policy.required[i];
 				if (!req.skill || typeof req.skill !== "string") {
 					errors.push(`required[${i}] must have a "skill" string field`);
 				}
 			}
+		} else {
+			errors.push("required must be an array");
 		}
 	}
 
 	// Validate banned
 	if (policy.banned) {
-		if (!Array.isArray(policy.banned)) {
-			errors.push("banned must be an array");
-		} else {
+		if (Array.isArray(policy.banned)) {
 			for (let i = 0; i < policy.banned.length; i++) {
 				const ban = policy.banned[i];
 				if (!ban.skill || typeof ban.skill !== "string") {
 					errors.push(`banned[${i}] must have a "skill" string field`);
 				}
 			}
+		} else {
+			errors.push("banned must be an array");
 		}
 	}
 
@@ -100,9 +101,7 @@ export function validatePolicy(policy: SkillPolicy): string[] {
 	// Validate content patterns compile as regex
 	if (policy.content) {
 		if (policy.content.deny_patterns) {
-			if (!Array.isArray(policy.content.deny_patterns)) {
-				errors.push("content.deny_patterns must be an array");
-			} else {
+			if (Array.isArray(policy.content.deny_patterns)) {
 				for (const dp of policy.content.deny_patterns) {
 					try {
 						new RegExp(dp.pattern);
@@ -111,16 +110,16 @@ export function validatePolicy(policy: SkillPolicy): string[] {
 					}
 					if (!dp.reason || typeof dp.reason !== "string") {
 						errors.push(
-							`content.deny_patterns: pattern "${dp.pattern}" must have a "reason" string`,
+							`content.deny_patterns: pattern "${dp.pattern}" must have a "reason" string`
 						);
 					}
 				}
+			} else {
+				errors.push("content.deny_patterns must be an array");
 			}
 		}
 		if (policy.content.require_patterns) {
-			if (!Array.isArray(policy.content.require_patterns)) {
-				errors.push("content.require_patterns must be an array");
-			} else {
+			if (Array.isArray(policy.content.require_patterns)) {
 				for (const rp of policy.content.require_patterns) {
 					try {
 						new RegExp(rp.pattern);
@@ -129,10 +128,12 @@ export function validatePolicy(policy: SkillPolicy): string[] {
 					}
 					if (!rp.reason || typeof rp.reason !== "string") {
 						errors.push(
-							`content.require_patterns: pattern "${rp.pattern}" must have a "reason" string`,
+							`content.require_patterns: pattern "${rp.pattern}" must have a "reason" string`
 						);
 					}
 				}
+			} else {
+				errors.push("content.require_patterns must be an array");
 			}
 		}
 	}
@@ -144,7 +145,7 @@ export function validatePolicy(policy: SkillPolicy): string[] {
 			!["major", "minor", "patch"].includes(policy.freshness.max_version_drift)
 		) {
 			errors.push(
-				`freshness.max_version_drift must be "major", "minor", or "patch" (got "${policy.freshness.max_version_drift}")`,
+				`freshness.max_version_drift must be "major", "minor", or "patch" (got "${policy.freshness.max_version_drift}")`
 			);
 		}
 		if (
@@ -156,15 +157,13 @@ export function validatePolicy(policy: SkillPolicy): string[] {
 	}
 
 	// Validate audit
-	if (policy.audit) {
-		if (
-			policy.audit.min_severity_to_block &&
-			!["critical", "high", "medium", "low"].includes(policy.audit.min_severity_to_block)
-		) {
-			errors.push(
-				`audit.min_severity_to_block must be "critical", "high", "medium", or "low" (got "${policy.audit.min_severity_to_block}")`,
-			);
-		}
+	if (
+		policy.audit?.min_severity_to_block &&
+		!["critical", "high", "medium", "low"].includes(policy.audit.min_severity_to_block)
+	) {
+		errors.push(
+			`audit.min_severity_to_block must be "critical", "high", "medium", or "low" (got "${policy.audit.min_severity_to_block}")`
+		);
 	}
 
 	return errors;
@@ -187,7 +186,9 @@ export async function discoverPolicyFile(startDir: string): Promise<string | nul
 			// Not found, continue walking up
 		}
 		const parent = dirname(current);
-		if (parent === current) break;
+		if (parent === current) {
+			break;
+		}
 		current = parent;
 	}
 

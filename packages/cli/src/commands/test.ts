@@ -7,24 +7,25 @@ import { formatTerminal } from "../testing/reporters/terminal.js";
 import type { TestOptions } from "../testing/types.js";
 
 interface TestCommandOptions {
-	skill?: string;
-	type?: string;
 	agent?: string;
 	agentCmd?: string;
-	format?: "terminal" | "json" | "markdown";
-	output?: string;
-	trials?: string;
-	passThreshold?: string;
-	timeout?: string;
-	maxCost?: string;
-	dry?: boolean;
-	updateBaseline?: boolean;
 	ci?: boolean;
-	provider?: string;
+	dry?: boolean;
+	format?: "terminal" | "json" | "markdown";
+	maxCost?: string;
 	model?: string;
+	output?: string;
+	passThreshold?: string;
+	provider?: string;
+	skill?: string;
+	timeout?: string;
+	trials?: string;
+	type?: string;
+	updateBaseline?: boolean;
 	verbose?: boolean;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export async function testCommand(dir: string, options: TestCommandOptions): Promise<number> {
 	const testOptions: TestOptions = {
 		skill: options.skill,
@@ -47,10 +48,18 @@ export async function testCommand(dir: string, options: TestCommandOptions): Pro
 
 	if (options.verbose) {
 		console.error(chalk.dim(`Testing: ${dir}`));
-		if (options.skill) console.error(chalk.dim(`Skill filter: ${options.skill}`));
-		if (options.type) console.error(chalk.dim(`Type filter: ${options.type}`));
-		if (options.agent) console.error(chalk.dim(`Agent: ${options.agent}`));
-		if (options.dry) console.error(chalk.dim("Mode: dry run"));
+		if (options.skill) {
+			console.error(chalk.dim(`Skill filter: ${options.skill}`));
+		}
+		if (options.type) {
+			console.error(chalk.dim(`Type filter: ${options.type}`));
+		}
+		if (options.agent) {
+			console.error(chalk.dim(`Agent: ${options.agent}`));
+		}
+		if (options.dry) {
+			console.error(chalk.dim("Mode: dry run"));
+		}
 	}
 
 	const { reports, baselineDiffs, costEstimate } = await runTests(dir, testOptions);
@@ -70,7 +79,9 @@ export async function testCommand(dir: string, options: TestCommandOptions): Pro
 		if (costEstimate) {
 			console.log(`\n${chalk.bold("Estimated cost:")} $${costEstimate.totalEstimatedCost}`);
 			for (const s of costEstimate.perSuite) {
-				console.log(`  ${s.suiteName}: $${s.estimatedCost} (${s.caseCount} cases x ${s.trials} trials)`);
+				console.log(
+					`  ${s.suiteName}: $${s.estimatedCost} (${s.caseCount} cases x ${s.trials} trials)`
+				);
 			}
 		}
 
@@ -109,7 +120,11 @@ export async function testCommand(dir: string, options: TestCommandOptions): Pro
 	const totalFailed = reports.reduce((s, r) => s + r.failed, 0);
 	const hasRegressions = [...baselineDiffs.values()].some((d) => d.regressions.length > 0);
 
-	if (totalFailed > 0) return 1;
-	if (options.ci && hasRegressions) return 1;
+	if (totalFailed > 0) {
+		return 1;
+	}
+	if (options.ci && hasRegressions) {
+		return 1;
+	}
 	return 0;
 }

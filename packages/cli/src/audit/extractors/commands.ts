@@ -3,10 +3,12 @@ import type { ExtractedCommand } from "../types.js";
 // Matches fenced code blocks with shell-like language hints
 const CODE_BLOCK_RE = /^```(?:bash|sh|shell|zsh|console)?\s*$/;
 const CODE_BLOCK_END = /^```\s*$/;
+const SHELL_PROMPT_RE = /^\s*[$%>]\s+/;
+const FENCE_PREFIX_RE = /^```/;
 
 function stripPrompt(line: string): string {
 	// Strip common shell prompts: "$ ", "% ", "> "
-	return line.replace(/^\s*[$%>]\s+/, "").trim();
+	return line.replace(SHELL_PROMPT_RE, "").trim();
 }
 
 export function extractCommands(content: string): ExtractedCommand[] {
@@ -23,7 +25,7 @@ export function extractCommands(content: string): ExtractedCommand[] {
 		if (!inCodeBlock && CODE_BLOCK_RE.test(line)) {
 			inCodeBlock = true;
 			// Shell block if language hint is present or no language specified
-			const lang = line.replace(/^```/, "").trim();
+			const lang = line.replace(FENCE_PREFIX_RE, "").trim();
 			isShellBlock = lang === "" || ["bash", "sh", "shell", "zsh", "console"].includes(lang);
 			continue;
 		}

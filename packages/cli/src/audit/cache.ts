@@ -9,8 +9,8 @@ export function getCacheDir(): string {
 }
 
 interface CacheEntry {
-	value: boolean;
 	timestamp: number;
+	value: boolean;
 }
 
 let dirEnsured = false;
@@ -20,7 +20,9 @@ export function resetCacheState(): void {
 }
 
 async function ensureCacheDir(): Promise<void> {
-	if (dirEnsured) return;
+	if (dirEnsured) {
+		return;
+	}
 	try {
 		await mkdir(getCacheDir(), { recursive: true });
 		dirEnsured = true;
@@ -37,7 +39,7 @@ function cacheFilePath(ecosystem: string, name: string): string {
 export async function getCached(
 	ecosystem: string,
 	name: string,
-	ttlMs = DEFAULT_TTL_MS,
+	ttlMs = DEFAULT_TTL_MS
 ): Promise<boolean | undefined> {
 	try {
 		const path = cacheFilePath(ecosystem, name);
@@ -73,7 +75,7 @@ interface JsonCacheEntry {
 export async function getJsonCached(
 	ecosystem: string,
 	name: string,
-	ttlMs = DEFAULT_TTL_MS,
+	ttlMs = DEFAULT_TTL_MS
 ): Promise<unknown | undefined> {
 	try {
 		const path = cacheFilePath(ecosystem, name);

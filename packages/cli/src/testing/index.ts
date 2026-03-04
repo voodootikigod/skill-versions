@@ -14,9 +14,10 @@ import type { BaselineDiff, CaseResult, TestOptions, TestReport, TestSuite } fro
  * Run test suites for discovered skills.
  * Main orchestrator: discover -> parse -> (dry/execute) -> baseline -> report.
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export async function runTests(
 	dir: string,
-	options: TestOptions,
+	options: TestOptions
 ): Promise<{
 	reports: TestReport[];
 	baselineDiffs: Map<string, BaselineDiff>;
@@ -71,7 +72,7 @@ export async function runTests(
 	// 3. Cost estimation
 	const costEstimate = estimateTestCost(
 		suiteEntries.map((e) => e.suite),
-		options,
+		options
 	);
 
 	// 4. If --dry, return early
@@ -121,7 +122,7 @@ export async function runTests(
 		// Check budget
 		if (options.maxCost && costEstimate.totalEstimatedCost > options.maxCost) {
 			console.error(
-				`Warning: Estimated cost $${costEstimate.totalEstimatedCost} exceeds budget $${options.maxCost}. Skipping.`,
+				`Warning: Estimated cost $${costEstimate.totalEstimatedCost} exceeds budget $${options.maxCost}. Skipping.`
 			);
 			skipped = entry.suite.cases.length;
 		} else {
@@ -130,7 +131,8 @@ export async function runTests(
 					workDir: ".",
 					timeout: options.timeout ?? entry.suite.timeout,
 					trials: options.trials ?? entry.suite.trials,
-					passThreshold: options.passThreshold ?? Math.ceil((options.trials ?? entry.suite.trials) * 0.67),
+					passThreshold:
+						options.passThreshold ?? Math.ceil((options.trials ?? entry.suite.trials) * 0.67),
 					testsDir: entry.testsDir,
 					providerFlag: options.provider,
 					modelFlag: options.model,
@@ -173,7 +175,6 @@ function resolveHarness(agent?: string, agentCmd?: string): AgentHarness {
 	switch (agent) {
 		case "claude-code":
 			return new ClaudeCodeHarness();
-		case "generic":
 		default:
 			return new GenericHarness(agentCmd);
 	}

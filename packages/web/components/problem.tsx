@@ -57,10 +57,10 @@ export function Problem() {
 					</div>
 				</div>
 				<a
-					href="https://www.voodootikigod.com/your-agents-knowledge-has-a-shelf-life/"
-					target="_blank"
-					rel="noopener noreferrer"
 					className={styles.blogLink}
+					href="https://www.voodootikigod.com/your-agents-knowledge-has-a-shelf-life/"
+					rel="noopener noreferrer"
+					target="_blank"
 				>
 					Read the full story: Your Agent&rsquo;s Knowledge Has a Shelf Life
 					<span className={styles.arrow}>&rarr;</span>

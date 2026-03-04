@@ -1,18 +1,18 @@
 export interface TestSuite {
+	cases: TestCase[];
 	name: string;
 	productVersion?: string;
 	timeout: number;
 	trials: number;
-	cases: TestCase[];
 }
 
 export interface TestCase {
-	id: string;
-	type: "trigger" | "outcome" | "style" | "regression";
-	prompt: string;
 	expectTrigger?: boolean;
 	fixture?: string;
 	graders: GraderConfig[];
+	id: string;
+	prompt: string;
+	type: "trigger" | "outcome" | "style" | "regression";
 }
 
 export type GraderConfig =
@@ -26,83 +26,83 @@ export type GraderConfig =
 	| { type: "custom"; module: string };
 
 export interface GraderResult {
-	grader: string;
-	passed: boolean;
-	message: string;
 	detail?: string;
+	grader: string;
+	message: string;
+	passed: boolean;
 }
 
 export interface TrialResult {
-	trial: number;
-	graderResults: GraderResult[];
-	passed: boolean;
 	duration: number;
 	error?: string;
+	graderResults: GraderResult[];
+	passed: boolean;
+	trial: number;
 }
 
 export interface CaseResult {
 	caseId: string;
-	type: TestCase["type"];
-	prompt: string;
-	trials: TrialResult[];
+	flaky: boolean;
 	passed: boolean;
 	passRate: number;
-	flaky: boolean;
+	prompt: string;
+	trials: TrialResult[];
+	type: TestCase["type"];
 }
 
 export interface TestReport {
+	cases: CaseResult[];
+	failed: number;
+	generatedAt: string;
+	passed: number;
 	skillName: string;
 	skillPath: string;
-	suite: string;
-	cases: CaseResult[];
-	passed: number;
-	failed: number;
 	skipped: number;
+	suite: string;
 	totalDuration: number;
-	generatedAt: string;
 }
 
 export interface AgentExecution {
-	exitCode: number;
-	transcript: string;
-	filesCreated: string[];
 	duration: number;
+	exitCode: number;
+	filesCreated: string[];
 	tokenUsage?: { input: number; output: number };
+	transcript: string;
 }
 
 export interface TestOptions {
-	skill?: string;
-	type?: string;
 	agent?: string;
 	agentCmd?: string;
-	format?: "terminal" | "json" | "markdown";
-	output?: string;
-	trials?: number;
-	passThreshold?: number;
-	timeout?: number;
-	maxCost?: number;
-	dry?: boolean;
-	updateBaseline?: boolean;
 	ci?: boolean;
-	provider?: string;
+	dry?: boolean;
+	format?: "terminal" | "json" | "markdown";
+	maxCost?: number;
 	model?: string;
+	output?: string;
+	passThreshold?: number;
+	provider?: string;
+	skill?: string;
+	timeout?: number;
+	trials?: number;
+	type?: string;
+	updateBaseline?: boolean;
 	verbose?: boolean;
 }
 
 export interface CostEstimate {
-	totalEstimatedCost: number;
 	perSuite: Array<{
 		suiteName: string;
 		estimatedCost: number;
 		caseCount: number;
 		trials: number;
 	}>;
+	totalEstimatedCost: number;
 }
 
 export interface BaselineDiff {
-	regressions: Array<{ caseId: string; wasPassRate: number; nowPassRate: number }>;
 	improvements: Array<{ caseId: string; wasPassRate: number; nowPassRate: number }>;
-	unchanged: number;
 	newCases: string[];
+	regressions: Array<{ caseId: string; wasPassRate: number; nowPassRate: number }>;
 	removedCases: string[];
+	unchanged: number;
 }

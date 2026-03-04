@@ -18,6 +18,7 @@ import type { LintFinding, LintOptions, LintReport } from "./types.js";
  * 4. If --fix is set, apply auto-fixes and write back
  * 5. Return a LintReport with findings and summary counts
  */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export async function runLint(paths: string[], options: LintOptions = {}): Promise<LintReport> {
 	// Discover all skill files
 	const allFiles: string[] = [];
@@ -85,7 +86,7 @@ export async function runLint(paths: string[], options: LintOptions = {}): Promi
 				// Remove fixed findings from the results
 				const fixedSet = new Set(result.fixed);
 				for (const f of deduped) {
-					if (!f.fixable || !fixedSet.has(f.field)) {
+					if (!(f.fixable && fixedSet.has(f.field))) {
 						allFindings.push(f);
 					}
 				}
