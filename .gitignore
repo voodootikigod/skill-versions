@@ -11,3 +11,7 @@ packages/web/tsconfig.tsbuildinfo
 # Dolt database files (added by bd init)
 .dolt/
 *.db
+
+# Beads runtime files
+.beads/dolt-monitor.pid
+.beads/dolt-server.activity
