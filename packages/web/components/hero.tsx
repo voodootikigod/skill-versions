@@ -5,8 +5,9 @@ export function Hero() {
 	return (
 		<section className={styles.hero}>
 			<h1 className={styles.title}>
-				<span className={styles.glow}>skill</span>
-				<span className={styles.glow}>safe</span>
+				<span className={styles.glow}>skills</span>
+				<span className={styles.glowDim}>-</span>
+				<span className={styles.glow}>check</span>
 			</h1>
 			<p className={styles.tagline}>
 				Quality & integrity layer for Agent Skills
