@@ -1,5 +1,5 @@
 name: "Skills Check CI"
-description: "Quality & integrity layer for Agent Skills — check freshness, audit security, lint metadata, analyze budgets, enforce policy, and more"
+description: "Quality & integrity layer for Agent Skills — check freshness, audit security, lint metadata, and more"
 author: "voodootikigod"
 
 branding:
