@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 	title: {
-		default: "Skills Check — Quality & integrity layer for Agent Skills",
+		default: "Skills Check — The missing quality toolkit for Agent Skills",
 		template: "%s | Skills Check",
 	},
 	description:
@@ -36,9 +36,9 @@ export const metadata: Metadata = {
 	authors: [{ name: "Chris Williams", url: "https://github.com/voodootikigod" }],
 	creator: "Chris Williams",
 	openGraph: {
-		title: "Skills Check — Quality & integrity layer for Agent Skills",
+		title: "Skills Check — The missing quality toolkit for Agent Skills",
 		description:
-			"Quality & integrity layer for AI Agent Skills. 10 commands for freshness, security, quality, and efficiency.",
+			"The missing quality toolkit for AI Agent Skills. 10 commands for freshness, security, quality, and efficiency.",
 		url: "https://skillscheck.ai",
 		siteName: "Skills Check",
 		locale: "en_US",
@@ -46,9 +46,9 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Skills Check — Quality & integrity layer for Agent Skills",
+		title: "Skills Check — The missing quality toolkit for Agent Skills",
 		description:
-			"Quality & integrity layer for AI Agent Skills. 10 commands for freshness, security, quality, and efficiency.",
+			"The missing quality toolkit for AI Agent Skills. 10 commands for freshness, security, quality, and efficiency.",
 		creator: "@voodootikigod",
 	},
 	robots: {

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Skills Check — Quality & integrity layer for Agent Skills";
+export const alt = "Skills Check — The missing quality toolkit for Agent Skills";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -40,7 +40,7 @@ export default function OGImage() {
 					display: "flex",
 				}}
 			>
-				Quality & integrity layer for Agent Skills
+				The missing quality toolkit for Agent Skills
 			</div>
 			<div
 				style={{

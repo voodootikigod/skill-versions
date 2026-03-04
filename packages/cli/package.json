@@ -1,7 +1,7 @@
 {
   "name": "skills-check",
   "version": "0.1.0",
-  "description": "Quality & integrity layer for Agent Skills — like npm outdated for skill knowledge",
+  "description": "The missing quality toolkit for Agent Skills — like npm outdated for skill knowledge",
   "type": "module",
   "bin": {
     "skills-check": "./dist/index.js"
@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@skills-check/schema": "*",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.0.0",
     "@types/semver": "^7.7.0",
     "tsup": "^8.5.0",

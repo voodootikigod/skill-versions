@@ -10,7 +10,7 @@ export function Hero() {
 				<span className={styles.glow}>check</span>
 			</h1>
 			<p className={styles.tagline}>
-				Quality & integrity layer for Agent Skills
+				The missing quality toolkit for Agent Skills
 				<br />
 				<span className={styles.dim}>
 					Freshness, security, quality, and efficiency &mdash; 10 commands, one toolkit

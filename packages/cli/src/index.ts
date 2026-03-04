@@ -18,7 +18,9 @@ const program = new Command();
 
 program
 	.name("skills-check")
-	.description("Quality & integrity layer for Agent Skills — like npm outdated for skill knowledge")
+	.description(
+		"The missing quality toolkit for Agent Skills — like npm outdated for skill knowledge"
+	)
 	.version(version);
 
 program
