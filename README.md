@@ -1,19 +1,19 @@
-# skillsafe
+# skills-check
 
 Quality & integrity layer for [Agent Skills](https://agentskills.io) — like `npm outdated` for skill knowledge.
 
-Skills that reference versioned products (via `product-version` in frontmatter) can drift as upstream packages ship new releases. `skillsafe` detects this drift, audits security, lints metadata, analyzes token budgets, enforces policy, and more.
+Skills that reference versioned products (via `product-version` in frontmatter) can drift as upstream packages ship new releases. `skills-check` detects this drift, audits security, lints metadata, analyzes token budgets, enforces policy, and more.
 
 ## Install
 
 ```bash
-npm install -g skillsafe
+npm install -g skills-check
 ```
 
 Or run directly:
 
 ```bash
-npx skillsafe check
+npx skills-check check
 ```
 
 ## Quick Start
@@ -24,24 +24,24 @@ Scan your skills directory and map products to npm packages:
 
 ```bash
 # Interactive — prompts for each mapping
-skillsafe init ./skills
+skills-check init ./skills
 
 # Non-interactive — auto-detects common packages
-skillsafe init ./skills --yes
+skills-check init ./skills --yes
 ```
 
-This creates a `skillsafe.json` registry file.
+This creates a `skills-check.json` registry file.
 
 ### 2. Check for staleness
 
 ```bash
-skillsafe check
+skills-check check
 ```
 
 Output:
 
 ```
-skillsafe
+skills-check
 ==================================================
 
 STALE (2):
@@ -53,43 +53,43 @@ STALE (2):
 
 CURRENT (15): upstash-redis, next, turbo, ...
 
-Run "skillsafe report --format markdown" for a full report.
+Run "skills-check report --format markdown" for a full report.
 ```
 
 ### 3. Generate a report
 
 ```bash
 # Markdown (for PRs, issues, dashboards)
-skillsafe report --format markdown > STALENESS.md
+skills-check report --format markdown > STALENESS.md
 
 # JSON (for automation)
-skillsafe report --format json
+skills-check report --format json
 ```
 
 ## CLI Reference
 
-### `skillsafe init [dir]`
+### `skills-check init [dir]`
 
-Scan a skills directory and generate a `skillsafe.json` registry.
+Scan a skills directory and generate a `skills-check.json` registry.
 
 | Flag | Description |
 |------|-------------|
 | `-y, --yes` | Non-interactive mode, auto-detect package mappings |
 | `-o, --output <path>` | Output path for registry file |
 
-### `skillsafe check`
+### `skills-check check`
 
 Check skill versions against the npm registry.
 
 | Flag | Description |
 |------|-------------|
-| `-r, --registry <path>` | Path to registry file (default: `./skillsafe.json`) |
+| `-r, --registry <path>` | Path to registry file (default: `./skills-check.json`) |
 | `-p, --product <name>` | Check a single product |
 | `--json` | Machine-readable JSON output |
 | `-v, --verbose` | Show all products including current |
 | `--ci` | Exit code 1 if any stale products found |
 
-### `skillsafe report`
+### `skills-check report`
 
 Generate a full staleness report.
 
@@ -98,9 +98,9 @@ Generate a full staleness report.
 | `-r, --registry <path>` | Path to registry file |
 | `-f, --format <type>` | Output format: `json` or `markdown` (default: `markdown`) |
 
-### `skillsafe audit [dir]`
+### `skills-check audit [dir]`
 
-Security audit and hallucination detection for skill files. Scans for hallucinated package references, prompt injection patterns, dangerous shell commands, broken URLs, and incomplete metadata. Includes an advisory database of known hallucinated packages, persistent disk caching, and `.skillsafeignore` support.
+Security audit and hallucination detection for skill files. Scans for hallucinated package references, prompt injection patterns, dangerous shell commands, broken URLs, and incomplete metadata. Includes an advisory database of known hallucinated packages, persistent disk caching, and `.skills-checkignore` support.
 
 | Flag | Description |
 |------|-------------|
@@ -111,7 +111,7 @@ Security audit and hallucination detection for skill files. Scans for hallucinat
 | `--skip-urls` | Skip URL liveness checks |
 | `--unique-only` | Skip injection and command checkers (use when Snyk/Socket/Gen cover these) |
 | `--include-registry-audits` | Fetch Snyk/Socket/Gen results from skills.sh |
-| `--ignore <path>` | Path to `.skillsafeignore` file |
+| `--ignore <path>` | Path to `.skills-checkignore` file |
 | `--verbose` | Show progress and scan details |
 | `--quiet` | Suppress output, exit code only |
 
@@ -135,7 +135,7 @@ Security audit and hallucination detection for skill files. Scans for hallucinat
 
 **Ignore rules:**
 
-Create a `.skillsafeignore` file (one rule per line):
+Create a `.skills-checkignore` file (one rule per line):
 
 ```
 # Ignore all hallucinated-package findings
@@ -157,35 +157,35 @@ This line's dangerous-command findings only will be suppressed.
 
 **Caching:**
 
-Registry lookups are cached to `~/.cache/skillsafe/audit/` with a 1-hour TTL, so repeated runs are fast.
+Registry lookups are cached to `~/.cache/skills-check/audit/` with a 1-hour TTL, so repeated runs are fast.
 
 ```bash
 # Audit all skills in current directory
-skillsafe audit
+skills-check audit
 
 # JSON output for CI
-skillsafe audit ./skills --format json
+skills-check audit ./skills --format json
 
 # SARIF for GitHub Security tab
-skillsafe audit ./skills --format sarif -o results.sarif
+skills-check audit ./skills --format sarif -o results.sarif
 
 # Write markdown report to file
-skillsafe audit ./skills --format markdown -o audit-report.md
+skills-check audit ./skills --format markdown -o audit-report.md
 
 # Only check package registries (fastest)
-skillsafe audit ./skills --packages-only
+skills-check audit ./skills --packages-only
 
 # Skip slow URL checks
-skillsafe audit ./skills --skip-urls
+skills-check audit ./skills --skip-urls
 
 # Fail only on critical findings
-skillsafe audit --fail-on critical
+skills-check audit --fail-on critical
 
 # Quiet mode for CI (exit code only)
-skillsafe audit --quiet --fail-on high
+skills-check audit --quiet --fail-on high
 ```
 
-### `skillsafe budget [dir]`
+### `skills-check budget [dir]`
 
 Measure token cost and detect redundancy in skill files. Analyzes how much context window each skill consumes and identifies overlap between skills.
 
@@ -202,25 +202,25 @@ Measure token cost and detect redundancy in skill files. Analyzes how much conte
 
 ```bash
 # Analyze all skills in current directory
-skillsafe budget
+skills-check budget
 
 # Detailed per-section breakdown
-skillsafe budget ./skills --detailed
+skills-check budget ./skills --detailed
 
 # Fail if total tokens exceed 50k
-skillsafe budget --max-tokens 50000
+skills-check budget --max-tokens 50000
 
 # Save a baseline snapshot
-skillsafe budget --save baseline.json
+skills-check budget --save baseline.json
 
 # Compare against a saved baseline
-skillsafe budget --compare baseline.json
+skills-check budget --compare baseline.json
 
 # JSON output for CI
-skillsafe budget --format json
+skills-check budget --format json
 ```
 
-### `skillsafe verify`
+### `skills-check verify`
 
 Verify that skill version bumps match content changes. Validates that the declared semver bump (major/minor/patch) is appropriate for the actual content diff.
 
@@ -241,22 +241,22 @@ Verify that skill version bumps match content changes. Validates that the declar
 
 ```bash
 # Verify all skills
-skillsafe verify --all
+skills-check verify --all
 
 # Verify a single skill
-skillsafe verify --skill ./skills/react/SKILL.md
+skills-check verify --skill ./skills/react/SKILL.md
 
 # Compare two specific versions
-skillsafe verify --before v1/SKILL.md --after v2/SKILL.md
+skills-check verify --before v1/SKILL.md --after v2/SKILL.md
 
 # Suggest the appropriate bump level
-skillsafe verify --all --suggest
+skills-check verify --all --suggest
 
 # Skip LLM (heuristic-only mode)
-skillsafe verify --all --skip-llm
+skills-check verify --all --skip-llm
 ```
 
-### `skillsafe lint [dir]`
+### `skills-check lint [dir]`
 
 Validate metadata completeness, structural quality, and format in skill files. Auto-fix mode can fill in missing fields from git context.
 
@@ -270,23 +270,23 @@ Validate metadata completeness, structural quality, and format in skill files. A
 
 ```bash
 # Lint all skills in current directory
-skillsafe lint
+skills-check lint
 
 # Auto-fix missing metadata
-skillsafe lint --fix
+skills-check lint --fix
 
 # CI mode with warning threshold
-skillsafe lint --ci --fail-on warning
+skills-check lint --ci --fail-on warning
 
 # JSON output
-skillsafe lint --format json
+skills-check lint --format json
 ```
 
-### `skillsafe policy <subcommand>`
+### `skills-check policy <subcommand>`
 
 Enforce organizational policy rules for skill files via `.skill-policy.yml`. The policy command has three subcommands.
 
-#### `skillsafe policy check [dir]`
+#### `skills-check policy check [dir]`
 
 Check all installed skills against organizational policy.
 
@@ -299,7 +299,7 @@ Check all installed skills against organizational policy.
 | `-o, --output <path>` | Write report to file |
 | `--fail-on <severity>` | Exit code 1 threshold: `blocked`, `violation`, `warning` (default: `blocked`) |
 
-#### `skillsafe policy init`
+#### `skills-check policy init`
 
 Generate a starter `.skill-policy.yml` file.
 
@@ -307,7 +307,7 @@ Generate a starter `.skill-policy.yml` file.
 |------|-------------|
 | `-o, --output <path>` | Output path for policy file |
 
-#### `skillsafe policy validate`
+#### `skills-check policy validate`
 
 Validate a `.skill-policy.yml` file for correctness.
 
@@ -317,22 +317,22 @@ Validate a `.skill-policy.yml` file for correctness.
 
 ```bash
 # Check skills against policy
-skillsafe policy check
+skills-check policy check
 
 # Use a custom policy file
-skillsafe policy check --policy ./my-policy.yml
+skills-check policy check --policy ./my-policy.yml
 
 # Generate a starter policy
-skillsafe policy init
+skills-check policy init
 
 # Validate an existing policy file
-skillsafe policy validate --policy .skill-policy.yml
+skills-check policy validate --policy .skill-policy.yml
 
 # CI mode
-skillsafe policy check --ci --fail-on violation
+skills-check policy check --ci --fail-on violation
 ```
 
-### `skillsafe test [dir]`
+### `skills-check test [dir]`
 
 Run eval test suites declared in skill `tests/` directories. Supports multiple agent harnesses, rubric-based grading, regression detection, and budget caps.
 
@@ -357,25 +357,25 @@ Run eval test suites declared in skill `tests/` directories. Supports multiple a
 
 ```bash
 # Run all skill tests
-skillsafe test
+skills-check test
 
 # Test a specific skill
-skillsafe test --skill react-patterns
+skills-check test --skill react-patterns
 
 # Dry run — show test plan only
-skillsafe test --dry
+skills-check test --dry
 
 # CI mode with regression detection
-skillsafe test --ci
+skills-check test --ci
 
 # Set a budget cap
-skillsafe test --max-cost 5.00
+skills-check test --max-cost 5.00
 
 # Use Claude Code as the agent harness
-skillsafe test --agent claude-code
+skills-check test --agent claude-code
 ```
 
-### `skillsafe refresh [skills-dir]`
+### `skills-check refresh [skills-dir]`
 
 Use an LLM to propose targeted updates to stale skill files. Fetches changelogs, generates diffs, and optionally applies changes.
 
@@ -405,8 +405,8 @@ export GOOGLE_GENERATIVE_AI_API_KEY=...
 ```
 
 The skills directory is resolved in priority order:
-1. CLI argument: `skillsafe refresh ./my-skills`
-2. Registry field: `"skillsDir": "./skills"` in skillsafe.json
+1. CLI argument: `skills-check refresh ./my-skills`
+2. Registry field: `"skillsDir": "./skills"` in skills-check.json
 3. Default: `./skills`
 
 ## Exit Codes
@@ -419,11 +419,11 @@ The skills directory is resolved in priority order:
 
 ## Registry Format
 
-The `skillsafe.json` file maps products to npm packages:
+The `skills-check.json` file maps products to npm packages:
 
 ```json
 {
-  "$schema": "https://skillsafe.sh/schema.json",
+  "$schema": "https://skillscheck.ai/schema.json",
   "version": 1,
   "lastCheck": "2026-02-28T00:00:00Z",
   "products": {
@@ -458,10 +458,10 @@ The `init` command reads this field and groups skills by shared version + name p
 
 ### GitHub Action
 
-The `voodootikigod/skillsafe` action runs one or more skillsafe commands in your CI pipeline. By default it runs `check` only (backward-compatible). Enable additional commands via the `commands` input or individual toggle flags.
+The `voodootikigod/skills-check` action runs one or more skills-check commands in your CI pipeline. By default it runs `check` only (backward-compatible). Enable additional commands via the `commands` input or individual toggle flags.
 
 ```yaml
-- uses: voodootikigod/skillsafe@v1
+- uses: voodootikigod/skills-check@v1
   with:
     commands: check,audit,lint,budget
     audit-fail-on: high
@@ -501,7 +501,7 @@ The action requires `issues: write` permission when `open-issues` is enabled.
 | Input | Default | Description |
 |-------|---------|-------------|
 | `skills-dir` | `"."` | Directory containing skill files to analyze |
-| `registry` | `"skillsafe.json"` | Path to registry file |
+| `registry` | `"skills-check.json"` | Path to registry file |
 | `node-version` | `"22"` | Node.js version |
 
 **Check-specific options (backward-compatible):**
@@ -527,7 +527,7 @@ The action requires `issues: write` permission when `open-issues` is enabled.
 **Staleness check only (default, backward-compatible):**
 
 ```yaml
-- uses: voodootikigod/skillsafe@v1
+- uses: voodootikigod/skills-check@v1
   with:
     fail-on-stale: "true"
 ```
@@ -535,7 +535,7 @@ The action requires `issues: write` permission when `open-issues` is enabled.
 **Full quality gate with multiple commands:**
 
 ```yaml
-- uses: voodootikigod/skillsafe@v1
+- uses: voodootikigod/skills-check@v1
   with:
     commands: check,audit,lint,budget
     audit-fail-on: high
@@ -547,7 +547,7 @@ The action requires `issues: write` permission when `open-issues` is enabled.
 **Security-focused PR gate:**
 
 ```yaml
-- uses: voodootikigod/skillsafe@v1
+- uses: voodootikigod/skills-check@v1
   with:
     commands: audit,lint
     audit-fail-on: medium
@@ -558,7 +558,7 @@ The action requires `issues: write` permission when `open-issues` is enabled.
 **Policy enforcement:**
 
 ```yaml
-- uses: voodootikigod/skillsafe@v1
+- uses: voodootikigod/skills-check@v1
   with:
     commands: policy
     policy-file: .skill-policy.yml
@@ -568,7 +568,7 @@ The action requires `issues: write` permission when `open-issues` is enabled.
 **Using individual toggle flags instead of `commands`:**
 
 ```yaml
-- uses: voodootikigod/skillsafe@v1
+- uses: voodootikigod/skills-check@v1
   with:
     check: "true"
     audit: "true"
@@ -594,7 +594,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: voodootikigod/skillsafe@v1
+      - uses: voodootikigod/skills-check@v1
         with:
           commands: check,audit,lint,budget
           audit-fail-on: high
@@ -605,7 +605,7 @@ jobs:
 **PR gate example:**
 
 ```yaml
-- uses: voodootikigod/skillsafe@v1
+- uses: voodootikigod/skills-check@v1
   with:
     commands: check,audit,lint
     open-issues: "false"
@@ -617,11 +617,11 @@ jobs:
 **Using the results output:**
 
 ```yaml
-- uses: voodootikigod/skillsafe@v1
-  id: skillsafe
+- uses: voodootikigod/skills-check@v1
+  id: skills-check
   with:
     commands: check,audit
-- run: echo "Results: ${{ steps.skillsafe.outputs.results }}"
+- run: echo "Results: ${{ steps.skills-check.outputs.results }}"
 ```
 
 #### Setup
@@ -638,25 +638,25 @@ For simpler setups, run individual commands directly:
 
 ```yaml
 - name: Check skill freshness
-  run: npx skillsafe check --ci
+  run: npx skills-check check --ci
 
 - name: Audit skill security
-  run: npx skillsafe audit --fail-on high --quiet
+  run: npx skills-check audit --fail-on high --quiet
 
 - name: Lint skill metadata
-  run: npx skillsafe lint --ci --fail-on error
+  run: npx skills-check lint --ci --fail-on error
 
 - name: Check token budget
-  run: npx skillsafe budget --max-tokens 50000 --format json
+  run: npx skills-check budget --max-tokens 50000 --format json
 
 - name: Enforce policy
-  run: npx skillsafe policy check --ci --fail-on violation
+  run: npx skills-check policy check --ci --fail-on violation
 ```
 
 ## Complementary Tools
 
 - [`npx skills`](https://skills.sh) -- registry + installer for Agent Skills
-- `skillsafe` -- quality & integrity layer (this tool)
+- `skills-check` -- quality & integrity layer (this tool)
 - [`skills`](https://github.com/anthropics/skills) -- official Agent Skills reference
 
 ## License

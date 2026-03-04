@@ -1,12 +1,12 @@
 # Mandatory Metadata Validation
 
-> **Owner:** 📦 skills.sh (enforce on publish) + 🔧 skillsafe (lint/validate)
+> **Owner:** 📦 skills.sh (enforce on publish) + 🔧 skills-check (lint/validate)
 > **Priority:** 🟡 Quadrant 2 — Lower Novelty, High Impact
 > **Novelty:** ★★☆☆☆ | **Impact:** ★★★★☆
 
 ## Summary
 
-Raise the quality floor of the skill ecosystem by requiring essential metadata in SKILL.md frontmatter — enforced at publish time by the registry and available as a local linting step via skillsafe. This is the `crates.io` model: you can write whatever you want locally, but publishing requires `description`, `license`, and `repository` at minimum.
+Raise the quality floor of the skill ecosystem by requiring essential metadata in SKILL.md frontmatter — enforced at publish time by the registry and available as a local linting step via skills-check. This is the `crates.io` model: you can write whatever you want locally, but publishing requires `description`, `license`, and `repository` at minimum.
 
 ## Current State
 
@@ -59,11 +59,11 @@ min-context: 2000                     # Minimum context tokens needed
 
 ## Two-Layer Enforcement
 
-### Layer 1: skillsafe lint (local, advisory)
+### Layer 1: skills-check lint (local, advisory)
 
 ```bash
 # Lint all skills for metadata completeness
-npx skillsafe lint
+npx skills-check lint
 
 # Output:
 # ai-sdk-core/SKILL.md
@@ -77,10 +77,10 @@ npx skillsafe lint
 # 2 errors, 1 warning across 1 skill
 
 # Lint with auto-fix (adds template fields)
-npx skillsafe lint --fix
+npx skills-check lint --fix
 
 # Lint in CI mode
-npx skillsafe lint --ci --fail-on error
+npx skills-check lint --ci --fail-on error
 ```
 
 ### Layer 2: skills.sh publish (registry, blocking)
@@ -142,13 +142,13 @@ The conditional `product-version` requirement triggers when the skill content re
 Use SPDX license identifiers for validation. Accept both standard identifiers (`MIT`, `Apache-2.0`) and SPDX expressions (`MIT OR Apache-2.0`).
 
 ### Auto-fix Capability
-`skillsafe lint --fix` can:
+`skills-check lint --fix` can:
 - Add `author` from git config (`git config user.name`)
 - Add `repository` from git remote (`git remote get-url origin`)
 - Add template `license: "MIT"` with a TODO comment
 - Add `product-version` by detecting product references in content and querying npm for latest version
 
-## File Structure (skillsafe side)
+## File Structure (skills-check side)
 
 ```
 src/

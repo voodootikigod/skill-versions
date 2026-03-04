@@ -16,8 +16,8 @@ export function Hero() {
 				</span>
 			</p>
 			<div className={styles.install}>
-				<code className={styles.command}>npx skillsafe check</code>
-				<CopyButton text="npx skillsafe check" />
+				<code className={styles.command}>npx skills-check check</code>
+				<CopyButton text="npx skills-check check" />
 			</div>
 		</section>
 	);

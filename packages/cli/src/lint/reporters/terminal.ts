@@ -41,7 +41,7 @@ export function formatLintTerminal(report: LintReport): string {
 	const lines: string[] = [];
 
 	lines.push("");
-	lines.push(chalk.bold("skillsafe lint"));
+	lines.push(chalk.bold("skills-check lint"));
 	lines.push("=".repeat(50));
 	lines.push("");
 

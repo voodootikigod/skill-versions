@@ -8,7 +8,7 @@ describe("gradeJsonMatch", () => {
 	let workDir: string;
 
 	beforeEach(async () => {
-		workDir = join(tmpdir(), `skillsafe-test-json-${Date.now()}`);
+		workDir = join(tmpdir(), `skills-check-test-json-${Date.now()}`);
 		await mkdir(workDir, { recursive: true });
 	});
 

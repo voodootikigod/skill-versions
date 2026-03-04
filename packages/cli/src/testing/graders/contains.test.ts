@@ -8,7 +8,7 @@ describe("gradeContains", () => {
 	let workDir: string;
 
 	beforeEach(async () => {
-		workDir = join(tmpdir(), `skillsafe-test-contains-${Date.now()}`);
+		workDir = join(tmpdir(), `skills-check-test-contains-${Date.now()}`);
 		await mkdir(workDir, { recursive: true });
 	});
 

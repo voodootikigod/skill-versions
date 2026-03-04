@@ -19,7 +19,7 @@ function toSarifLevel(severity: AuditSeverity): SarifLevel["level"] {
 }
 
 function toRuleId(finding: AuditFinding): string {
-	return `skillsafe/${finding.category}`;
+	return `skills-check/${finding.category}`;
 }
 
 function buildRules(findings: AuditFinding[]): object[] {
@@ -66,8 +66,8 @@ export function formatSarif(report: AuditReport): string {
 		{
 			tool: {
 				driver: {
-					name: "skillsafe",
-					informationUri: "https://skillsafe.sh",
+					name: "skills-check",
+					informationUri: "https://skillscheck.ai",
 					rules: buildRules(report.findings),
 				},
 			},

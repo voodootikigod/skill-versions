@@ -20,7 +20,7 @@ function makeReport(overrides?: Partial<TestReport>): TestReport {
 describe("formatMarkdown", () => {
 	it("shows title", () => {
 		const output = formatMarkdown([]);
-		expect(output).toContain("# Skillsafe Test Report");
+		expect(output).toContain("# Skills Check Test Report");
 	});
 
 	it("shows empty message when no reports", () => {

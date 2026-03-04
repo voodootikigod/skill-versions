@@ -8,7 +8,7 @@ describe("gradeFileExists", () => {
 	let workDir: string;
 
 	beforeEach(async () => {
-		workDir = join(tmpdir(), `skillsafe-test-fe-${Date.now()}`);
+		workDir = join(tmpdir(), `skills-check-test-fe-${Date.now()}`);
 		await mkdir(workDir, { recursive: true });
 	});
 

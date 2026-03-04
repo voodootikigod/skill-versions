@@ -8,7 +8,7 @@ describe("gradePackageHas", () => {
 	let workDir: string;
 
 	beforeEach(async () => {
-		workDir = join(tmpdir(), `skillsafe-test-pkg-${Date.now()}`);
+		workDir = join(tmpdir(), `skills-check-test-pkg-${Date.now()}`);
 		await mkdir(workDir, { recursive: true });
 	});
 

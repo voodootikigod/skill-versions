@@ -1,6 +1,6 @@
 # Skill Testing / Eval Integration
 
-> **Owner:** 🤝 Joint — 📐 Spec (convention) + 🔧 skillsafe (regression harness) + 📦 skills.sh (run infrastructure)
+> **Owner:** 🤝 Joint — 📐 Spec (convention) + 🔧 skills-check (regression harness) + 📦 skills.sh (run infrastructure)
 > **Priority:** 🔴 Quadrant 1 — High Novelty, High Impact
 > **Novelty:** ★★★★☆ | **Impact:** ★★★★★
 
@@ -151,38 +151,38 @@ for the declared product version, it should FAIL.
 
 ## CLI Interface
 
-### Running Tests (integrated into skillsafe)
+### Running Tests (integrated into skills-check)
 
 ```bash
 # Run all tests for all skills
-npx skillsafe test
+npx skills-check test
 
 # Run tests for a specific skill
-npx skillsafe test --skill ai-sdk-core
+npx skills-check test --skill ai-sdk-core
 
 # Run only trigger tests (fast, no agent execution)
-npx skillsafe test --type trigger
+npx skills-check test --type trigger
 
 # Run with a specific agent/model combination
-npx skillsafe test --agent claude-code --model opus
+npx skills-check test --agent claude-code --model opus
 
 # Run with verbose output showing each grader result
-npx skillsafe test --verbose
+npx skills-check test --verbose
 
 # Run in CI mode (JSON output, strict exit codes)
-npx skillsafe test --ci --output test-results.json
+npx skills-check test --ci --output test-results.json
 
 # Dry run: show what would be tested without executing
-npx skillsafe test --dry
+npx skills-check test --dry
 ```
 
 ### After a Refresh (regression pipeline)
 
 ```bash
 # The key integration: refresh + test
-npx skillsafe check          # Find stale skills
-npx skillsafe refresh         # AI-assisted update
-npx skillsafe test --type regression  # Verify nothing broke
+npx skills-check check          # Find stale skills
+npx skills-check refresh         # AI-assisted update
+npx skills-check test --type regression  # Verify nothing broke
 ```
 
 This is the pipeline: detect staleness → refresh → verify. The test step catches cases where the AI-assisted refresh introduced errors.
@@ -190,7 +190,7 @@ This is the pipeline: detect staleness → refresh → verify. The test step cat
 ## Implementation Architecture
 
 ```
-skillsafe test
+skills-check test
   ├── Discover skills with tests/ directories
   ├── Parse cases.yaml for each skill
   ├── For trigger tests:
@@ -259,9 +259,9 @@ Detecting whether a skill was invoked is agent-specific:
 - Generic: May not be detectable — skip trigger tests for unknown agents
 
 ### Baseline and Regression Tracking
-- Store test results in `.skillsafe/test-baselines/` as JSON
+- Store test results in `.skills-check/test-baselines/` as JSON
 - On subsequent runs, compare against baseline and highlight regressions
-- `skillsafe test --update-baseline` to accept current results as the new baseline
+- `skills-check test --update-baseline` to accept current results as the new baseline
 
 ## Spec Proposal (for agentskills.io discussion)
 
@@ -312,7 +312,7 @@ src/
 
 ## Success Criteria
 
-- Running `skillsafe test` on a skill with 5 test cases completes in < 2 minutes
+- Running `skills-check test` on a skill with 5 test cases completes in < 2 minutes
 - The refresh → test pipeline catches at least 80% of introduced regressions in manual testing
 - Test case format is simple enough that a skill author can write their first test in < 10 minutes
 - Works with at least Claude Code and one other agent

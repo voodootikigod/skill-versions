@@ -76,7 +76,7 @@ const commandGroups = [
 			{
 				name: "init",
 				description:
-					"Scan a skills directory for SKILL.md files and generate a skillsafe.json registry.",
+					"Scan a skills directory for SKILL.md files and generate a skills-check.json registry.",
 				icon: "\u279C",
 			},
 		],

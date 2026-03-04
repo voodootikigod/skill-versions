@@ -12,7 +12,7 @@ export function formatTerminal(
 	const lines: string[] = [];
 
 	lines.push("");
-	lines.push(chalk.bold("skillsafe test"));
+	lines.push(chalk.bold("skills-check test"));
 	lines.push("=".repeat(50));
 	lines.push("");
 

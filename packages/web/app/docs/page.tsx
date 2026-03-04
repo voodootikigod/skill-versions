@@ -7,9 +7,9 @@ import styles from "./docs.module.css";
 export const metadata: Metadata = {
 	title: "Docs",
 	description:
-		"CLI reference for skillsafe: init, check, report, refresh, audit, lint, budget, verify, policy, and test commands. Registry format, SKILL.md frontmatter spec, and CI integration guide.",
+		"CLI reference for skills-check: init, check, report, refresh, audit, lint, budget, verify, policy, and test commands. Registry format, SKILL.md frontmatter spec, and CI integration guide.",
 	alternates: {
-		canonical: "https://skillsafe.sh/docs",
+		canonical: "https://skillscheck.ai/docs",
 	},
 };
 
@@ -24,8 +24,8 @@ export default function DocsPage() {
 					<section>
 						<h2 id="overview">Overview</h2>
 						<p>
-							<code>skillsafe</code> is a quality & integrity layer for Agent Skills. It provides 10
-							commands covering freshness detection, security auditing, metadata linting, token
+							<code>skills-check</code> is a quality & integrity layer for Agent Skills. It provides
+							10 commands covering freshness detection, security auditing, metadata linting, token
 							budget analysis, semver verification, policy enforcement, and eval testing for your
 							SKILL.md files.
 						</p>
@@ -35,11 +35,11 @@ export default function DocsPage() {
 						<h2 id="install">Installation</h2>
 						<p>No installation required. Run directly with npx:</p>
 						<pre>
-							<code>npx skillsafe check</code>
+							<code>npx skills-check check</code>
 						</pre>
 						<p>Or install globally:</p>
 						<pre>
-							<code>npm install -g skillsafe</code>
+							<code>npm install -g skills-check</code>
 						</pre>
 					</section>
 
@@ -59,16 +59,16 @@ export default function DocsPage() {
 							<code>init [dir]</code>
 						</h3>
 						<p>
-							Scan a skills directory for SKILL.md files and generate a <code>skillsafe.json</code>{" "}
-							registry.
+							Scan a skills directory for SKILL.md files and generate a{" "}
+							<code>skills-check.json</code> registry.
 						</p>
 						<pre>
 							<code>
 								{`# Interactive mode (prompts for package mappings)
-npx skillsafe init ./skills
+npx skills-check init ./skills
 
 # Non-interactive mode (auto-detect mappings)
-npx skillsafe init ./skills -y`}
+npx skills-check init ./skills -y`}
 							</code>
 						</pre>
 
@@ -79,16 +79,16 @@ npx skillsafe init ./skills -y`}
 						<pre>
 							<code>
 								{`# Human-readable output
-npx skillsafe check
+npx skills-check check
 
 # JSON output
-npx skillsafe check --json
+npx skills-check check --json
 
 # CI mode (exit code 1 if stale)
-npx skillsafe check --ci
+npx skills-check check --ci
 
 # Check a single product
-npx skillsafe check -p ai-sdk`}
+npx skills-check check -p ai-sdk`}
 							</code>
 						</pre>
 
@@ -99,10 +99,10 @@ npx skillsafe check -p ai-sdk`}
 						<pre>
 							<code>
 								{`# Markdown report
-npx skillsafe report
+npx skills-check report
 
 # JSON report
-npx skillsafe report --format json`}
+npx skills-check report --format json`}
 							</code>
 						</pre>
 
@@ -116,19 +116,19 @@ npx skillsafe report --format json`}
 						<pre>
 							<code>
 								{`# Interactive mode — review each change
-npx skillsafe refresh ./skills
+npx skills-check refresh ./skills
 
 # Auto-apply all changes
-npx skillsafe refresh -y
+npx skills-check refresh -y
 
 # Preview only (no writes)
-npx skillsafe refresh --dry-run
+npx skills-check refresh --dry-run
 
 # Use a specific provider/model
-npx skillsafe refresh --provider anthropic --model claude-sonnet-4-20250514
+npx skills-check refresh --provider anthropic --model claude-sonnet-4-20250514
 
 # Refresh a single product
-npx skillsafe refresh -p ai-sdk`}
+npx skills-check refresh -p ai-sdk`}
 							</code>
 						</pre>
 						<p>
@@ -161,19 +161,19 @@ export GOOGLE_GENERATIVE_AI_API_KEY=...`}
 						<pre>
 							<code>
 								{`# Audit all skills in current directory
-npx skillsafe audit
+npx skills-check audit
 
 # Audit a specific file or directory
-npx skillsafe audit ./skills/ai-sdk-core.md
+npx skills-check audit ./skills/ai-sdk-core.md
 
 # JSON output for CI
-npx skillsafe audit --format json
+npx skills-check audit --format json
 
 # SARIF output for GitHub Security tab
-npx skillsafe audit --format sarif
+npx skills-check audit --format sarif
 
 # Fail on specific severity
-npx skillsafe audit --fail-on warning --ci`}
+npx skills-check audit --fail-on warning --ci`}
 							</code>
 						</pre>
 
@@ -187,19 +187,19 @@ npx skillsafe audit --fail-on warning --ci`}
 						<pre>
 							<code>
 								{`# Lint all skills in current directory
-npx skillsafe lint
+npx skills-check lint
 
 # Auto-fix issues using git context
-npx skillsafe lint --fix
+npx skills-check lint --fix
 
 # CI mode with strict exit codes
-npx skillsafe lint --ci
+npx skills-check lint --ci
 
 # Fail on warnings (default: errors only)
-npx skillsafe lint --fail-on warning
+npx skills-check lint --fail-on warning
 
 # JSON output
-npx skillsafe lint --format json`}
+npx skills-check lint --format json`}
 							</code>
 						</pre>
 						<h4>Key options</h4>
@@ -252,25 +252,25 @@ npx skillsafe lint --format json`}
 						<pre>
 							<code>
 								{`# Analyze all skills
-npx skillsafe budget
+npx skills-check budget
 
 # Analyze a specific skill
-npx skillsafe budget -s ai-sdk-core
+npx skills-check budget -s ai-sdk-core
 
 # Detailed per-section breakdown
-npx skillsafe budget --detailed
+npx skills-check budget --detailed
 
 # Set a token ceiling — exit 1 if exceeded
-npx skillsafe budget --max-tokens 5000
+npx skills-check budget --max-tokens 5000
 
 # Save a snapshot for future comparison
-npx skillsafe budget --save baseline.json
+npx skills-check budget --save baseline.json
 
 # Compare against a previous snapshot
-npx skillsafe budget --compare baseline.json
+npx skills-check budget --compare baseline.json
 
 # JSON output
-npx skillsafe budget --format json`}
+npx skills-check budget --format json`}
 							</code>
 						</pre>
 						<h4>Key options</h4>
@@ -331,19 +331,19 @@ npx skillsafe budget --format json`}
 						<pre>
 							<code>
 								{`# Verify all skills
-npx skillsafe verify --all
+npx skills-check verify --all
 
 # Verify a specific skill
-npx skillsafe verify -s ./skills/ai-sdk-core.md
+npx skills-check verify -s ./skills/ai-sdk-core.md
 
 # Compare specific versions
-npx skillsafe verify --before v1.0.0 --after v1.1.0
+npx skills-check verify --before v1.0.0 --after v1.1.0
 
 # Suggest the correct version bump
-npx skillsafe verify --suggest
+npx skills-check verify --suggest
 
 # Heuristic-only mode (no LLM required)
-npx skillsafe verify --skip-llm`}
+npx skills-check verify --skip-llm`}
 							</code>
 						</pre>
 						<h4>Key options</h4>
@@ -399,22 +399,22 @@ npx skillsafe verify --skip-llm`}
 						<pre>
 							<code>
 								{`# Check skills against policy
-npx skillsafe policy check
+npx skills-check policy check
 
 # Check a specific skill
-npx skillsafe policy check -s ai-sdk-core
+npx skills-check policy check -s ai-sdk-core
 
 # Initialize a default policy file
-npx skillsafe policy init
+npx skills-check policy init
 
 # Validate the policy file itself
-npx skillsafe policy validate
+npx skills-check policy validate
 
 # Custom policy file path
-npx skillsafe policy check --policy ./config/policy.yml
+npx skills-check policy check --policy ./config/policy.yml
 
 # Fail on specific severity
-npx skillsafe policy check --fail-on violation`}
+npx skills-check policy check --fail-on violation`}
 							</code>
 						</pre>
 						<h4>Subcommands</h4>
@@ -459,25 +459,25 @@ npx skillsafe policy check --fail-on violation`}
 						<pre>
 							<code>
 								{`# Run all skill tests
-npx skillsafe test
+npx skills-check test
 
 # Test a specific skill
-npx skillsafe test -s ai-sdk-core
+npx skills-check test -s ai-sdk-core
 
 # Run only outcome tests
-npx skillsafe test --type outcome
+npx skills-check test --type outcome
 
 # Use a specific agent harness
-npx skillsafe test --agent claude-code
+npx skills-check test --agent claude-code
 
 # Multiple trials per test case
-npx skillsafe test --trials 3
+npx skills-check test --trials 3
 
 # Preview test plan without executing
-npx skillsafe test --dry
+npx skills-check test --dry
 
 # Update baseline after verified changes
-npx skillsafe test --update-baseline`}
+npx skills-check test --update-baseline`}
 							</code>
 						</pre>
 						<h4>Key options</h4>
@@ -537,13 +537,13 @@ npx skillsafe test --update-baseline`}
 					<section>
 						<h2 id="registry">Registry Format</h2>
 						<p>
-							The <code>skillsafe.json</code> file follows a{" "}
+							The <code>skills-check.json</code> file follows a{" "}
 							<Link href="/schema.json">JSON Schema</Link> that editors can validate against:
 						</p>
 						<pre>
 							<code>
 								{`{
-  "$schema": "https://skillsafe.sh/schema.json",
+  "$schema": "https://skillscheck.ai/schema.json",
   "version": 1,
   "products": {
     "ai-sdk": {
@@ -585,14 +585,14 @@ Your skill content here...`}
 
 						<h3>GitHub Action</h3>
 						<p>
-							The <code>voodootikigod/skillsafe</code> action runs one or more skillsafe commands in
-							your CI pipeline. By default it runs <code>check</code> only (backward-compatible).
-							Enable additional commands via the <code>commands</code> input or individual toggle
-							flags.
+							The <code>voodootikigod/skills-check</code> action runs one or more skills-check
+							commands in your CI pipeline. By default it runs <code>check</code> only
+							(backward-compatible). Enable additional commands via the <code>commands</code> input
+							or individual toggle flags.
 						</p>
 						<pre>
 							<code>
-								{`- uses: voodootikigod/skillsafe@v1
+								{`- uses: voodootikigod/skills-check@v1
   with:
     commands: check,audit,lint,budget
     audit-fail-on: high
@@ -779,7 +779,7 @@ Your skill content here...`}
 										<code>registry</code>
 									</td>
 									<td>
-										<code>skillsafe.json</code>
+										<code>skills-check.json</code>
 									</td>
 									<td>Path to registry file</td>
 								</tr>
@@ -877,7 +877,7 @@ Your skill content here...`}
 						<pre>
 							<code>
 								{`# Full quality gate
-- uses: voodootikigod/skillsafe@v1
+- uses: voodootikigod/skills-check@v1
   with:
     commands: check,audit,lint,budget
     audit-fail-on: high
@@ -886,14 +886,14 @@ Your skill content here...`}
     fail-on-stale: "true"
 
 # Security-focused PR gate
-- uses: voodootikigod/skillsafe@v1
+- uses: voodootikigod/skills-check@v1
   with:
     commands: audit,lint
     audit-fail-on: medium
     open-issues: "false"
 
 # Policy enforcement
-- uses: voodootikigod/skillsafe@v1
+- uses: voodootikigod/skills-check@v1
   with:
     commands: policy
     policy-file: .skill-policy.yml
@@ -919,7 +919,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: voodootikigod/skillsafe@v1
+      - uses: voodootikigod/skills-check@v1
         with:
           commands: check,audit,lint,budget
           audit-fail-on: high
@@ -932,19 +932,19 @@ jobs:
 						<pre>
 							<code>
 								{`- name: Check skill freshness
-  run: npx skillsafe check --ci
+  run: npx skills-check check --ci
 
 - name: Audit skill security
-  run: npx skillsafe audit --fail-on high --quiet
+  run: npx skills-check audit --fail-on high --quiet
 
 - name: Lint skill metadata
-  run: npx skillsafe lint --ci --fail-on error
+  run: npx skills-check lint --ci --fail-on error
 
 - name: Check token budget
-  run: npx skillsafe budget --max-tokens 50000
+  run: npx skills-check budget --max-tokens 50000
 
 - name: Enforce policy
-  run: npx skillsafe policy check --ci --fail-on violation`}
+  run: npx skills-check policy check --ci --fail-on violation`}
 							</code>
 						</pre>
 					</section>

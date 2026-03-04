@@ -185,7 +185,7 @@ describe("auditCommand", () => {
 		await auditCommand(".", { format: "markdown" });
 		expect(logSpy).toHaveBeenCalled();
 		const output = logSpy.mock.calls[0][0] as string;
-		expect(output).toContain("# Skillsafe Audit Report");
+		expect(output).toContain("# Skills Check Audit Report");
 	});
 
 	it("outputs sarif format", async () => {

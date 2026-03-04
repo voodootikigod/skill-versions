@@ -38,7 +38,7 @@ export async function runCase(
 
 		try {
 			// Set up work directory (copy fixture if specified)
-			trialWorkDir = await mkdtemp(join(tmpdir(), `skillsafe-test-${testCase.id}-`));
+			trialWorkDir = await mkdtemp(join(tmpdir(), `skills-check-test-${testCase.id}-`));
 
 			if (testCase.fixture && options.testsDir) {
 				const fixturePath = join(options.testsDir, "..", testCase.fixture);

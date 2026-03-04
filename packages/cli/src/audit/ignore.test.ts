@@ -29,12 +29,12 @@ describe("loadIgnoreRules", () => {
 	});
 
 	it("returns empty array when file does not exist", async () => {
-		const rules = await loadIgnoreRules(join(tempDir, ".skillsafeignore"));
+		const rules = await loadIgnoreRules(join(tempDir, ".skills-checkignore"));
 		expect(rules).toHaveLength(0);
 	});
 
 	it("parses category-only rules", async () => {
-		const path = join(tempDir, ".skillsafeignore");
+		const path = join(tempDir, ".skills-checkignore");
 		await writeFile(path, "hallucinated-package\nprompt-injection\n", "utf-8");
 		const rules = await loadIgnoreRules(path);
 		expect(rules).toHaveLength(2);
@@ -43,7 +43,7 @@ describe("loadIgnoreRules", () => {
 	});
 
 	it("parses category:file rules", async () => {
-		const path = join(tempDir, ".skillsafeignore");
+		const path = join(tempDir, ".skills-checkignore");
 		await writeFile(path, "prompt-injection:skills/foo/", "utf-8");
 		const rules = await loadIgnoreRules(path);
 		expect(rules).toHaveLength(1);
@@ -51,7 +51,7 @@ describe("loadIgnoreRules", () => {
 	});
 
 	it("skips comments and blank lines", async () => {
-		const path = join(tempDir, ".skillsafeignore");
+		const path = join(tempDir, ".skills-checkignore");
 		await writeFile(path, "# comment\n\nhallucinated-package\n", "utf-8");
 		const rules = await loadIgnoreRules(path);
 		expect(rules).toHaveLength(1);

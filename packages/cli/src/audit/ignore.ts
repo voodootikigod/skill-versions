@@ -9,7 +9,7 @@ export interface IgnoreRule {
 const INLINE_IGNORE_RE = /<!--\s*audit-ignore(?::?\s*([\w-]+))?\s*-->/;
 
 /**
- * Load ignore rules from a .skillsafeignore file.
+ * Load ignore rules from a .skills-checkignore file.
  *
  * Format (one rule per line):
  *   hallucinated-package          # ignore all hallucinated-package findings
@@ -18,7 +18,7 @@ const INLINE_IGNORE_RE = /<!--\s*audit-ignore(?::?\s*([\w-]+))?\s*-->/;
  *   # comments start with #
  */
 export async function loadIgnoreRules(ignorePath?: string): Promise<IgnoreRule[]> {
-	const path = ignorePath ?? ".skillsafeignore";
+	const path = ignorePath ?? ".skills-checkignore";
 	let content: string;
 	try {
 		content = await readFile(path, "utf-8");
@@ -55,7 +55,7 @@ export function shouldIgnore(
 	rules: IgnoreRule[],
 	rawContent: string
 ): boolean {
-	// Check .skillsafeignore rules
+	// Check .skills-checkignore rules
 	for (const rule of rules) {
 		const categoryMatch = !rule.category || rule.category === finding.category;
 		const fileMatch = !rule.file || finding.file.includes(rule.file);

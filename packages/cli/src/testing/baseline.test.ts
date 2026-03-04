@@ -161,7 +161,7 @@ describe("saveBaseline and loadBaseline", () => {
 	const originalCwd = process.cwd();
 
 	beforeEach(async () => {
-		baselineDir = join(tmpdir(), `skillsafe-baseline-${Date.now()}`);
+		baselineDir = join(tmpdir(), `skills-check-baseline-${Date.now()}`);
 		await mkdir(baselineDir, { recursive: true });
 		process.chdir(baselineDir);
 	});

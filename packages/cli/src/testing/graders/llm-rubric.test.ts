@@ -14,7 +14,7 @@ describe("gradeLlmRubric", () => {
 	let workDir: string;
 
 	beforeEach(async () => {
-		workDir = join(tmpdir(), `skillsafe-test-llm-${Date.now()}`);
+		workDir = join(tmpdir(), `skills-check-test-llm-${Date.now()}`);
 		await mkdir(workDir, { recursive: true });
 	});
 

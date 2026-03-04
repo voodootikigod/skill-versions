@@ -92,7 +92,7 @@ npx skills search --classifier "Type :: Setup" --classifier "Complexity :: Begin
 The classifier vocabulary is maintained as a registry (JSON file in the spec repo or skills.sh repo). New classifiers are added through PRs, not invented ad-hoc by skill authors. This prevents the namespace pollution that makes freeform tags useless at scale.
 
 ### Validation
-`skillsafe lint` validates that classifiers in a skill's frontmatter are recognized values. Unrecognized classifiers produce warnings (not errors) to allow for gradual vocabulary expansion.
+`skills-check lint` validates that classifiers in a skill's frontmatter are recognized values. Unrecognized classifiers produce warnings (not errors) to allow for gradual vocabulary expansion.
 
 ### Relationship to Keywords
 Classifiers supplement, not replace, freeform `keywords`. Keywords handle the long tail that classifiers can't predict. Classifiers handle the structured dimensions that matter for filtering.
@@ -118,7 +118,7 @@ src/
     compatibility.ts      # Agent compatibility checking
 ```
 
-## File Structure (skillsafe side)
+## File Structure (skills-check side)
 
 ```
 src/

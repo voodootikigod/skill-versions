@@ -17,7 +17,7 @@ function makeReport(overrides?: Partial<AuditReport>): AuditReport {
 describe("formatMarkdown", () => {
 	it("includes title and date", () => {
 		const output = formatMarkdown(makeReport());
-		expect(output).toContain("# Skillsafe Audit Report");
+		expect(output).toContain("# Skills Check Audit Report");
 		expect(output).toMatch(DATE_PATTERN_RE);
 	});
 

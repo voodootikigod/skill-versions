@@ -161,12 +161,12 @@ The activated features should be persisted alongside the installed skill:
 
 ### Authoring Experience
 - Skill authors mark sections with HTML comments (`<!-- feature: name -->`) or rely on heading-level mapping from frontmatter
-- A `skillsafe lint` command could validate that all declared features have corresponding sections and vice versa
+- A `skills-check lint` command could validate that all declared features have corresponding sections and vice versa
 - Feature boundaries should be at heading level (## or ###), not inline
 
 ### Context Budget Integration
 - Feature flags directly feed into context budget analysis
-- `skillsafe budget ./skills/ --features app-router,typescript` would report token counts for only the activated features
+- `skills-check budget ./skills/ --features app-router,typescript` would report token counts for only the activated features
 - This creates a feedback loop: authors can see which features are expensive and optimize accordingly
 
 ### Gradual Adoption
@@ -196,7 +196,7 @@ src/
     info.ts             # Extended with --show-features
 ```
 
-## File Structure for Implementation (skillsafe side)
+## File Structure for Implementation (skills-check side)
 
 ```
 src/

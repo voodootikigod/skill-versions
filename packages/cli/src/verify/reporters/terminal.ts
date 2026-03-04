@@ -75,7 +75,7 @@ export function formatVerifyTerminal(report: VerifyReport): string {
 	const lines: string[] = [];
 
 	lines.push("");
-	lines.push(chalk.bold("skillsafe verify"));
+	lines.push(chalk.bold("skills-check verify"));
 	lines.push("=".repeat(50));
 	lines.push("");
 

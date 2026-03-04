@@ -13,7 +13,7 @@ async function checkUrlLiveness(url: string): Promise<{ ok: boolean; status?: nu
 			signal: controller.signal,
 			redirect: "follow",
 			headers: {
-				"User-Agent": "skillsafe-cli (https://skillsafe.sh)",
+				"User-Agent": "skills-check-cli (https://skillscheck.ai)",
 			},
 		});
 

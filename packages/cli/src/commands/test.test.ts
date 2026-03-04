@@ -144,7 +144,7 @@ describe("testCommand", () => {
 
 		expect(logSpy).toHaveBeenCalled();
 		const output = logSpy.mock.calls[0][0] as string;
-		expect(output).toContain("# Skillsafe Test Report");
+		expect(output).toContain("# Skills Check Test Report");
 	});
 
 	it("shows verbose output", async () => {

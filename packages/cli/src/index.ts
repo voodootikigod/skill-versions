@@ -17,14 +17,14 @@ const { version } = require("../package.json") as { version: string };
 const program = new Command();
 
 program
-	.name("skillsafe")
+	.name("skills-check")
 	.description("Quality & integrity layer for Agent Skills — like npm outdated for skill knowledge")
 	.version(version);
 
 program
 	.command("check")
 	.description("Check skill versions against npm registry")
-	.option("-r, --registry <path>", "path to skillsafe.json")
+	.option("-r, --registry <path>", "path to skills-check.json")
 	.option("-p, --product <name>", "check a single product")
 	.option("--json", "output results as JSON")
 	.option("-v, --verbose", "show all products including current")
@@ -41,7 +41,7 @@ program
 
 program
 	.command("init")
-	.description("Scan skills directory and generate a skillsafe.json registry")
+	.description("Scan skills directory and generate a skills-check.json registry")
 	.argument("[dir]", "skills directory to scan", "./skills")
 	.option("-y, --yes", "non-interactive mode, auto-detect package mappings")
 	.option("-o, --output <path>", "output path for registry file")
@@ -59,7 +59,7 @@ program
 	.command("refresh")
 	.description("Use an LLM to propose targeted updates to stale skill files")
 	.argument("[skills-dir]", "path to skills directory")
-	.option("-r, --registry <path>", "path to skillsafe.json")
+	.option("-r, --registry <path>", "path to skills-check.json")
 	.option("-p, --product <name>", "refresh a single product")
 	.option("--provider <name>", "LLM provider: anthropic, openai, google")
 	.option("--model <id>", "specific model ID (e.g. claude-sonnet-4-20250514)")
@@ -89,7 +89,7 @@ program
 		"skip injection and command checkers (use when Snyk/Socket/Gen cover these)"
 	)
 	.option("--include-registry-audits", "fetch Snyk/Socket/Gen results from skills.sh")
-	.option("--ignore <path>", "path to .skillsafeignore file")
+	.option("--ignore <path>", "path to .skills-checkignore file")
 	.option("--verbose", "show progress and scan details")
 	.option("--quiet", "suppress output, exit code only")
 	.action(async (dir, options) => {
@@ -149,7 +149,7 @@ program
 program
 	.command("report")
 	.description("Generate a full staleness report")
-	.option("-r, --registry <path>", "path to skillsafe.json")
+	.option("-r, --registry <path>", "path to skills-check.json")
 	.option("-f, --format <type>", "output format: json or markdown", "markdown")
 	.action(async (options) => {
 		try {

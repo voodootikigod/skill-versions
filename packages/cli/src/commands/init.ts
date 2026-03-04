@@ -62,12 +62,12 @@ function autoDetect(productKey: string): { displayName: string; package: string 
 }
 
 /**
- * Initialize a skillsafe.json registry by scanning a skills directory.
+ * Initialize a skills-check.json registry by scanning a skills directory.
  */
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export async function initCommand(dir: string, options: InitOptions): Promise<number> {
 	console.log();
-	console.log(chalk.bold("skillsafe init"));
+	console.log(chalk.bold("skills-check init"));
 	console.log("=".repeat(50));
 	console.log();
 	console.log(`Scanning ${chalk.cyan(dir)} for SKILL.md files...`);
@@ -213,7 +213,7 @@ export async function initCommand(dir: string, options: InitOptions): Promise<nu
 	}
 
 	const registry: Registry = {
-		$schema: "https://skillsafe.sh/schema.json",
+		$schema: "https://skillscheck.ai/schema.json",
 		version: 1,
 		lastCheck: now,
 		products,
@@ -223,7 +223,7 @@ export async function initCommand(dir: string, options: InitOptions): Promise<nu
 
 	console.log();
 	console.log(chalk.green(`Created ${outputPath} with ${productCount} products.`));
-	console.log(chalk.dim('Run "skillsafe check" to check for updates.'));
+	console.log(chalk.dim('Run "skills-check check" to check for updates.'));
 	console.log();
 
 	return 0;

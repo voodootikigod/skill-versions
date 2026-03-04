@@ -1,12 +1,12 @@
 # Skill Security Audit & Hallucination Detection
 
-> **Owner:** skillsafe
+> **Owner:** skills-check
 > **Priority:** 🔴 Quadrant 1 — High Novelty, High Impact
 > **Novelty:** ★★★★★ | **Impact:** ★★★★★
 
 ## Summary
 
-A CLI tool (`skillsafe audit`) that scans skill files for security issues unique to agent skills: hallucinated package references, prompt injection patterns, dangerous shell commands, and references to non-existent or malicious resources. This is the `npm audit` + `cargo deny` equivalent for the skill ecosystem.
+A CLI tool (`skills-check audit`) that scans skill files for security issues unique to agent skills: hallucinated package references, prompt injection patterns, dangerous shell commands, and references to non-existent or malicious resources. This is the `npm audit` + `cargo deny` equivalent for the skill ecosystem.
 
 ## Why This Is Urgent
 
@@ -44,7 +44,7 @@ No tool currently validates skill content integrity.
 ## Implementation Architecture
 
 ```
-skillsafe audit [path]
+skills-check audit [path]
   ├── Parse SKILL.md files recursively from [path]
   ├── Extract commands and references
   │   ├── Regex extraction of npx/npm/pip/cargo commands
@@ -70,22 +70,22 @@ skillsafe audit [path]
 
 ```bash
 # Audit all skills in a directory
-npx skillsafe audit ./skills/
+npx skills-check audit ./skills/
 
 # Audit a single skill
-npx skillsafe audit ./skills/ai-sdk-core/SKILL.md
+npx skills-check audit ./skills/ai-sdk-core/SKILL.md
 
 # Audit with JSON output for CI
-npx skillsafe audit ./skills/ --format json --output audit-report.json
+npx skills-check audit ./skills/ --format json --output audit-report.json
 
 # Audit with specific severity threshold
-npx skillsafe audit ./skills/ --fail-on warning  # or: critical, high, medium
+npx skills-check audit ./skills/ --fail-on warning  # or: critical, high, medium
 
 # Audit with a custom policy file (see Policy Enforcement spec)
-npx skillsafe audit ./skills/ --policy .skill-policy.yml
+npx skills-check audit ./skills/ --policy .skill-policy.yml
 
 # Verify only package references (fast mode)
-npx skillsafe audit ./skills/ --packages-only
+npx skills-check audit ./skills/ --packages-only
 ```
 
 ## Output Format
@@ -124,14 +124,14 @@ Summary: 1 critical, 2 high, 1 medium across 15 skills scanned.
 - npm: 100 requests/minute for unauthenticated. Batch and cache aggressively.
 - PyPI: No official rate limit but be respectful. Cache responses for 1 hour.
 - crates.io: 1 request/second. Queue with backoff.
-- Cache all registry responses locally (`~/.cache/skillsafe/audit/`) with TTL.
+- Cache all registry responses locally (`~/.cache/skills-check/audit/`) with TTL.
 
 ### False Positive Management
 - Some skills legitimately reference internal/private packages. Support a `.skill-audit-ignore` file or inline `<!-- audit-ignore: package-exists -->` comments.
 - Prompt injection detection will have false positives for skills that legitimately instruct agents on security testing or red-teaming. Allow per-finding suppression.
 
 ### CI Integration
-- GitHub Action that runs `skillsafe audit` on PRs that modify SKILL.md files
+- GitHub Action that runs `skills-check audit` on PRs that modify SKILL.md files
 - Exit code 2 for critical findings should block merge
 - SARIF output format for GitHub Security tab integration
 
@@ -177,7 +177,7 @@ src/
 - `gray-matter` — Parse YAML frontmatter
 - `node-fetch` or built-in fetch — Registry API calls
 - `minimatch` — Pattern matching for ignore files
-- Existing skillsafe infrastructure for SKILL.md discovery
+- Existing skills-check infrastructure for SKILL.md discovery
 
 ## Testing Strategy
 

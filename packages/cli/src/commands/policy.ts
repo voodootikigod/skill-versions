@@ -29,7 +29,7 @@ function meetsThreshold(severity: PolicySeverity, threshold: PolicySeverity): bo
 }
 
 /**
- * `skillsafe policy check` — check skills against policy.
+ * `skills-check policy check` — check skills against policy.
  */
 export async function policyCheckCommand(
 	dir: string,
@@ -51,7 +51,7 @@ export async function policyCheckCommand(
 		const discovered = await discoverPolicyFile(dir);
 		if (!discovered) {
 			console.error(
-				chalk.red("No .skill-policy.yml found. Run `skillsafe policy init` to create one.")
+				chalk.red("No .skill-policy.yml found. Run `skills-check policy init` to create one.")
 			);
 			return 2;
 		}
@@ -121,7 +121,7 @@ export async function policyCheckCommand(
 }
 
 /**
- * `skillsafe policy init` — generate a starter policy file.
+ * `skills-check policy init` — generate a starter policy file.
  */
 export async function policyInitCommand(options: { output?: string }): Promise<number> {
 	const content = generateStarterPolicy();
@@ -133,7 +133,7 @@ export async function policyInitCommand(options: { output?: string }): Promise<n
 }
 
 /**
- * `skillsafe policy validate` — validate a policy file.
+ * `skills-check policy validate` — validate a policy file.
  */
 export async function policyValidateCommand(options: { policy?: string }): Promise<number> {
 	const policyPath = options.policy ?? ".skill-policy.yml";

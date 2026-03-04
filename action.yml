@@ -1,4 +1,4 @@
-name: "Skillsafe"
+name: "Skills Check CI"
 description: "Quality & integrity layer for Agent Skills — check freshness, audit security, lint metadata, analyze budgets, enforce policy, and more"
 author: "voodootikigod"
 
@@ -57,8 +57,8 @@ inputs:
     description: "Directory containing skill files to analyze"
     default: "."
   registry:
-    description: "Path to the skillsafe.json registry file"
-    default: "skillsafe.json"
+    description: "Path to the skills-check.json registry file"
+    default: "skills-check.json"
   node-version:
     description: "Node.js version to use"
     default: "22"
@@ -130,12 +130,12 @@ runs:
       shell: bash
       run: |
         set +e
-        OUTPUT=$(npx --yes skillsafe check --registry "${{ inputs.registry }}" --json --ci 2>&1)
+        OUTPUT=$(npx --yes skills-check check --registry "${{ inputs.registry }}" --json --ci 2>&1)
         EXIT_CODE=$?
         set -e
 
         if [ "$EXIT_CODE" -eq 2 ]; then
-          echo "::error::skillsafe check: configuration error"
+          echo "::error::skills-check check: configuration error"
           echo "$OUTPUT"
           echo "exit_code=2" >> "$GITHUB_OUTPUT"
           exit 2
@@ -155,13 +155,13 @@ runs:
       if: steps.resolve.outputs.run_check == 'true' && steps.check.outputs.exit_code == '1'
       shell: bash
       run: |
-        REPORT=$(npx --yes skillsafe report --registry "${{ inputs.registry }}" --format markdown 2>/dev/null)
+        REPORT=$(npx --yes skills-check report --registry "${{ inputs.registry }}" --format markdown 2>/dev/null)
 
         # Write multiline output
         {
-          echo "report<<SKILLSAFE_EOF"
+          echo "report<<SKILLSCHECK_EOF"
           echo "$REPORT"
-          echo "SKILLSAFE_EOF"
+          echo "SKILLSCHECK_EOF"
         } >> "$GITHUB_OUTPUT"
 
     - name: Upsert issue
@@ -188,7 +188,7 @@ runs:
       shell: bash
       run: |
         set +e
-        npx --yes skillsafe audit "${{ inputs.skills-dir }}" \
+        npx --yes skills-check audit "${{ inputs.skills-dir }}" \
           --format json \
           --fail-on "${{ inputs.audit-fail-on }}" \
           --quiet
@@ -198,11 +198,11 @@ runs:
         echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
 
         if [ "$EXIT_CODE" -eq 2 ]; then
-          echo "::error::skillsafe audit: configuration error"
+          echo "::error::skills-check audit: configuration error"
           exit 2
         fi
         if [ "$EXIT_CODE" -eq 1 ]; then
-          echo "::error::skillsafe audit: findings at or above '${{ inputs.audit-fail-on }}' severity"
+          echo "::error::skills-check audit: findings at or above '${{ inputs.audit-fail-on }}' severity"
           exit 1
         fi
 
@@ -213,7 +213,7 @@ runs:
       shell: bash
       run: |
         set +e
-        npx --yes skillsafe lint "${{ inputs.skills-dir }}" \
+        npx --yes skills-check lint "${{ inputs.skills-dir }}" \
           --ci \
           --format json \
           --fail-on "${{ inputs.lint-fail-on }}"
@@ -223,11 +223,11 @@ runs:
         echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
 
         if [ "$EXIT_CODE" -eq 2 ]; then
-          echo "::error::skillsafe lint: configuration error"
+          echo "::error::skills-check lint: configuration error"
           exit 2
         fi
         if [ "$EXIT_CODE" -eq 1 ]; then
-          echo "::error::skillsafe lint: issues at or above '${{ inputs.lint-fail-on }}' level"
+          echo "::error::skills-check lint: issues at or above '${{ inputs.lint-fail-on }}' level"
           exit 1
         fi
 
@@ -243,18 +243,18 @@ runs:
         fi
 
         set +e
-        npx --yes skillsafe budget "${BUDGET_ARGS[@]}"
+        npx --yes skills-check budget "${BUDGET_ARGS[@]}"
         EXIT_CODE=$?
         set -e
 
         echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
 
         if [ "$EXIT_CODE" -eq 2 ]; then
-          echo "::error::skillsafe budget: configuration error"
+          echo "::error::skills-check budget: configuration error"
           exit 2
         fi
         if [ "$EXIT_CODE" -eq 1 ]; then
-          echo "::error::skillsafe budget: token count exceeds threshold (${{ inputs.budget-max-tokens }})"
+          echo "::error::skills-check budget: token count exceeds threshold (${{ inputs.budget-max-tokens }})"
           exit 1
         fi
 
@@ -271,18 +271,18 @@ runs:
         POLICY_ARGS+=(--fail-on "${{ inputs.policy-fail-on }}")
 
         set +e
-        npx --yes skillsafe policy check "${POLICY_ARGS[@]}"
+        npx --yes skills-check policy check "${POLICY_ARGS[@]}"
         EXIT_CODE=$?
         set -e
 
         echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
 
         if [ "$EXIT_CODE" -eq 2 ]; then
-          echo "::error::skillsafe policy: configuration error"
+          echo "::error::skills-check policy: configuration error"
           exit 2
         fi
         if [ "$EXIT_CODE" -eq 1 ]; then
-          echo "::error::skillsafe policy: violations at or above '${{ inputs.policy-fail-on }}' severity"
+          echo "::error::skills-check policy: violations at or above '${{ inputs.policy-fail-on }}' severity"
           exit 1
         fi
 
@@ -293,18 +293,18 @@ runs:
       shell: bash
       run: |
         set +e
-        npx --yes skillsafe verify --all --format json --skip-llm --quiet
+        npx --yes skills-check verify --all --format json --skip-llm --quiet
         EXIT_CODE=$?
         set -e
 
         echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
 
         if [ "$EXIT_CODE" -eq 2 ]; then
-          echo "::error::skillsafe verify: configuration error"
+          echo "::error::skills-check verify: configuration error"
           exit 2
         fi
         if [ "$EXIT_CODE" -eq 1 ]; then
-          echo "::error::skillsafe verify: version bump mismatches detected"
+          echo "::error::skills-check verify: version bump mismatches detected"
           exit 1
         fi
 
@@ -315,18 +315,18 @@ runs:
       shell: bash
       run: |
         set +e
-        npx --yes skillsafe test "${{ inputs.skills-dir }}" --ci --format json
+        npx --yes skills-check test "${{ inputs.skills-dir }}" --ci --format json
         EXIT_CODE=$?
         set -e
 
         echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
 
         if [ "$EXIT_CODE" -eq 2 ]; then
-          echo "::error::skillsafe test: configuration error"
+          echo "::error::skills-check test: configuration error"
           exit 2
         fi
         if [ "$EXIT_CODE" -eq 1 ]; then
-          echo "::error::skillsafe test: regressions detected"
+          echo "::error::skills-check test: regressions detected"
           exit 1
         fi
 

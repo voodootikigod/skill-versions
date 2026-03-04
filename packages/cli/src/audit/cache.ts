@@ -5,7 +5,7 @@ import { join } from "node:path";
 const DEFAULT_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 export function getCacheDir(): string {
-	return join(homedir(), ".cache", "skillsafe", "audit");
+	return join(homedir(), ".cache", "skills-check", "audit");
 }
 
 interface CacheEntry {

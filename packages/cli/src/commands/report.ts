@@ -65,7 +65,7 @@ export async function reportCommand(options: ReportOptions): Promise<number> {
 	const now = new Date().toISOString().split("T")[0];
 
 	const lines: string[] = [];
-	lines.push("# Skillsafe Report");
+	lines.push("# Skills Check Report");
 	lines.push("");
 	lines.push(`Generated: ${now}`);
 	lines.push("");

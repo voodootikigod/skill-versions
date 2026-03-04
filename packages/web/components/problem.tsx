@@ -47,7 +47,7 @@ export function Problem() {
 					<div className={styles.point}>
 						<span className={styles.icon}>&#x2705;</span>
 						<div>
-							<h3 className={styles.pointTitle}>skillsafe fixes this</h3>
+							<h3 className={styles.pointTitle}>skills-check fixes this</h3>
 							<p className={styles.pointDescription}>
 								10 commands covering freshness, security, quality, token budgets, semver
 								verification, and policy enforcement &mdash; everything you need to keep agent

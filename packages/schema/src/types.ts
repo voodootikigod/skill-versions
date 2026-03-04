@@ -1,5 +1,5 @@
 /**
- * Registry format: skillsafe.json
+ * Registry format: skills-check.json
  */
 export interface Registry {
 	$schema?: string;

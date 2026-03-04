@@ -2,12 +2,12 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 import type { BaselineDiff, TestReport } from "./types.js";
 
-const BASELINE_DIR = ".skillsafe/test-baselines";
+const BASELINE_DIR = ".skills-check/test-baselines";
 
 function getBaselinePath(skillPath: string): string {
 	const skillDir = dirname(skillPath);
 	const skillName = basename(skillDir);
-	// Find root by walking up until we find .skillsafe or use cwd
+	// Find root by walking up until we find .skills-check or use cwd
 	return join(BASELINE_DIR, `${skillName}.json`);
 }
 

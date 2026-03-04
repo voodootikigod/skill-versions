@@ -24,7 +24,7 @@ describe("formatSarif", () => {
 	it("includes tool information", () => {
 		const output = formatSarif(makeReport());
 		const parsed = JSON.parse(output);
-		expect(parsed.runs[0].tool.driver.name).toBe("skillsafe");
+		expect(parsed.runs[0].tool.driver.name).toBe("skills-check");
 	});
 
 	it("maps findings to results", () => {
@@ -46,7 +46,7 @@ describe("formatSarif", () => {
 		expect(parsed.runs[0].results).toHaveLength(1);
 
 		const result = parsed.runs[0].results[0];
-		expect(result.ruleId).toBe("skillsafe/hallucinated-package");
+		expect(result.ruleId).toBe("skills-check/hallucinated-package");
 		expect(result.level).toBe("error");
 		expect(result.message.text).toBe("Package not found");
 		expect(result.locations[0].physicalLocation.region.startLine).toBe(42);
@@ -163,7 +163,7 @@ describe("formatSarif", () => {
 		});
 
 		const parsed = JSON.parse(formatSarif(report));
-		// Should have the main skillsafe run + additional runs for each auditor
+		// Should have the main skills-check run + additional runs for each auditor
 		expect(parsed.runs.length).toBeGreaterThan(1);
 
 		const auditorRuns = parsed.runs.slice(1);

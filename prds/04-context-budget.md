@@ -1,12 +1,12 @@
 # Context Budget Analysis
 
-> **Owner:** 🔧 skillsafe
+> **Owner:** 🔧 skills-check
 > **Priority:** 🔴 Quadrant 1 — High Novelty, High Impact
 > **Novelty:** ★★★★★ | **Impact:** ★★★★☆
 
 ## Summary
 
-A CLI tool (`skillsafe budget`) that measures and reports the token cost of installed skills, identifies redundancy between skills, and helps authors and consumers optimize context window usage. This is `bundlephobia` for the skill ecosystem — but unlike bundle size for JavaScript, token cost for skills directly impacts agent performance, latency, and monetary cost.
+A CLI tool (`skills-check budget`) that measures and reports the token cost of installed skills, identifies redundancy between skills, and helps authors and consumers optimize context window usage. This is `bundlephobia` for the skill ecosystem — but unlike bundle size for JavaScript, token cost for skills directly impacts agent performance, latency, and monetary cost.
 
 ## Why This Is Novel
 
@@ -22,28 +22,28 @@ No tool in any ecosystem measures this.
 
 ```bash
 # Measure all installed skills
-npx skillsafe budget
+npx skills-check budget
 
 # Measure a specific skill
-npx skillsafe budget --skill ai-sdk-core
+npx skills-check budget --skill ai-sdk-core
 
 # Measure with feature flags applied
-npx skillsafe budget --skill nextjs-patterns --features app-router,typescript
+npx skills-check budget --skill nextjs-patterns --features app-router,typescript
 
 # Measure transitive cost (skill + its dependencies)
-npx skillsafe budget --skill fullstack-react --include-deps
+npx skills-check budget --skill fullstack-react --include-deps
 
 # Compare two configurations
-npx skillsafe budget --compare before.json after.json
+npx skills-check budget --compare before.json after.json
 
 # Output as JSON for CI integration
-npx skillsafe budget --format json
+npx skills-check budget --format json
 
 # Set a budget limit (fails if exceeded)
-npx skillsafe budget --max-tokens 50000
+npx skills-check budget --max-tokens 50000
 
 # Detailed breakdown by section
-npx skillsafe budget --skill ai-sdk-core --detailed
+npx skills-check budget --skill ai-sdk-core --detailed
 ```
 
 ## Output Format
@@ -76,7 +76,7 @@ Budget: 18,010 / 128,000 tokens (14.1% of context used by skills)
 ## Implementation Architecture
 
 ```
-skillsafe budget [options]
+skills-check budget [options]
   ├── Discover installed skills
   ├── For each skill:
   │   ├── Read SKILL.md content
@@ -163,9 +163,9 @@ Report cost as "per 1,000 skill loads" at the relevant model price point.
 ### Comparison Mode
 Store budget snapshots and compare:
 ```bash
-npx skillsafe budget --save baseline.json
+npx skills-check budget --save baseline.json
 # ... make changes ...
-npx skillsafe budget --compare baseline.json
+npx skills-check budget --compare baseline.json
 ```
 
 Output:
@@ -201,7 +201,7 @@ src/
 ## Dependencies
 
 - `tiktoken` (or `js-tiktoken`) — Token counting
-- Existing skillsafe infrastructure for skill discovery
+- Existing skills-check infrastructure for skill discovery
 - Feature flag parser (from feature flags spec, if implemented)
 
 ## Success Criteria

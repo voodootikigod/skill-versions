@@ -14,7 +14,7 @@ export function formatMarkdown(report: AuditReport): string {
 	const lines: string[] = [];
 	const now = report.generatedAt.split("T")[0];
 
-	lines.push("# Skillsafe Audit Report");
+	lines.push("# Skills Check Audit Report");
 	lines.push("");
 	lines.push(`Generated: ${now}`);
 	lines.push("");

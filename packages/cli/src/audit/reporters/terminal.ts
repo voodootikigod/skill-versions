@@ -46,7 +46,7 @@ export function formatTerminal(report: AuditReport): string {
 	const lines: string[] = [];
 
 	lines.push("");
-	lines.push(chalk.bold("skillsafe audit"));
+	lines.push(chalk.bold("skills-check audit"));
 	lines.push("=".repeat(50));
 	lines.push("");
 

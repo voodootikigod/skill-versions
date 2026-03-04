@@ -8,13 +8,13 @@ import { Quickstart } from "@/components/quickstart";
 const jsonLd = {
 	"@context": "https://schema.org",
 	"@type": "SoftwareApplication",
-	name: "skillsafe",
+	name: "skills-check",
 	applicationCategory: "DeveloperApplication",
 	operatingSystem: "Any",
 	description:
 		"Quality & integrity layer for AI Agent Skills — check freshness, audit security, lint metadata, enforce policy, measure token budgets, verify semver, and run eval tests across your SKILL.md files.",
-	url: "https://skillsafe.sh",
-	downloadUrl: "https://www.npmjs.com/package/skillsafe",
+	url: "https://skillscheck.ai",
+	downloadUrl: "https://www.npmjs.com/package/skills-check",
 	softwareVersion: "1.0.0",
 	author: {
 		"@type": "Person",

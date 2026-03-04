@@ -7,10 +7,10 @@ export function Footer() {
 		<footer className={styles.footer}>
 			<div className={styles.container}>
 				<div className={styles.left}>
-					<span className={styles.brand}>skillsafe</span>
+					<span className={styles.brand}>skills-check</span>
 					<span className={styles.separator}>|</span>
 					<a
-						href="https://github.com/voodootikigod/skillsafe"
+						href="https://github.com/voodootikigod/skills-check"
 						rel="noopener noreferrer"
 						target="_blank"
 					>
@@ -20,7 +20,11 @@ export function Footer() {
 					<Link href="/schema.json">Schema</Link>
 				</div>
 				<div className={styles.right}>
-					<a href="https://npmjs.com/package/skillsafe" rel="noopener noreferrer" target="_blank">
+					<a
+						href="https://npmjs.com/package/skills-check"
+						rel="noopener noreferrer"
+						target="_blank"
+					>
 						npm
 					</a>
 				</div>

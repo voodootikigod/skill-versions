@@ -35,7 +35,7 @@ async function checkCratesExists(name: string): Promise<boolean> {
 	try {
 		const response = await fetch(`${CRATES_API}/${encodeURIComponent(name)}`, {
 			headers: {
-				"User-Agent": "skillsafe-cli (https://skillsafe.sh)",
+				"User-Agent": "skills-check-cli (https://skillscheck.ai)",
 			},
 		});
 		return response.ok;

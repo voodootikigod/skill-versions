@@ -152,12 +152,12 @@ src/
     check-lock.ts         # Verify installed matches lock
 ```
 
-## skillsafe Integration
+## skills-check Integration
 
-skillsafe can read `skills.lock` to:
-- Report exact installed versions in `skillsafe check` output
+skills-check can read `skills.lock` to:
+- Report exact installed versions in `skills-check check` output
 - Detect when a skill was updated without the lockfile being regenerated
-- Use commit SHAs for precise git-based diffing in `skillsafe verify`
+- Use commit SHAs for precise git-based diffing in `skills-check verify`
 
 ## Success Criteria
 

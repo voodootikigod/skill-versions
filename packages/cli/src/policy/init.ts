@@ -2,8 +2,8 @@
  * Generate a starter .skill-policy.yml file with commented examples.
  */
 export function generateStarterPolicy(): string {
-	return `# .skill-policy.yml — skillsafe policy enforcement
-# See: https://skillsafe.sh/docs/policy
+	return `# .skill-policy.yml — skills-check policy enforcement
+# See: https://skillscheck.ai/docs/policy
 version: 1
 
 # Trusted sources — only skills from these sources are allowed

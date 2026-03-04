@@ -102,8 +102,8 @@ describe("formatLintTerminal", () => {
 		expect(output).toContain("2");
 	});
 
-	it("includes skillsafe lint header", () => {
+	it("includes skills-check lint header", () => {
 		const output = formatLintTerminal(makeReport());
-		expect(output).toContain("skillsafe lint");
+		expect(output).toContain("skills-check lint");
 	});
 });

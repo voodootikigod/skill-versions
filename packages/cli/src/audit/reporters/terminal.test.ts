@@ -20,7 +20,7 @@ describe("formatTerminal", () => {
 
 	it("includes header", () => {
 		const output = formatTerminal(makeReport());
-		expect(output).toContain("skillsafe audit");
+		expect(output).toContain("skills-check audit");
 	});
 
 	it("groups findings by file", () => {

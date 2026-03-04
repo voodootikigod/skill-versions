@@ -8,7 +8,7 @@ describe("gradeCommand", () => {
 	let workDir: string;
 
 	beforeEach(async () => {
-		workDir = join(tmpdir(), `skillsafe-test-cmd-${Date.now()}`);
+		workDir = join(tmpdir(), `skills-check-test-cmd-${Date.now()}`);
 		await mkdir(workDir, { recursive: true });
 	});
 

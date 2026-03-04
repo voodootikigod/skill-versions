@@ -80,14 +80,14 @@ function validateSkill(skill: SkillFile): ValidationResult {
 
 ```bash
 # Check if a skill is compatible with a newer edition
-npx skillsafe edition check --target 2026
+npx skills-check edition check --target 2026
 
 # Auto-migrate a skill to a newer edition
-npx skillsafe edition migrate --target 2026
+npx skills-check edition migrate --target 2026
 # Adds missing required fields, restructures as needed
 
 # Show what changed between editions
-npx skillsafe edition diff 2025 2026
+npx skills-check edition diff 2025 2026
 ```
 
 ## Implementation Considerations
@@ -99,9 +99,9 @@ Skills without an `edition` field default to the oldest edition ("2025"). This e
 Annual editions (matching the year) keep the pace manageable and predictable. Not every year needs a new edition — only release one when there are enough accumulated changes to justify it.
 
 ### Tooling Support
-Every tool in the ecosystem (skillsafe, skills.sh, agent loaders) reads the edition field and adjusts behavior. This is the social contract: tools agree to support older editions indefinitely, but new features only work at the edition where they're introduced.
+Every tool in the ecosystem (skills-check, skills.sh, agent loaders) reads the edition field and adjusts behavior. This is the social contract: tools agree to support older editions indefinitely, but new features only work at the edition where they're introduced.
 
-## File Structure (skillsafe side)
+## File Structure (skills-check side)
 
 ```
 src/

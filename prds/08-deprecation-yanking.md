@@ -110,12 +110,12 @@ $ npx skills status
   ✗ bad-deploy@1.2.0 — yanked (advisory: SKILL-2026-001)
 ```
 
-## skillsafe Integration
+## skills-check Integration
 
-skillsafe can check deprecation/yank status as part of its health checks:
+skills-check can check deprecation/yank status as part of its health checks:
 
 ```bash
-$ npx skillsafe check
+$ npx skills-check check
   ai-sdk-core:  ✓ Current (6.1.0, product matches 6.1.x)
   old-patterns:  ⚠ Deprecated — replacement available: new-patterns
   bad-deploy:    ✗ YANKED — see advisory SKILL-2026-001
@@ -138,7 +138,7 @@ Allow authors to unyank within 48 hours (matching npm's unpublish window). After
 - **Removed** skills: `skills ci` fails. The lockfile reference is broken.
 
 ### Advisory Database
-Yanked skills should be recorded in the advisory database (same one used by `skillsafe audit`). This creates a feedback loop: audit checks for yanked dependencies, yank events populate the advisory database.
+Yanked skills should be recorded in the advisory database (same one used by `skills-check audit`). This creates a feedback loop: audit checks for yanked dependencies, yank events populate the advisory database.
 
 ## File Structure (skills.sh side)
 
@@ -152,7 +152,7 @@ src/
     lockfile.ts           # Lockfile-aware resolution (skip yanked for new installs)
 ```
 
-## File Structure (skillsafe side)
+## File Structure (skills-check side)
 
 ```
 src/
@@ -166,5 +166,5 @@ src/
 
 - Deprecated skills show clear warnings with replacement guidance
 - Yanked skills are blocked for new installs but resolve from existing lockfiles
-- `skillsafe check` surfaces lifecycle status alongside staleness info
+- `skills-check check` surfaces lifecycle status alongside staleness info
 - Advisory database is populated when skills are yanked

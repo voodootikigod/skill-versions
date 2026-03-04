@@ -1,4 +1,4 @@
-export type { Registry, RegistryProduct } from "@skillsafe/schema";
+export type { Registry, RegistryProduct } from "@skills-check/schema";
 
 /**
  * Result of checking a single product against npm

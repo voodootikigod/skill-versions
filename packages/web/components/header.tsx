@@ -6,12 +6,12 @@ export function Header() {
 		<header className={styles.header}>
 			<nav className={styles.nav}>
 				<Link className={styles.logo} href="/">
-					skillsafe
+					skills-check
 				</Link>
 				<div className={styles.links}>
 					<Link href="/docs">Docs</Link>
 					<a
-						href="https://github.com/voodootikigod/skillsafe"
+						href="https://github.com/voodootikigod/skills-check"
 						rel="noopener noreferrer"
 						target="_blank"
 					>

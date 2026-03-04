@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
 			userAgent: "*",
 			allow: "/",
 		},
-		sitemap: "https://skillsafe.sh/sitemap.xml",
+		sitemap: "https://skillscheck.ai/sitemap.xml",
 	};
 }

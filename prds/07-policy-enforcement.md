@@ -1,12 +1,12 @@
 # Policy Enforcement (cargo deny for Skills)
 
-> **Owner:** 🔧 skillsafe
+> **Owner:** 🔧 skills-check
 > **Priority:** 🟡 Quadrant 2 — Lower Novelty, High Impact
 > **Novelty:** ★★★☆☆ | **Impact:** ★★★★☆
 
 ## Summary
 
-A policy-as-code tool (`skillsafe policy`) that enforces organizational rules about which skills are allowed, required, or banned. This is `cargo deny` adapted for the skill ecosystem — the gate-keeper that enterprises need before they'll adopt skills at scale.
+A policy-as-code tool (`skills-check policy`) that enforces organizational rules about which skills are allowed, required, or banned. This is `cargo deny` adapted for the skill ecosystem — the gate-keeper that enterprises need before they'll adopt skills at scale.
 
 ## Why This Matters
 
@@ -79,7 +79,7 @@ freshness:
 
 # Audit integration
 audit:
-  require_clean: true               # skillsafe audit must pass
+  require_clean: true               # skills-check audit must pass
   min_severity_to_block: "high"     # Block on high+ findings
 ```
 
@@ -87,22 +87,22 @@ audit:
 
 ```bash
 # Check all installed skills against policy
-npx skillsafe policy check
+npx skills-check policy check
 
 # Check against a specific policy file
-npx skillsafe policy check --policy .skill-policy.yml
+npx skills-check policy check --policy .skill-policy.yml
 
 # Check a specific skill
-npx skillsafe policy check --skill ai-sdk-core
+npx skills-check policy check --skill ai-sdk-core
 
 # Generate a starter policy file
-npx skillsafe policy init
+npx skills-check policy init
 
 # Validate policy file syntax
-npx skillsafe policy validate
+npx skills-check policy validate
 
 # CI mode: strict exit codes
-npx skillsafe policy check --ci
+npx skills-check policy check --ci
 ```
 
 ## Output Format
@@ -141,12 +141,12 @@ Summary: 1 blocked, 2 violations, 1 warning. Policy check FAILED.
 
 ### Inheritance
 Support policy inheritance for monorepos:
-- Organization-level policy at `~/.config/skillsafe/policy.yml`
+- Organization-level policy at `~/.config/skills-check/policy.yml`
 - Project-level policy at `.skill-policy.yml` (extends or overrides org policy)
 - Workspace-level policies in subdirectories (further refinement)
 
 ### Integration with Audit
-The `audit.require_clean` setting runs `skillsafe audit` as part of the policy check. This means a single `policy check` command can enforce both organizational rules AND security audit findings.
+The `audit.require_clean` setting runs `skills-check audit` as part of the policy check. This means a single `policy check` command can enforce both organizational rules AND security audit findings.
 
 ### Pre-install Hook
 If integrated with skills.sh, policy check could run before installation:
@@ -184,5 +184,5 @@ src/
 - Policy check for 50 skills completes in < 5 seconds
 - Source allow/deny lists correctly gate installation
 - Content pattern matching has < 5% false positive rate
-- Integrates with skillsafe audit as a single check
+- Integrates with skills-check audit as a single check
 - Starter policy file is useful out of the box

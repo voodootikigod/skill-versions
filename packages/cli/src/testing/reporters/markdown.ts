@@ -10,7 +10,7 @@ export function formatMarkdown(
 ): string {
 	const lines: string[] = [];
 
-	lines.push("# Skillsafe Test Report");
+	lines.push("# Skills Check Test Report");
 	lines.push("");
 
 	if (reports.length === 0) {

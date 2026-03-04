@@ -14,15 +14,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 	title: {
-		default: "Skillsafe — Quality & integrity layer for Agent Skills",
-		template: "%s | Skillsafe",
+		default: "Skills Check — Quality & integrity layer for Agent Skills",
+		template: "%s | Skills Check",
 	},
 	description:
 		"Quality & integrity layer for AI Agent Skills — check freshness, audit security, lint metadata, enforce policy, measure token budgets, verify semver, and run eval tests across your SKILL.md files.",
-	metadataBase: new URL("https://skillsafe.sh"),
+	metadataBase: new URL("https://skillscheck.ai"),
 	keywords: [
 		"agent skills",
-		"skillsafe",
+		"skills-check",
 		"AI agents",
 		"skill audit",
 		"skill lint",
@@ -35,17 +35,17 @@ export const metadata: Metadata = {
 	authors: [{ name: "Chris Williams", url: "https://github.com/voodootikigod" }],
 	creator: "Chris Williams",
 	openGraph: {
-		title: "Skillsafe — Quality & integrity layer for Agent Skills",
+		title: "Skills Check — Quality & integrity layer for Agent Skills",
 		description:
 			"Quality & integrity layer for AI Agent Skills. 10 commands for freshness, security, quality, and efficiency.",
-		url: "https://skillsafe.sh",
-		siteName: "Skillsafe",
+		url: "https://skillscheck.ai",
+		siteName: "Skills Check",
 		locale: "en_US",
 		type: "website",
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Skillsafe — Quality & integrity layer for Agent Skills",
+		title: "Skills Check — Quality & integrity layer for Agent Skills",
 		description:
 			"Quality & integrity layer for AI Agent Skills. 10 commands for freshness, security, quality, and efficiency.",
 		creator: "@voodootikigod",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
 		follow: true,
 	},
 	alternates: {
-		canonical: "https://skillsafe.sh",
+		canonical: "https://skillscheck.ai",
 	},
 };
 

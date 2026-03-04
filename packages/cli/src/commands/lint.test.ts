@@ -132,7 +132,7 @@ describe("lintCommand", () => {
 		await lintCommand(".", {});
 		expect(logSpy).toHaveBeenCalled();
 		const output = logSpy.mock.calls[0][0] as string;
-		expect(output).toContain("skillsafe lint");
+		expect(output).toContain("skills-check lint");
 	});
 
 	it("writes report to file with --output", async () => {

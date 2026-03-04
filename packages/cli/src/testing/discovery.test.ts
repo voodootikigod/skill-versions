@@ -19,7 +19,7 @@ describe("discoverTestableSkills", () => {
 	let tempDir: string;
 
 	beforeEach(async () => {
-		tempDir = join(tmpdir(), `skillsafe-test-discovery-${Date.now()}`);
+		tempDir = join(tmpdir(), `skills-check-test-discovery-${Date.now()}`);
 		await mkdir(tempDir, { recursive: true });
 	});
 

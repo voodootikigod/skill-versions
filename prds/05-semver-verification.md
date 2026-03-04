@@ -1,18 +1,18 @@
 # Semver for Knowledge / Version Verification
 
-> **Owner:** 🔧 skillsafe
+> **Owner:** 🔧 skills-check
 > **Priority:** 🔴 Quadrant 1 — High Novelty, High Impact
 > **Novelty:** ★★★★☆ | **Impact:** ★★★★☆
 
 ## Summary
 
-A framework for defining what semantic versioning means for knowledge artifacts (not code), plus a CLI tool (`skillsafe verify`) that analyzes content changes between skill versions and validates that the version bump matches the actual scope of change. This is `cargo semver-checks` adapted for prose and instructions rather than API surfaces.
+A framework for defining what semantic versioning means for knowledge artifacts (not code), plus a CLI tool (`skills-check verify`) that analyzes content changes between skill versions and validates that the version bump matches the actual scope of change. This is `cargo semver-checks` adapted for prose and instructions rather than API surfaces.
 
 ## The Problem
 
 Code has clear semantics for versioning: removing a public function is a major change, adding one is minor, fixing a bug is a patch. Skills have no equivalent vocabulary. When a skill's `product-version` bumps from 6.0 to 7.0, does that mean the skill was rewritten, or did someone just update a version number without changing content? Conversely, when content changes significantly but the version doesn't bump, nobody knows.
 
-This matters for trust. If `skillsafe check` reports a skill is current (version matches), but the content is actually stale, the version number is lying. If `skillsafe refresh` bumps a version after AI-assisted updates, how do we know the bump magnitude is appropriate?
+This matters for trust. If `skills-check check` reports a skill is current (version matches), but the content is actually stale, the version number is lying. If `skills-check refresh` bumps a version after AI-assisted updates, how do we know the bump magnitude is appropriate?
 
 ## Proposed Knowledge Versioning Vocabulary
 
@@ -38,19 +38,19 @@ This matters for trust. If `skillsafe check` reports a skill is current (version
 
 ```bash
 # Verify that a skill's version bump matches its content changes
-npx skillsafe verify --skill ai-sdk-core
+npx skills-check verify --skill ai-sdk-core
 
 # Compare two versions of a skill
-npx skillsafe verify --before skills/v1/ai-sdk-core/ --after skills/v2/ai-sdk-core/
+npx skills-check verify --before skills/v1/ai-sdk-core/ --after skills/v2/ai-sdk-core/
 
 # Verify all skills in a repo against their git history
-npx skillsafe verify --all
+npx skills-check verify --all
 
 # Auto-suggest the appropriate version bump
-npx skillsafe verify --suggest --skill ai-sdk-core
+npx skills-check verify --suggest --skill ai-sdk-core
 
 # Verify after a refresh
-npx skillsafe refresh && npx skillsafe verify
+npx skills-check refresh && npx skills-check verify
 ```
 
 ## Output Format
@@ -95,7 +95,7 @@ Assessment: ✗ PATCH bump appears INSUFFICIENT
 ### Content Diff Analysis
 
 ```
-skillsafe verify
+skills-check verify
   ├── Get previous version of SKILL.md (from git history or --before)
   ├── Get current version of SKILL.md
   ├── Structural diff:
@@ -170,15 +170,15 @@ Explain your reasoning.
 4. Compare combined assessment against declared version bump
 5. Report match or mismatch
 
-## Integration with Existing skillsafe Pipeline
+## Integration with Existing skills-check Pipeline
 
 This slots directly into the existing workflow:
 
 ```bash
-npx skillsafe check        # Find stale skills
-npx skillsafe refresh       # AI-assisted update
-npx skillsafe verify        # Validate the version bump
-npx skillsafe test          # Run regression tests
+npx skills-check check        # Find stale skills
+npx skills-check refresh       # AI-assisted update
+npx skills-check verify        # Validate the version bump
+npx skills-check test          # Run regression tests
 ```
 
 The `verify` step ensures that the AI-assisted refresh correctly classified the magnitude of its changes.

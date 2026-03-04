@@ -6,31 +6,31 @@ const steps = [
 		number: "1",
 		title: "Initialize your registry",
 		description: "Discover SKILL.md files and map them to npm packages.",
-		command: "npx skillsafe init",
+		command: "npx skills-check init",
 	},
 	{
 		number: "2",
 		title: "Check freshness and audit safety",
 		description: "Detect version drift and scan for security issues in one pass.",
-		command: "npx skillsafe check && npx skillsafe audit",
+		command: "npx skills-check check && npx skills-check audit",
 	},
 	{
 		number: "3",
 		title: "Lint, budget, and verify",
 		description: "Validate metadata, measure token costs, and confirm version bumps are honest.",
-		command: "npx skillsafe lint && npx skillsafe budget && npx skillsafe verify",
+		command: "npx skills-check lint && npx skills-check budget && npx skills-check verify",
 	},
 	{
 		number: "4",
 		title: "Enforce policy and test",
 		description: "Apply organizational trust rules and run eval test suites.",
-		command: "npx skillsafe policy check && npx skillsafe test",
+		command: "npx skills-check policy check && npx skills-check test",
 	},
 	{
 		number: "5",
 		title: "Refresh stale skills",
 		description: "Use an LLM to propose targeted updates and generate a report.",
-		command: "npx skillsafe refresh && npx skillsafe report",
+		command: "npx skills-check refresh && npx skills-check report",
 	},
 ];
 

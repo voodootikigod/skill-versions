@@ -115,7 +115,7 @@ These are complementary, not competing:
 - A skill in a group can also have feature flags. Both filters apply.
 
 ### Context Budget Integration
-`skillsafe budget` should report per-group token costs:
+`skills-check budget` should report per-group token costs:
 
 ```
 Context Budget by Group
@@ -148,7 +148,7 @@ src/
     match.ts              # Preview which groups a prompt activates
 ```
 
-## File Structure (skillsafe side)
+## File Structure (skills-check side)
 
 ```
 src/
@@ -160,5 +160,5 @@ src/
 
 - A project with 15 skills loads only 3-5 for typical interactions
 - Group trigger matching adds < 10ms to skill loading
-- Token savings measurable via `skillsafe budget --by-group`
+- Token savings measurable via `skills-check budget --by-group`
 - Backward compatible: projects without groups.yaml work unchanged

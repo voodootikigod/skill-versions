@@ -1,5 +1,5 @@
 {
-  "name": "skillsafe-monorepo",
+  "name": "skills-check-monorepo",
   "private": true,
   "workspaces": [
     "packages/*"

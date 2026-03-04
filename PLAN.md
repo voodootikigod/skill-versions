@@ -1,8 +1,8 @@
-# skillsafe Roadmap — Implementation Plan
+# skills-check Roadmap — Implementation Plan
 
 ## Scope
 
-This plan covers the Phase 1 implementation of three new skillsafe CLI commands, preceded by a shared infrastructure extraction. These are the highest-priority items from `prds/00-prioritization-and-ownership.md`.
+This plan covers the Phase 1 implementation of three new skills-check CLI commands, preceded by a shared infrastructure extraction. These are the highest-priority items from `prds/00-prioritization-and-ownership.md`.
 
 | Wave | Issue | Command | PRD |
 |------|-------|---------|-----|
@@ -38,8 +38,8 @@ Teams must understand the existing patterns before writing code.
 packages/cli/src/audit/
   types.ts          — AuditFinding, AuditChecker, CheckContext, AuditOptions
   index.ts          — Orchestrator: discover → parse → extract → check → filter → report
-  cache.ts          — Disk cache (~/.cache/skillsafe/audit/) with TTL
-  ignore.ts         — .skillsafeignore + inline <!-- audit-ignore -->
+  cache.ts          — Disk cache (~/.cache/skills-check/audit/) with TTL
+  ignore.ts         — .skills-checkignore + inline <!-- audit-ignore -->
   extractors/       — packages.ts, commands.ts, urls.ts (run once per file)
   checkers/         — registry.ts, advisory.ts, injection.ts, commands.ts, metadata.ts, urls.ts
   reporters/        — terminal.ts, json.ts, markdown.ts, sarif.ts
@@ -141,7 +141,7 @@ Barrel export for all shared modules.
 ## Wave 2, Team 1: Budget Command (ss-0dh.1)
 
 ### Goal
-Implement `skillsafe budget` — measures token cost of installed skills, detects redundancy, estimates API cost. See `prds/04-context-budget.md` for full spec.
+Implement `skills-check budget` — measures token cost of installed skills, detects redundancy, estimates API cost. See `prds/04-context-budget.md` for full spec.
 
 ### Dependency
 Install `js-tiktoken` in `packages/cli`:
@@ -294,7 +294,7 @@ Add `js-tiktoken` to dependencies.
 ## Wave 2, Team 2: Verify Command (ss-0dh.2)
 
 ### Goal
-Implement `skillsafe verify` — analyzes content changes between skill versions and validates that version bumps match actual change scope. See `prds/05-semver-verification.md` for full spec.
+Implement `skills-check verify` — analyzes content changes between skill versions and validates that version bumps match actual change scope. See `prds/05-semver-verification.md` for full spec.
 
 ### Files to Create
 
@@ -459,7 +459,7 @@ Add `verify` command registration.
 ## Wave 2, Team 3: Lint Command (ss-0dh.3)
 
 ### Goal
-Implement `skillsafe lint` — validates metadata completeness with deeper checks than audit's metadata checker, plus auto-fix. See `prds/10-mandatory-metadata.md` for full spec.
+Implement `skills-check lint` — validates metadata completeness with deeper checks than audit's metadata checker, plus auto-fix. See `prds/10-mandatory-metadata.md` for full spec.
 
 ### Files to Create
 
@@ -620,7 +620,7 @@ Add `lint` command registration.
 ## Wave 3, Team 1: Policy Command (ss-0dh.4)
 
 ### Goal
-Implement `skillsafe policy` — enforces organizational rules about which skills are allowed, required, or banned. This is `cargo deny` adapted for skills. See `prds/07-policy-enforcement.md` for full spec.
+Implement `skills-check policy` — enforces organizational rules about which skills are allowed, required, or banned. This is `cargo deny` adapted for skills. See `prds/07-policy-enforcement.md` for full spec.
 
 ### Files to Create
 
@@ -844,7 +844,7 @@ Add `policy` command registration with `check`, `init`, `validate` subcommands.
 ## Wave 3, Team 2: Test Command (ss-0dh.5)
 
 ### Goal
-Implement `skillsafe test` — runs eval test suites declared in a skill's `tests/` directory against an agent harness. See `prds/03-skill-testing.md` for full spec.
+Implement `skills-check test` — runs eval test suites declared in a skill's `tests/` directory against an agent harness. See `prds/03-skill-testing.md` for full spec.
 
 ### Key Design Decisions
 - **Agent harness abstraction**: AgentHarness interface with implementations for Claude Code (`claude exec`), generic shell, and a mock harness for testing the test runner itself
@@ -1144,7 +1144,7 @@ export function loadBaseline(skillPath: string): TestReport | null;
 export function saveBaseline(skillPath: string, report: TestReport): void;
 export function compareBaseline(current: TestReport, baseline: TestReport): BaselineDiff;
 ```
-- Storage: `.skillsafe/test-baselines/<skill-name>.json`
+- Storage: `.skills-check/test-baselines/<skill-name>.json`
 - Diff: show regressions (was passing, now failing) and improvements
 
 #### `packages/cli/src/testing/cost.ts`
