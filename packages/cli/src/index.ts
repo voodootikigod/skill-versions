@@ -8,6 +8,7 @@ import { lintCommand } from "./commands/lint.js";
 import { policyCheckCommand, policyInitCommand, policyValidateCommand } from "./commands/policy.js";
 import { refreshCommand } from "./commands/refresh.js";
 import { reportCommand } from "./commands/report.js";
+import { testCommand } from "./commands/test.js";
 import { verifyCommand } from "./commands/verify.js";
 
 const require = createRequire(import.meta.url);
@@ -230,6 +231,36 @@ policyCmd
 	.action(async (options) => {
 		try {
 			const code = await policyValidateCommand(options);
+			process.exit(code);
+		} catch (error) {
+			console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
+			process.exit(2);
+		}
+	});
+
+program
+	.command("test")
+	.description("Run eval test suites declared in skill tests/ directories")
+	.argument("[dir]", "directory to search for testable skills", ".")
+	.option("-s, --skill <name>", "test a specific skill by name")
+	.option("-t, --type <type>", "filter by test type: trigger, outcome, style, regression")
+	.option("--agent <name>", "agent harness: claude-code, generic", "generic")
+	.option("--agent-cmd <command>", "custom command template for generic harness")
+	.option("-f, --format <type>", "output format: terminal, json, or markdown", "terminal")
+	.option("-o, --output <path>", "write report to file")
+	.option("--trials <n>", "runs per test case")
+	.option("--pass-threshold <n>", "trials that must pass")
+	.option("--timeout <seconds>", "per-case timeout")
+	.option("--max-cost <dollars>", "budget cap for test run")
+	.option("--dry", "show test plan without executing")
+	.option("--update-baseline", "accept current results as new baseline")
+	.option("--ci", "strict exit codes (exit 1 on regressions)")
+	.option("--provider <name>", "LLM provider for rubric grading: anthropic, openai, google")
+	.option("--model <id>", "model for rubric grading")
+	.option("--verbose", "show per-grader results")
+	.action(async (dir, options) => {
+		try {
+			const code = await testCommand(dir, options);
 			process.exit(code);
 		} catch (error) {
 			console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
