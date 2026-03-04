@@ -9,7 +9,6 @@
     </filter>
   </defs>
   <rect width="32" height="32" rx="6" fill="#0a0a0a"/>
-  <text x="16" y="22" text-anchor="middle" font-family="monospace" font-weight="700" font-size="16" fill="#fff" filter="url(#glow)" style="text-shadow: 0 0 6px rgba(80,227,194,0.8)">
-    <tspan fill="#50e3c2" opacity="0.9">S</tspan><tspan fill="#fff">V</tspan>
-  </text>
+  <path d="M16 5 L25 9 L25 17 C25 22 20.5 26 16 27 C11.5 26 7 22 7 17 L7 9 Z" fill="none" stroke="#50e3c2" stroke-width="1.5" filter="url(#glow)"/>
+  <text x="16" y="21" text-anchor="middle" font-family="monospace" font-weight="700" font-size="14" fill="#fff" filter="url(#glow)">S</text>
 </svg>
