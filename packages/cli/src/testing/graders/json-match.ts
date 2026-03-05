@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { resolve } from "node:path";
 import type { GraderResult } from "../types.js";
+import { safePath } from "../safe-path.js";
 
 /**
  * Parse a JSON file and validate its structure against an expected schema.
@@ -12,7 +13,7 @@ export async function gradeJsonMatch(
 	file: string,
 	schema: Record<string, unknown>
 ): Promise<GraderResult> {
-	const fullPath = join(workDir, file);
+	const fullPath = safePath(resolve(workDir), file);
 	let content: string;
 
 	try {

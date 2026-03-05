@@ -1,9 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CheckContext, ExtractedUrl } from "../types.js";
+
+// Mock dns/promises lookup before importing the module under test
+vi.mock("node:dns/promises", () => ({
+	lookup: vi.fn().mockResolvedValue({ address: "93.184.216.34", family: 4 }),
+}));
+
+import { lookup } from "node:dns/promises";
 import { urlChecker } from "./urls.js";
 
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);
+
+const mockLookup = vi.mocked(lookup);
 
 function makeContext(urls: ExtractedUrl[]): CheckContext {
 	return {
@@ -21,6 +30,8 @@ function url(u: string, line = 1, text?: string): ExtractedUrl {
 describe("urlChecker", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		// Default: DNS resolves to a public IP
+		mockLookup.mockResolvedValue({ address: "93.184.216.34", family: 4 });
 	});
 
 	afterEach(() => {
@@ -53,9 +64,21 @@ describe("urlChecker", () => {
 	});
 
 	it("skips localhost URLs", async () => {
+		mockLookup.mockResolvedValue({ address: "127.0.0.1", family: 4 });
 		const ctx = makeContext([url("http://localhost:3000"), url("http://127.0.0.1:8080")]);
 		const findings = await urlChecker.check(ctx);
-		expect(findings).toHaveLength(0);
+		expect(mockFetch).not.toHaveBeenCalled();
+	});
+
+	it("skips private network and cloud metadata URLs", async () => {
+		const privateUrls = [
+			url("http://169.254.169.254/latest/meta-data/"),
+			url("http://metadata.google.internal/computeMetadata/v1/"),
+			url("http://internal-service.local:8080/api"),
+		];
+		mockLookup.mockResolvedValue({ address: "169.254.169.254", family: 4 });
+		const ctx = makeContext(privateUrls);
+		const findings = await urlChecker.check(ctx);
 		expect(mockFetch).not.toHaveBeenCalled();
 	});
 

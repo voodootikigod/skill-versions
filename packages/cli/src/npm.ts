@@ -16,7 +16,7 @@ export interface NpmPackageMetadata {
  * Uses the full (non-abbreviated) metadata endpoint.
  */
 export async function fetchPackageMetadata(packageName: string): Promise<NpmPackageMetadata> {
-	const url = `${NPM_REGISTRY}/${packageName.replace("/", "%2F")}`;
+	const url = `${NPM_REGISTRY}/${encodeURIComponent(packageName)}`;
 	const response = await fetch(url, {
 		headers: {
 			Accept: "application/json",
@@ -36,7 +36,7 @@ export async function fetchPackageMetadata(packageName: string): Promise<NpmPack
  * Uses the abbreviated metadata endpoint for speed.
  */
 export async function fetchLatestVersion(packageName: string): Promise<string> {
-	const url = `${NPM_REGISTRY}/${packageName.replace("/", "%2F")}`;
+	const url = `${NPM_REGISTRY}/${encodeURIComponent(packageName)}`;
 	const response = await fetch(url, {
 		headers: {
 			Accept: "application/vnd.npm.install-v1+json",

@@ -1,10 +1,79 @@
+import { lookup } from "node:dns/promises";
 import type { AuditChecker, AuditFinding, CheckContext, ExtractedUrl } from "../types.js";
 
 const CONCURRENCY_LIMIT = 5;
 const TIMEOUT_MS = 10_000;
 
+/**
+ * Check if an IP address is private, loopback, link-local, or a cloud metadata endpoint.
+ */
+function isPrivateIp(ip: string): boolean {
+	// IPv4 loopback
+	if (ip.startsWith("127.") || ip === "0.0.0.0") return true;
+	// IPv4 private ranges
+	if (ip.startsWith("10.")) return true;
+	if (ip.startsWith("192.168.")) return true;
+	if (/^172\.(1[6-9]|2\d|3[01])\./.test(ip)) return true;
+	// IPv4 link-local
+	if (ip.startsWith("169.254.")) return true;
+	// IPv6 loopback and link-local
+	if (ip === "::1" || ip.startsWith("fe80:") || ip === "::") return true;
+	return false;
+}
+
+/**
+ * Check if a URL hostname points to a known cloud metadata endpoint.
+ */
+function isCloudMetadataHost(hostname: string): boolean {
+	const blocked = [
+		"169.254.169.254",
+		"metadata.google.internal",
+		"metadata.goog",
+	];
+	return blocked.includes(hostname.toLowerCase());
+}
+
+/**
+ * Validate that a URL does not target private/internal network addresses.
+ * Returns true if the URL is safe to fetch.
+ */
+async function isSafeUrl(url: string): Promise<boolean> {
+	try {
+		const parsed = new URL(url);
+		const hostname = parsed.hostname;
+
+		// Block known cloud metadata endpoints
+		if (isCloudMetadataHost(hostname)) return false;
+
+		// Block common private-network hostnames
+		if (
+			hostname === "localhost" ||
+			hostname.endsWith(".local") ||
+			hostname.endsWith(".internal")
+		) {
+			return false;
+		}
+
+		// Resolve DNS and check the IP
+		try {
+			const result = await lookup(hostname);
+			if (isPrivateIp(result.address)) return false;
+		} catch {
+			// DNS resolution failed — allow fetch to fail naturally
+		}
+
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 async function checkUrlLiveness(url: string): Promise<{ ok: boolean; status?: number }> {
 	try {
+		if (!(await isSafeUrl(url))) {
+			return { ok: false };
+		}
+
 		const controller = new AbortController();
 		const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -62,11 +131,8 @@ export const urlChecker: AuditChecker = {
 	async check(context: CheckContext): Promise<AuditFinding[]> {
 		const findings: AuditFinding[] = [];
 
-		// Only check http(s) URLs, skip localhost/127.0.0.1
-		const checkable = context.urls.filter(
-			(u) =>
-				u.url.startsWith("http") && !u.url.includes("localhost") && !u.url.includes("127.0.0.1")
-		);
+		// Only check http(s) URLs — private/internal filtering happens in checkUrlLiveness
+		const checkable = context.urls.filter((u) => u.url.startsWith("http"));
 
 		// Deduplicate by URL
 		const seen = new Set<string>();

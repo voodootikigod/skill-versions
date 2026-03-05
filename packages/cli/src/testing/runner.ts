@@ -1,6 +1,7 @@
 import { cp, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { safePath } from "./safe-path.js";
 import { gradeCommand } from "./graders/command.js";
 import { gradeContains } from "./graders/contains.js";
 import { gradeCustom } from "./graders/custom.js";
@@ -41,11 +42,12 @@ export async function runCase(
 			trialWorkDir = await mkdtemp(join(tmpdir(), `skills-check-test-${testCase.id}-`));
 
 			if (testCase.fixture && options.testsDir) {
-				const fixturePath = join(options.testsDir, "..", testCase.fixture);
+				const skillDir = resolve(options.testsDir, "..");
 				try {
+					const fixturePath = safePath(skillDir, testCase.fixture);
 					await cp(fixturePath, trialWorkDir, { recursive: true });
 				} catch {
-					// Fixture not found — proceed with empty dir
+					// Fixture not found or path traversal — proceed with empty dir
 				}
 			}
 
@@ -152,8 +154,11 @@ async function runSingleGrader(
 			return gradePackageHas(workDir, grader.dependencies, grader.devDependencies);
 
 		case "llm-rubric": {
-			const rubricPath =
-				grader.rubric && options.testsDir ? join(options.testsDir, "..", grader.rubric) : undefined;
+			let rubricPath: string | undefined;
+			if (grader.rubric && options.testsDir) {
+				const skillDir = resolve(options.testsDir, "..");
+				rubricPath = safePath(skillDir, grader.rubric);
+			}
 			return gradeLlmRubric(
 				workDir,
 				grader.criteria,
@@ -165,9 +170,13 @@ async function runSingleGrader(
 		}
 
 		case "custom": {
-			const modulePath = options.testsDir
-				? join(options.testsDir, "..", grader.module)
-				: grader.module;
+			let modulePath: string;
+			if (options.testsDir) {
+				const skillDir = resolve(options.testsDir, "..");
+				modulePath = safePath(skillDir, grader.module);
+			} else {
+				modulePath = grader.module;
+			}
 			return gradeCustom(workDir, modulePath);
 		}
 

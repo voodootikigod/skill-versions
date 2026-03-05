@@ -1,5 +1,10 @@
 .DS_Store
 node_modules/
+
+# Environment variables
+.env
+.env.*
+.env.local
 dist/
 skills-check.json
 *.tgz

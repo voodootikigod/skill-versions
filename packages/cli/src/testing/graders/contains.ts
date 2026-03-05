@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { resolve } from "node:path";
 import type { GraderResult } from "../types.js";
+import { safePath } from "../safe-path.js";
 
 /**
  * Check that a file contains (or does not contain) the given regex patterns.
@@ -12,7 +13,7 @@ export async function gradeContains(
 	patterns: string[],
 	negate?: boolean
 ): Promise<GraderResult> {
-	const fullPath = join(workDir, file);
+	const fullPath = safePath(resolve(workDir), file);
 	let content: string;
 
 	try {

@@ -18,7 +18,7 @@ const VALID_GRADER_TYPES = new Set([
  */
 export async function parseTestSuite(content: string): Promise<TestSuite> {
 	const yaml = await import("js-yaml");
-	const raw = yaml.load(content) as Record<string, unknown>;
+	const raw = yaml.load(content, { schema: yaml.JSON_SCHEMA }) as Record<string, unknown>;
 
 	if (!raw || typeof raw !== "object") {
 		throw new Error("Invalid cases.yaml: expected an object");

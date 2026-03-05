@@ -96,7 +96,7 @@ runs:
   steps:
     # ── Setup ──────────────────────────────────────────────────────────
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
       with:
         node-version: ${{ inputs.node-version }}
 
@@ -104,23 +104,31 @@ runs:
     - name: Resolve commands
       id: resolve
       shell: bash
+      env:
+        INPUT_COMMANDS: ${{ inputs.commands }}
+        INPUT_CHECK: ${{ inputs.check }}
+        INPUT_AUDIT: ${{ inputs.audit }}
+        INPUT_LINT: ${{ inputs.lint }}
+        INPUT_BUDGET: ${{ inputs.budget }}
+        INPUT_POLICY: ${{ inputs.policy }}
+        INPUT_VERIFY: ${{ inputs.verify }}
+        INPUT_TEST: ${{ inputs.test }}
       run: |
-        COMMANDS="${{ inputs.commands }}"
-        if [ -n "$COMMANDS" ]; then
+        if [ -n "$INPUT_COMMANDS" ]; then
           # Parse comma-separated list into individual flags
-          for CMD in $(echo "$COMMANDS" | tr ',' ' '); do
+          for CMD in $(echo "$INPUT_COMMANDS" | tr ',' ' '); do
             CMD=$(echo "$CMD" | xargs)  # trim whitespace
             echo "run_${CMD}=true" >> "$GITHUB_OUTPUT"
           done
         else
           # Use individual toggle inputs
-          [ "${{ inputs.check }}" = "true" ]  && echo "run_check=true"  >> "$GITHUB_OUTPUT"
-          [ "${{ inputs.audit }}" = "true" ]  && echo "run_audit=true"  >> "$GITHUB_OUTPUT"
-          [ "${{ inputs.lint }}" = "true" ]   && echo "run_lint=true"   >> "$GITHUB_OUTPUT"
-          [ "${{ inputs.budget }}" = "true" ] && echo "run_budget=true" >> "$GITHUB_OUTPUT"
-          [ "${{ inputs.policy }}" = "true" ] && echo "run_policy=true" >> "$GITHUB_OUTPUT"
-          [ "${{ inputs.verify }}" = "true" ] && echo "run_verify=true" >> "$GITHUB_OUTPUT"
-          [ "${{ inputs.test }}" = "true" ]   && echo "run_test=true"   >> "$GITHUB_OUTPUT"
+          [ "$INPUT_CHECK" = "true" ]  && echo "run_check=true"  >> "$GITHUB_OUTPUT"
+          [ "$INPUT_AUDIT" = "true" ]  && echo "run_audit=true"  >> "$GITHUB_OUTPUT"
+          [ "$INPUT_LINT" = "true" ]   && echo "run_lint=true"   >> "$GITHUB_OUTPUT"
+          [ "$INPUT_BUDGET" = "true" ] && echo "run_budget=true" >> "$GITHUB_OUTPUT"
+          [ "$INPUT_POLICY" = "true" ] && echo "run_policy=true" >> "$GITHUB_OUTPUT"
+          [ "$INPUT_VERIFY" = "true" ] && echo "run_verify=true" >> "$GITHUB_OUTPUT"
+          [ "$INPUT_TEST" = "true" ]   && echo "run_test=true"   >> "$GITHUB_OUTPUT"
         fi
 
     # ── Check ──────────────────────────────────────────────────────────
@@ -128,9 +136,11 @@ runs:
       id: check
       if: steps.resolve.outputs.run_check == 'true'
       shell: bash
+      env:
+        INPUT_REGISTRY: ${{ inputs.registry }}
       run: |
         set +e
-        OUTPUT=$(npx --yes skills-check check --registry "${{ inputs.registry }}" --json --ci 2>&1)
+        OUTPUT=$(npx --yes skills-check check --registry "$INPUT_REGISTRY" --json --ci 2>&1)
         EXIT_CODE=$?
         set -e
 
@@ -154,8 +164,10 @@ runs:
       id: report
       if: steps.resolve.outputs.run_check == 'true' && steps.check.outputs.exit_code == '1'
       shell: bash
+      env:
+        INPUT_REGISTRY: ${{ inputs.registry }}
       run: |
-        REPORT=$(npx --yes skills-check report --registry "${{ inputs.registry }}" --format markdown 2>/dev/null)
+        REPORT=$(npx --yes skills-check report --registry "$INPUT_REGISTRY" --format markdown 2>/dev/null)
 
         # Write multiline output
         {
@@ -177,8 +189,10 @@ runs:
     - name: Fail on stale
       if: steps.resolve.outputs.run_check == 'true' && steps.check.outputs.exit_code == '1' && inputs.fail-on-stale == 'true'
       shell: bash
+      env:
+        STALE_COUNT: ${{ steps.check.outputs.stale_count }}
       run: |
-        echo "::error::${{ steps.check.outputs.stale_count }} stale product(s) detected"
+        echo "::error::${STALE_COUNT} stale product(s) detected"
         exit 1
 
     # ── Audit ──────────────────────────────────────────────────────────
@@ -186,11 +200,14 @@ runs:
       id: audit
       if: steps.resolve.outputs.run_audit == 'true'
       shell: bash
+      env:
+        INPUT_SKILLS_DIR: ${{ inputs.skills-dir }}
+        INPUT_AUDIT_FAIL_ON: ${{ inputs.audit-fail-on }}
       run: |
         set +e
-        npx --yes skills-check audit "${{ inputs.skills-dir }}" \
+        npx --yes skills-check audit "$INPUT_SKILLS_DIR" \
           --format json \
-          --fail-on "${{ inputs.audit-fail-on }}" \
+          --fail-on "$INPUT_AUDIT_FAIL_ON" \
           --quiet
         EXIT_CODE=$?
         set -e
@@ -202,7 +219,7 @@ runs:
           exit 2
         fi
         if [ "$EXIT_CODE" -eq 1 ]; then
-          echo "::error::skills-check audit: findings at or above '${{ inputs.audit-fail-on }}' severity"
+          echo "::error::skills-check audit: findings at or above '${INPUT_AUDIT_FAIL_ON}' severity"
           exit 1
         fi
 
@@ -211,12 +228,15 @@ runs:
       id: lint
       if: steps.resolve.outputs.run_lint == 'true'
       shell: bash
+      env:
+        INPUT_SKILLS_DIR: ${{ inputs.skills-dir }}
+        INPUT_LINT_FAIL_ON: ${{ inputs.lint-fail-on }}
       run: |
         set +e
-        npx --yes skills-check lint "${{ inputs.skills-dir }}" \
+        npx --yes skills-check lint "$INPUT_SKILLS_DIR" \
           --ci \
           --format json \
-          --fail-on "${{ inputs.lint-fail-on }}"
+          --fail-on "$INPUT_LINT_FAIL_ON"
         EXIT_CODE=$?
         set -e
 
@@ -227,7 +247,7 @@ runs:
           exit 2
         fi
         if [ "$EXIT_CODE" -eq 1 ]; then
-          echo "::error::skills-check lint: issues at or above '${{ inputs.lint-fail-on }}' level"
+          echo "::error::skills-check lint: issues at or above '${INPUT_LINT_FAIL_ON}' level"
           exit 1
         fi
 
@@ -236,10 +256,13 @@ runs:
       id: budget
       if: steps.resolve.outputs.run_budget == 'true'
       shell: bash
+      env:
+        INPUT_SKILLS_DIR: ${{ inputs.skills-dir }}
+        INPUT_BUDGET_MAX_TOKENS: ${{ inputs.budget-max-tokens }}
       run: |
-        BUDGET_ARGS=("${{ inputs.skills-dir }}" --format json)
-        if [ -n "${{ inputs.budget-max-tokens }}" ]; then
-          BUDGET_ARGS+=(--max-tokens "${{ inputs.budget-max-tokens }}")
+        BUDGET_ARGS=("$INPUT_SKILLS_DIR" --format json)
+        if [ -n "$INPUT_BUDGET_MAX_TOKENS" ]; then
+          BUDGET_ARGS+=(--max-tokens "$INPUT_BUDGET_MAX_TOKENS")
         fi
 
         set +e
@@ -254,7 +277,7 @@ runs:
           exit 2
         fi
         if [ "$EXIT_CODE" -eq 1 ]; then
-          echo "::error::skills-check budget: token count exceeds threshold (${{ inputs.budget-max-tokens }})"
+          echo "::error::skills-check budget: token count exceeds threshold (${INPUT_BUDGET_MAX_TOKENS})"
           exit 1
         fi
 
@@ -263,12 +286,16 @@ runs:
       id: policy
       if: steps.resolve.outputs.run_policy == 'true'
       shell: bash
+      env:
+        INPUT_SKILLS_DIR: ${{ inputs.skills-dir }}
+        INPUT_POLICY_FILE: ${{ inputs.policy-file }}
+        INPUT_POLICY_FAIL_ON: ${{ inputs.policy-fail-on }}
       run: |
-        POLICY_ARGS=("${{ inputs.skills-dir }}" --ci --format json)
-        if [ -n "${{ inputs.policy-file }}" ]; then
-          POLICY_ARGS+=(--policy "${{ inputs.policy-file }}")
+        POLICY_ARGS=("$INPUT_SKILLS_DIR" --ci --format json)
+        if [ -n "$INPUT_POLICY_FILE" ]; then
+          POLICY_ARGS+=(--policy "$INPUT_POLICY_FILE")
         fi
-        POLICY_ARGS+=(--fail-on "${{ inputs.policy-fail-on }}")
+        POLICY_ARGS+=(--fail-on "$INPUT_POLICY_FAIL_ON")
 
         set +e
         npx --yes skills-check policy check "${POLICY_ARGS[@]}"
@@ -282,7 +309,7 @@ runs:
           exit 2
         fi
         if [ "$EXIT_CODE" -eq 1 ]; then
-          echo "::error::skills-check policy: violations at or above '${{ inputs.policy-fail-on }}' severity"
+          echo "::error::skills-check policy: violations at or above '${INPUT_POLICY_FAIL_ON}' severity"
           exit 1
         fi
 
@@ -313,9 +340,11 @@ runs:
       id: test
       if: steps.resolve.outputs.run_test == 'true'
       shell: bash
+      env:
+        INPUT_SKILLS_DIR: ${{ inputs.skills-dir }}
       run: |
         set +e
-        npx --yes skills-check test "${{ inputs.skills-dir }}" --ci --format json
+        npx --yes skills-check test "$INPUT_SKILLS_DIR" --ci --format json
         EXIT_CODE=$?
         set -e
 
@@ -335,22 +364,23 @@ runs:
       id: summary
       if: always()
       shell: bash
+      env:
+        CODE_CHECK: ${{ steps.check.outputs.exit_code }}
+        CODE_AUDIT: ${{ steps.audit.outputs.exit_code }}
+        CODE_LINT: ${{ steps.lint.outputs.exit_code }}
+        CODE_BUDGET: ${{ steps.budget.outputs.exit_code }}
+        CODE_POLICY: ${{ steps.policy.outputs.exit_code }}
+        CODE_VERIFY: ${{ steps.verify.outputs.exit_code }}
+        CODE_TEST: ${{ steps.test.outputs.exit_code }}
       run: |
         # Build a JSON object of exit codes for each command that ran
         RESULTS="{"
         FIRST=true
 
         for CMD in check audit lint budget policy verify test; do
-          # Read exit code from the corresponding step output
-          case "$CMD" in
-            check)  CODE="${{ steps.check.outputs.exit_code }}"  ;;
-            audit)  CODE="${{ steps.audit.outputs.exit_code }}"  ;;
-            lint)   CODE="${{ steps.lint.outputs.exit_code }}"   ;;
-            budget) CODE="${{ steps.budget.outputs.exit_code }}" ;;
-            policy) CODE="${{ steps.policy.outputs.exit_code }}" ;;
-            verify) CODE="${{ steps.verify.outputs.exit_code }}" ;;
-            test)   CODE="${{ steps.test.outputs.exit_code }}"   ;;
-          esac
+          # Read exit code from the corresponding env var
+          VAR="CODE_$(echo "$CMD" | tr '[:lower:]' '[:upper:]')"
+          CODE="${!VAR}"
 
           if [ -n "$CODE" ]; then
             if [ "$FIRST" = true ]; then

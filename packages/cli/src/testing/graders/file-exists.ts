@@ -1,6 +1,7 @@
 import { stat } from "node:fs/promises";
-import { join } from "node:path";
+import { resolve } from "node:path";
 import type { GraderResult } from "../types.js";
+import { safePath } from "../safe-path.js";
 
 /**
  * Check that specific files exist in the work directory.
@@ -8,9 +9,10 @@ import type { GraderResult } from "../types.js";
 export async function gradeFileExists(workDir: string, paths: string[]): Promise<GraderResult> {
 	const missing: string[] = [];
 	const found: string[] = [];
+	const resolvedWorkDir = resolve(workDir);
 
 	for (const p of paths) {
-		const fullPath = join(workDir, p);
+		const fullPath = safePath(resolvedWorkDir, p);
 		try {
 			const info = await stat(fullPath);
 			if (info.isFile() || info.isDirectory()) {
