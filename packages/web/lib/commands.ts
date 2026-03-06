@@ -144,12 +144,22 @@ export const commands: CommandInfo[] = [
 			{ flag: "--ci", description: "CI mode with strict exit codes" },
 			{ flag: "--quiet", description: "Suppress non-finding output" },
 			{ flag: "--no-network", description: "Skip network-dependent checks (registry, URLs)" },
+			{
+				flag: "--isolation <provider>",
+				description:
+					"Run in an isolated container (auto, docker, podman, apple-container, vercel-sandbox, etc.)",
+			},
+			{ flag: "--no-isolation", description: "Disable isolation and run directly on the host" },
 		],
 		examples: [
 			{ label: "Audit everything", code: "npx skills-check audit" },
 			{ label: "Audit one file", code: "npx skills-check audit ./skills/ai-sdk-core.md" },
 			{ label: "SARIF for GitHub Security tab", code: "npx skills-check audit --format sarif" },
 			{ label: "CI gate at high severity", code: "npx skills-check audit --fail-on high --ci" },
+			{
+				label: "Audit in Docker",
+				code: "npx skills-check audit --isolation docker",
+			},
 		],
 		ciTip:
 			"Use --format sarif and upload to GitHub's code scanning to see findings inline on PRs. Combine with --fail-on high to block merges on critical issues.",
@@ -326,6 +336,15 @@ export const commands: CommandInfo[] = [
 			{ flag: "--update-baseline", description: "Save results as new baseline" },
 			{ flag: "--ci", description: "CI mode with strict exit codes" },
 			{ flag: "-f, --format <type>", description: "Output: terminal or json" },
+			{
+				flag: "--isolation <provider>",
+				description:
+					"Run in an isolated container (auto, docker, podman, apple-container, vercel-sandbox, etc.)",
+			},
+			{
+				flag: "--no-isolation",
+				description: "Disable isolation and accept the risk of running directly on the host",
+			},
 		],
 		examples: [
 			{ label: "Run all tests", code: "npx skills-check test" },
@@ -333,6 +352,10 @@ export const commands: CommandInfo[] = [
 			{ label: "Outcome tests only", code: "npx skills-check test --type outcome" },
 			{ label: "Preview plan", code: "npx skills-check test --dry" },
 			{ label: "Update baseline", code: "npx skills-check test --update-baseline" },
+			{
+				label: "Test in isolation",
+				code: "npx skills-check test --isolation auto",
+			},
 		],
 		ciTip:
 			"Run test --ci after refresh to catch regressions. Use --update-baseline on main after verified changes so future PRs compare against the latest known-good results.",
