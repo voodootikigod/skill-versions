@@ -94,6 +94,11 @@ program
 	.option("--ignore <path>", "path to .skills-checkignore file")
 	.option("--verbose", "show progress and scan details")
 	.option("--quiet", "suppress output, exit code only")
+	.option(
+		"--isolation <provider>",
+		"run in isolated environment: auto, oci, apple, docker, podman, orbstack, rancher, nerdctl, vercel, local"
+	)
+	.option("--no-isolation", "force local execution (skip isolation detection)")
 	.action(async (dir, options) => {
 		try {
 			const code = await auditCommand(dir, options);
@@ -260,6 +265,11 @@ program
 	.option("--provider <name>", "LLM provider for rubric grading: anthropic, openai, google")
 	.option("--model <id>", "model for rubric grading")
 	.option("--verbose", "show per-grader results")
+	.option(
+		"--isolation <provider>",
+		"run in isolated environment: auto, oci, apple, docker, podman, orbstack, rancher, nerdctl, vercel, local"
+	)
+	.option("--no-isolation", "force local execution (skip isolation detection)")
 	.action(async (dir, options) => {
 		try {
 			const code = await testCommand(dir, options);

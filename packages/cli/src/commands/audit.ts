@@ -6,12 +6,14 @@ import { formatMarkdown } from "../audit/reporters/markdown.js";
 import { formatSarif } from "../audit/reporters/sarif.js";
 import { formatTerminal } from "../audit/reporters/terminal.js";
 import type { AuditOptions, AuditSeverity } from "../audit/types.js";
+import type { IsolationChoice } from "../isolation/types.js";
 
 interface AuditCommandOptions {
 	failOn?: string;
 	format?: "terminal" | "json" | "markdown" | "sarif";
 	ignore?: string;
 	includeRegistryAudits?: boolean;
+	isolation?: IsolationChoice | boolean;
 	output?: string;
 	packagesOnly?: boolean;
 	quiet?: boolean;
@@ -46,6 +48,88 @@ export async function auditCommand(dir: string, options: AuditCommandOptions): P
 			chalk.red(`Invalid --fail-on value: "${options.failOn}". Use: critical, high, medium, low`)
 		);
 		return 2;
+	}
+
+	// Resolve isolation preference (--no-isolation sets it to false)
+	let isolationChoice: string | undefined;
+	if (options.isolation === false) {
+		isolationChoice = "local";
+	} else if (typeof options.isolation === "string") {
+		isolationChoice = options.isolation;
+	}
+
+	// If isolation is requested and not "local", delegate to the isolation provider
+	if (isolationChoice && isolationChoice !== "local") {
+		const { selectProvider } = await import("../isolation/detect.js");
+		const provider = await selectProvider(isolationChoice, options.verbose);
+
+		// Warn when no isolation runtime was found and we're falling back to local
+		if (provider.isFallback && !options.quiet) {
+			console.error(
+				chalk.yellow("Warning: No isolation runtime found. Audit will run locally (URL checks will")
+			);
+			console.error(
+				chalk.yellow(
+					"make outbound requests from this machine). Use --no-isolation to suppress this warning."
+				)
+			);
+		}
+
+		if (provider.name !== "local") {
+			if (!options.quiet) {
+				console.error(chalk.dim(`Running audit in isolated environment (${provider.name})...`));
+			}
+
+			// Rebuild the CLI command string from options
+			const cmdParts = [dir];
+			if (options.format) {
+				cmdParts.push("--format", options.format);
+			}
+			if (options.output) {
+				cmdParts.push("--output", options.output);
+			}
+			if (options.failOn) {
+				cmdParts.push("--fail-on", options.failOn);
+			}
+			if (options.packagesOnly) {
+				cmdParts.push("--packages-only");
+			}
+			if (options.skipUrls) {
+				cmdParts.push("--skip-urls");
+			}
+			if (options.uniqueOnly) {
+				cmdParts.push("--unique-only");
+			}
+			if (options.includeRegistryAudits) {
+				cmdParts.push("--include-registry-audits");
+			}
+			if (options.ignore) {
+				cmdParts.push("--ignore", options.ignore);
+			}
+			if (options.verbose) {
+				cmdParts.push("--verbose");
+			}
+			if (options.quiet) {
+				cmdParts.push("--quiet");
+			}
+			cmdParts.push("--no-isolation"); // Prevent recursion inside the container
+
+			const result = await provider.execute({
+				command: `audit ${cmdParts.join(" ")}`,
+				skillsDir: dir,
+				timeout: 300,
+				networkAccess: !options.skipUrls, // URL checks need network
+				env: {},
+			});
+
+			if (result.stdout) {
+				console.log(result.stdout);
+			}
+			if (result.stderr) {
+				console.error(result.stderr);
+			}
+			return result.exitCode;
+		}
 	}
 
 	if (options.verbose) {

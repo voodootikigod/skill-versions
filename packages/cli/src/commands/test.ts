@@ -1,5 +1,6 @@
 import { writeFile } from "node:fs/promises";
 import chalk from "chalk";
+import type { IsolationChoice } from "../isolation/types.js";
 import { runTests } from "../testing/index.js";
 import { formatJson } from "../testing/reporters/json.js";
 import { formatMarkdown } from "../testing/reporters/markdown.js";
@@ -12,6 +13,7 @@ interface TestCommandOptions {
 	ci?: boolean;
 	dry?: boolean;
 	format?: "terminal" | "json" | "markdown";
+	isolation?: IsolationChoice | boolean;
 	maxCost?: string;
 	model?: string;
 	output?: string;
@@ -45,6 +47,138 @@ export async function testCommand(dir: string, options: TestCommandOptions): Pro
 		model: options.model,
 		verbose: options.verbose,
 	};
+
+	// Resolve isolation preference (--no-isolation sets it to false)
+	let isolationChoice: string | undefined;
+	if (options.isolation === false) {
+		isolationChoice = "local";
+	} else if (typeof options.isolation === "string") {
+		isolationChoice = options.isolation;
+	}
+
+	// If isolation is requested and not "local", delegate to the isolation provider
+	if (isolationChoice && isolationChoice !== "local") {
+		const { selectProvider } = await import("../isolation/detect.js");
+		const provider = await selectProvider(isolationChoice, options.verbose);
+
+		// Warn when no isolation runtime was found and we're falling back to local
+		if (provider.isFallback) {
+			console.error(
+				chalk.yellow.bold(
+					"\n  Warning: No isolation runtime found (Docker, Podman, OrbStack, Apple Containers, etc.)"
+				)
+			);
+			console.error(
+				chalk.yellow(
+					"  The test command executes agent harnesses that run arbitrary shell commands."
+				)
+			);
+			console.error(
+				chalk.yellow("  Running without isolation means tests execute directly on your machine")
+			);
+			console.error(
+				chalk.yellow(
+					"  and could modify files, make network requests, or run destructive commands.\n"
+				)
+			);
+
+			// In CI mode, proceed with a warning (CI has its own sandboxing)
+			// In interactive mode, require --no-isolation to explicitly accept the risk
+			if (!options.ci) {
+				console.error(
+					chalk.yellow(
+						"  To proceed without isolation, re-run with --no-isolation to accept the risk.\n"
+					)
+				);
+				return 2;
+			}
+			console.error(chalk.dim("  Continuing in CI mode without isolation.\n"));
+		}
+
+		if (provider.name !== "local") {
+			if (options.verbose) {
+				console.error(chalk.dim(`Running tests in isolated environment (${provider.name})...`));
+			}
+
+			// Rebuild the CLI command string from options
+			const cmdParts = [dir];
+			if (options.skill) {
+				cmdParts.push("--skill", options.skill);
+			}
+			if (options.type) {
+				cmdParts.push("--type", options.type);
+			}
+			if (options.agent) {
+				cmdParts.push("--agent", options.agent);
+			}
+			if (options.agentCmd) {
+				cmdParts.push("--agent-cmd", `"${options.agentCmd}"`);
+			}
+			if (options.format) {
+				cmdParts.push("--format", options.format);
+			}
+			if (options.output) {
+				cmdParts.push("--output", options.output);
+			}
+			if (options.trials) {
+				cmdParts.push("--trials", options.trials);
+			}
+			if (options.passThreshold) {
+				cmdParts.push("--pass-threshold", options.passThreshold);
+			}
+			if (options.timeout) {
+				cmdParts.push("--timeout", options.timeout);
+			}
+			if (options.maxCost) {
+				cmdParts.push("--max-cost", options.maxCost);
+			}
+			if (options.dry) {
+				cmdParts.push("--dry");
+			}
+			if (options.updateBaseline) {
+				cmdParts.push("--update-baseline");
+			}
+			if (options.ci) {
+				cmdParts.push("--ci");
+			}
+			if (options.provider) {
+				cmdParts.push("--provider", options.provider);
+			}
+			if (options.model) {
+				cmdParts.push("--model", options.model);
+			}
+			if (options.verbose) {
+				cmdParts.push("--verbose");
+			}
+			cmdParts.push("--no-isolation"); // Prevent recursion inside the container
+
+			// Forward LLM API keys for rubric grading
+			const env: Record<string, string> = {};
+			for (const key of ["ANTHROPIC_API_KEY", "OPENAI_API_KEY", "GOOGLE_GENERATIVE_AI_API_KEY"]) {
+				const val = process.env[key];
+				if (val) {
+					env[key] = val;
+				}
+			}
+
+			const result = await provider.execute({
+				command: `test ${cmdParts.join(" ")}`,
+				skillsDir: dir,
+				workDir: dir,
+				timeout: options.timeout ? Number.parseInt(options.timeout, 10) * 2 : 600,
+				networkAccess: true, // Tests may need network for agent harnesses
+				env,
+			});
+
+			if (result.stdout) {
+				console.log(result.stdout);
+			}
+			if (result.stderr) {
+				console.error(result.stderr);
+			}
+			return result.exitCode;
+		}
+	}
 
 	if (options.verbose) {
 		console.error(chalk.dim(`Testing: ${dir}`));
