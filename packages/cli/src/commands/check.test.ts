@@ -101,7 +101,9 @@ describe("checkCommand", () => {
 	});
 
 	it("handles fetch errors gracefully", async () => {
-		mockedFetchLatestVersions.mockResolvedValue(new Map([["next", new Error("Network error")]]));
+		mockedFetchLatestVersions.mockResolvedValue(
+			new Map<string, string | Error>([["next", new Error("Network error")]])
+		);
 		const code = await checkCommand({});
 		expect(code).toBe(0);
 		expect(console.error).toHaveBeenCalled();

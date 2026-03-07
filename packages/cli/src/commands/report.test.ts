@@ -127,7 +127,7 @@ describe("reportCommand", () => {
 
 	it("skips products with fetch errors", async () => {
 		mockedFetchLatestVersions.mockResolvedValue(
-			new Map([
+			new Map<string, string | Error>([
 				["next", new Error("Network error")],
 				["react", "18.2.0"],
 			])

@@ -70,12 +70,13 @@ describe("refreshCommand", () => {
 		mockedSaveRegistry.mockResolvedValue("skills-check.json");
 		mockedFetchLatestVersions.mockResolvedValue(new Map([["next", "15.0.0"]]));
 		mockedFetchChangelog.mockResolvedValue("## v15.0.0\n- Breaking changes");
-		mockedResolveModel.mockResolvedValue({} as ReturnType<typeof mockedResolveModel>);
+		mockedResolveModel.mockResolvedValue({} as Awaited<ReturnType<typeof resolveModel>>);
 		mockedReadSkillFile.mockResolvedValue({
+			path: "skills/nextjs-routing/SKILL.md",
 			raw: "---\nname: nextjs-routing\nproduct-version: '14.0.0'\n---\n# Routing",
 			content: "# Routing",
 			frontmatter: { name: "nextjs-routing", "product-version": "14.0.0" },
-		} as Awaited<ReturnType<typeof readSkillFile>>);
+		});
 		mockedWriteSkillFile.mockResolvedValue(undefined);
 		mockedGenerateObject.mockResolvedValue({
 			object: {
@@ -114,7 +115,9 @@ describe("refreshCommand", () => {
 	});
 
 	it("skips products with fetch errors", async () => {
-		mockedFetchLatestVersions.mockResolvedValue(new Map([["next", new Error("Network error")]]));
+		mockedFetchLatestVersions.mockResolvedValue(
+			new Map<string, string | Error>([["next", new Error("Network error")]])
+		);
 		const code = await refreshCommand(undefined, { yes: true });
 		expect(code).toBe(0);
 		expect(console.error).toHaveBeenCalled();
@@ -207,15 +210,17 @@ describe("refreshCommand", () => {
 		// First call: initial read. Second call: verification read after write (still old version)
 		mockedReadSkillFile
 			.mockResolvedValueOnce({
+				path: "skills/nextjs-routing/SKILL.md",
 				raw: originalRaw,
 				content: "# Routing\n\nOld content.\n",
 				frontmatter: { name: "nextjs-routing", "product-version": "14.0.0" },
-			} as Awaited<ReturnType<typeof readSkillFile>>)
+			})
 			.mockResolvedValueOnce({
+				path: "skills/nextjs-routing/SKILL.md",
 				raw: updatedRaw,
 				content: "# Routing\n\nNew content.\nExtra line.\n",
 				frontmatter: { name: "nextjs-routing", "product-version": "14.0.0" },
-			} as Awaited<ReturnType<typeof readSkillFile>>);
+			});
 
 		await refreshCommand("./skills", { yes: true });
 
