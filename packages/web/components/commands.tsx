@@ -20,7 +20,7 @@ export function Commands() {
 	return (
 		<section className={styles.section} id="commands">
 			<div className={styles.container}>
-				<h2 className={styles.heading}>10 commands, one toolkit</h2>
+				<h2 className={styles.heading}>12 commands, one toolkit</h2>
 				<p className={styles.subtitle}>
 					Everything you need to keep agent skills fresh, safe, and efficient.
 				</p>

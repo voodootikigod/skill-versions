@@ -75,6 +75,8 @@ When implementing features, always check the relevant PRD first. When a PRD is t
 | `verify` | ✅ Shipped | Validate that content changes between skill versions match the declared semver bump (heuristic + LLM-assisted, like cargo semver-checks for knowledge) |
 | `test` | ✅ Shipped | Run eval test suites declared in a skill's `tests/` directory against an agent harness. Regression detection after `refresh`. Supports Claude Code and generic harnesses |
 | `policy` | ✅ Shipped | Enforce organizational rules: trusted sources, banned patterns, required metadata, staleness limits, audit cleanliness. Policy-as-code via `.skill-policy.yml` |
+| `fingerprint` | ✅ Shipped | Generate skill fingerprint registry with content hashes and watermarks for integrity verification and runtime detection |
+| `usage` | ✅ Shipped | Analyze skill telemetry events: usage frequency, version drift, cost estimation, and policy cross-referencing |
 
 ## Monorepo Structure
 
@@ -83,7 +85,7 @@ npm workspaces monorepo with three packages orchestrated by Turborepo:
 | Package | Published As | Purpose |
 |---------|-------------|---------|
 | `packages/schema` | `@skills-check/schema` | TypeScript types + generated JSON Schema for the registry format |
-| `packages/cli` | `skills-check` (npm) | CLI tool — 10 commands: `init`, `check`, `report`, `refresh`, `audit`, `budget`, `verify`, `lint`, `policy`, `test` |
+| `packages/cli` | `skills-check` (npm) | CLI tool — 12 commands: `init`, `check`, `report`, `refresh`, `audit`, `budget`, `verify`, `lint`, `policy`, `test`, `fingerprint`, `usage` |
 | `packages/web` | Private (Vercel) | Next.js 16 marketing/docs site at skillscheck.ai |
 
 **Build order matters**: `schema` must build first (produces `dist/schema.json` and type declarations), then `cli` and `web` consume it. Turbo handles this via `"dependsOn": ["^build"]`.
@@ -115,6 +117,8 @@ npm run typecheck
 # Run CLI during development
 cd packages/cli && npx tsx src/index.ts check
 cd packages/cli && npx tsx src/index.ts audit [path]
+cd packages/cli && npx tsx src/index.ts fingerprint [path]
+cd packages/cli && npx tsx src/index.ts usage --store file://telemetry.jsonl
 
 # Dev server for web
 cd packages/web && npm run dev
@@ -195,6 +199,37 @@ Policy-as-code enforcement via `.skill-policy.yml`. Seven validators: source all
 
 Eval test runner with `cases.yaml` declarative test suites. Agent harness abstraction with Claude Code and generic shell implementations. Seven built-in graders: file-exists, command (exit code), contains/not-contains (regex), json-match, package-has, llm-rubric (via Vercel AI SDK with graceful degradation), and custom (dynamic module import). Trial-based execution with configurable pass threshold and flaky test detection. Baseline storage for regression tracking.
 
+### Fingerprint (`packages/cli/src/fingerprint/`)
+
+Skill identity and integrity pipeline. Discovers SKILL.md files, extracts frontmatter and content, computes SHA-256 hashes at three granularities (frontmatter, full content, 500-token prefix), and detects/injects HTML comment watermarks (`<!-- skill:name/version source -->`). Uses `js-tiktoken` via `budget/tokenizer.ts` for prefix token counting. Shared `injectWatermarkIntoContent()` function used by both `fingerprint` and `lint --inject-watermarks`.
+
+```
+fingerprint/
+  index.ts                         # Orchestrator: discover → parse → hash → optionally inject watermarks → FingerprintRegistry
+  extractors/
+    hashes.ts                      # Watermark extraction/generation, SHA-256 computation, content normalization, prefix hashing, shared injection helper
+```
+
+### Usage (`packages/cli/src/usage/`)
+
+Telemetry analysis pipeline for tracking skill usage across an organization. Pluggable reader abstraction supports JSONL files (`file://`) and SQLite databases (`sqlite://`, Node 22 built-in `node:sqlite`). Analyzer deduplicates events by `request_id` (keeps highest confidence), groups by skill name, detects version drift, and estimates cost via `budget/cost.ts`. Policy cross-reference checks runtime telemetry against `.skill-policy.yml` for banned skills and denied sources.
+
+```
+usage/
+  index.ts                         # Orchestrator: create reader → read events → analyze → optionally check policy
+  analyzer.ts                      # Deduplication, grouping, version drift detection, cost estimation → UsageReport
+  policy-check.ts                  # Cross-reference telemetry against .skill-policy.yml banned/denied rules
+  readers/
+    types.ts                       # TelemetryReader interface, TelemetryReaderOptions
+    jsonl.ts                       # JSONL file reader with date filtering and schema validation
+    sqlite.ts                      # SQLite reader using Node 22 built-in node:sqlite module
+    index.ts                       # Factory: createReader(storeUri) dispatches by URI scheme
+  reporters/
+    terminal.ts                    # Chalk-colored table with version drift warnings
+    json.ts                        # JSON.stringify output with optional policy violations
+    markdown.ts                    # Markdown table with policy violation section
+```
+
 ### Schema (`packages/schema`)
 
 Pure types in `src/types.ts`. The `build` script runs `tsup` then `tsx src/generate.ts` to produce a JSON Schema artifact (`dist/schema.json`) from TypeScript types via `ts-json-schema-generator`.
@@ -245,7 +280,7 @@ Where skills-check naturally connects to skills.sh (current or future):
 
 ## Testing
 
-91 test files with 688 tests in `packages/cli/src/` (colocated with source files). Vitest with no config file — uses defaults. No coverage thresholds configured.
+110 test files with 869 tests in `packages/cli/src/` (colocated with source files). Vitest with no config file — uses defaults. No coverage thresholds configured.
 
 When writing tests, follow the established patterns: mock all network-dependent modules, use fixture SKILL.md files with known content, and test the orchestrator, individual checkers/validators/graders, and reporters independently.
 
@@ -253,7 +288,7 @@ When writing tests, follow the established patterns: mock all network-dependent 
 
 - **CLI**: Published to npm via GitHub Actions on release (`publish.yml`), uses `npm publish --provenance`
 - **Web**: Deployed to Vercel at skillscheck.ai
-- **GitHub Action**: Defined in root `action.yml`, composite action supporting all 10 commands via `commands` input or individual toggle flags. Backward-compatible — defaults to `check` only. Per-command threshold inputs (e.g., `audit-fail-on`, `budget-max-tokens`). Outputs include `results` JSON with per-command exit codes
+- **GitHub Action**: Defined in root `action.yml`, composite action supporting all 12 commands via `commands` input or individual toggle flags. Backward-compatible — defaults to `check` only. Per-command threshold inputs (e.g., `audit-fail-on`, `budget-max-tokens`). Outputs include `results` JSON with per-command exit codes
 
 ### Releasing
 

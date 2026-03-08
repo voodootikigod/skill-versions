@@ -375,6 +375,105 @@ skills-check test --max-cost 5.00
 skills-check test --agent claude-code
 ```
 
+### `skills-check fingerprint [dir]`
+
+Generate a fingerprint registry of installed skills with content hashes and watermarks for integrity verification and runtime detection.
+
+| Flag | Description |
+|------|-------------|
+| `-o, --output <path>` | Write registry to file |
+| `--inject-watermarks` | Add watermark comments to skills that lack them |
+| `--json` | Output as JSON |
+| `--ci` | Strict exit codes |
+| `--verbose` | Show progress and details |
+| `--quiet` | Suppress output, exit code only |
+
+**Exit codes:** `0` = success, `2` = configuration error.
+
+**Output format (JSON):**
+
+```json
+{
+  "skills": [
+    {
+      "name": "react-patterns",
+      "version": "1.2.0",
+      "fingerprints": {
+        "watermark": "sk_abc123...",
+        "frontmatter_sha256": "e3b0c44...",
+        "content_sha256": "a1b2c3d...",
+        "content_prefix_sha256": "f4e5d6c..."
+      },
+      "token_count": 1842,
+      "path": "skills/react/SKILL.md"
+    }
+  ]
+}
+```
+
+```bash
+# Fingerprint all skills in current directory
+skills-check fingerprint
+
+# Output as JSON
+skills-check fingerprint ./skills --json
+
+# Write registry to file
+skills-check fingerprint ./skills -o fingerprints.json
+
+# Inject watermarks into skills that lack them
+skills-check fingerprint ./skills --inject-watermarks
+
+# Quiet mode for CI (exit code only)
+skills-check fingerprint --quiet
+```
+
+### `skills-check usage`
+
+Analyze skill telemetry events to track usage frequency, version drift, cost estimation, and enforce usage policies.
+
+| Flag | Description |
+|------|-------------|
+| `--store <uri>` | Telemetry store URI (`file://path.jsonl` or `sqlite://path.db`) |
+| `--since <date>` | Filter events after this date |
+| `--until <date>` | Filter events before this date |
+| `--check-policy` | Cross-reference usage against `.skill-policy.yml` |
+| `--policy <path>` | Path to policy file |
+| `--detailed` | Show detailed per-skill breakdown |
+| `--format <fmt>` | Output format: `terminal`, `json`, `markdown` |
+| `--json` | Shorthand for `--format json` |
+| `--markdown` | Shorthand for `--format markdown` |
+| `-o, --output <path>` | Write output to file |
+| `--ci` | Strict exit codes |
+| `--fail-on <severity>` | Fail threshold for policy violations |
+| `--verbose` | Show progress |
+| `--quiet` | Suppress output |
+
+**Exit codes:** `0` = success, `1` = policy violations detected, `2` = configuration error.
+
+```bash
+# Analyze usage from a JSONL telemetry file
+skills-check usage --store file://telemetry.jsonl
+
+# Filter to last 30 days
+skills-check usage --store file://telemetry.jsonl --since 2026-02-06
+
+# Detailed per-skill breakdown
+skills-check usage --store sqlite://telemetry.db --detailed
+
+# Cross-reference usage against policy
+skills-check usage --store file://telemetry.jsonl --check-policy
+
+# JSON output for CI
+skills-check usage --store file://telemetry.jsonl --json
+
+# Markdown report to file
+skills-check usage --store file://telemetry.jsonl --markdown -o usage-report.md
+
+# CI mode with policy enforcement
+skills-check usage --store file://telemetry.jsonl --check-policy --ci --fail-on violation
+```
+
 ### `skills-check refresh [skills-dir]`
 
 Use an LLM to propose targeted updates to stale skill files. Fetches changelogs, generates diffs, and optionally applies changes.
@@ -485,6 +584,8 @@ The action requires `issues: write` permission when `open-issues` is enabled.
 | `policy` | `"false"` | Run the `policy check` command (organizational rule enforcement) |
 | `verify` | `"false"` | Run the `verify` command (semver bump validation) |
 | `test` | `"false"` | Run the `test` command (eval test suites) |
+| `fingerprint` | `"false"` | Run the `fingerprint` command (generate skill fingerprint registry) |
+| `usage` | `"false"` | Run the `usage` command (analyze skill usage from telemetry) |
 
 **Command-specific thresholds:**
 
@@ -495,6 +596,8 @@ The action requires `issues: write` permission when `open-issues` is enabled.
 | `budget-max-tokens` | `""` | Token ceiling -- fail if total exceeds this value (empty = no limit) |
 | `policy-file` | `""` | Path to `.skill-policy.yml` (empty = auto-detect) |
 | `policy-fail-on` | `"blocked"` | Policy severity threshold: `blocked`, `violation`, `warning` |
+| `usage-store` | `""` | Telemetry store URI for the `usage` command (e.g. `file://telemetry.jsonl` or `sqlite://telemetry.db`) |
+| `usage-check-policy` | `"false"` | Cross-reference usage data against skill policy |
 
 **Shared options:**
 
@@ -521,6 +624,8 @@ The action requires `issues: write` permission when `open-issues` is enabled.
 | `issue-number` | Issue number created/updated (empty if none) |
 | `report` | Full markdown report from the check command |
 | `results` | JSON object with exit codes from each command that ran (e.g. `{"check":0,"audit":1}`) |
+| `fingerprint-skills` | Number of skills fingerprinted |
+| `usage-calls` | Total number of skill usage calls |
 
 #### Examples
 
@@ -651,6 +756,12 @@ For simpler setups, run individual commands directly:
 
 - name: Enforce policy
   run: npx skills-check policy check --ci --fail-on violation
+
+- name: Generate skill fingerprints
+  run: npx skills-check fingerprint --json -o fingerprints.json
+
+- name: Analyze skill usage
+  run: npx skills-check usage --store file://telemetry.jsonl --check-policy --ci
 ```
 
 ## Complementary Tools

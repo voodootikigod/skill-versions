@@ -7,7 +7,7 @@ import styles from "./docs.module.css";
 export const metadata: Metadata = {
 	title: "Docs",
 	description:
-		"CLI reference for skills-check: init, check, report, refresh, audit, lint, budget, verify, policy, and test commands. Registry format, SKILL.md frontmatter spec, and CI integration guide.",
+		"CLI reference for skills-check: init, check, report, refresh, audit, lint, budget, verify, policy, test, fingerprint, and usage commands. Registry format, SKILL.md frontmatter spec, and CI integration guide.",
 	alternates: {
 		canonical: "https://skillscheck.ai/docs",
 	},
@@ -18,7 +18,7 @@ const techArticleJsonLd = {
 	"@type": "TechArticle",
 	headline: "Skills Check Documentation",
 	description:
-		"Complete CLI reference for skills-check: init, check, report, refresh, audit, lint, budget, verify, policy, and test commands. Registry format, SKILL.md frontmatter spec, and CI integration guide.",
+		"Complete CLI reference for skills-check: init, check, report, refresh, audit, lint, budget, verify, policy, test, fingerprint, and usage commands. Registry format, SKILL.md frontmatter spec, and CI integration guide.",
 	url: "https://skillscheck.ai/docs",
 	author: { "@type": "Person", name: "Chris Williams" },
 };
@@ -40,9 +40,9 @@ export default function DocsPage() {
 						<h2 id="overview">Overview</h2>
 						<p>
 							<code>skills-check</code> is a quality & integrity layer for Agent Skills. It provides
-							10 commands covering freshness detection, security auditing, metadata linting, token
-							budget analysis, semver verification, policy enforcement, and eval testing for your
-							SKILL.md files.
+							12 commands covering freshness detection, security auditing, metadata linting, token
+							budget analysis, semver verification, policy enforcement, eval testing, skill
+							fingerprinting, and usage analytics for your SKILL.md files.
 						</p>
 					</section>
 
@@ -71,7 +71,9 @@ export default function DocsPage() {
 							<a href="#cmd-budget">budget — measure token cost</a> &middot;{" "}
 							<a href="#cmd-verify">verify — validate semver bumps</a> &middot;{" "}
 							<a href="#cmd-policy">policy — enforce organizational rules</a> &middot;{" "}
-							<a href="#cmd-test">test — run eval test suites</a>
+							<a href="#cmd-test">test — run eval test suites</a> &middot;{" "}
+							<a href="#cmd-fingerprint">fingerprint — generate skill identity hashes</a> &middot;{" "}
+							<a href="#cmd-usage">usage — analyze skill telemetry</a>
 						</p>
 
 						<h3 id="cmd-init">
@@ -548,6 +550,151 @@ npx skills-check test --update-baseline`}
 										<code>--update-baseline</code>
 									</td>
 									<td>Save results as new baseline</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<h3 id="cmd-fingerprint">
+							<code>fingerprint [dir]</code>
+						</h3>
+						<p>
+							Generate a fingerprint registry of installed skills with SHA-256 content hashes and
+							optional watermarks for runtime detection and integrity verification.
+						</p>
+						<pre>
+							<code>
+								{`# Fingerprint all skills
+npx skills-check fingerprint
+
+# Inject watermarks into skill files
+npx skills-check fingerprint --inject-watermarks
+
+# JSON output to file
+npx skills-check fingerprint --json --output fingerprints.json`}
+							</code>
+						</pre>
+						<h4>Key options</h4>
+						<table>
+							<thead>
+								<tr>
+									<th>Option</th>
+									<th>Description</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										<code>--output &lt;path&gt;</code>
+									</td>
+									<td>Write fingerprint registry to a file</td>
+								</tr>
+								<tr>
+									<td>
+										<code>--inject-watermarks</code>
+									</td>
+									<td>Inject watermarks into skill files</td>
+								</tr>
+								<tr>
+									<td>
+										<code>--json</code>
+									</td>
+									<td>Output results as JSON</td>
+								</tr>
+								<tr>
+									<td>
+										<code>--ci</code>
+									</td>
+									<td>CI mode with strict exit codes</td>
+								</tr>
+								<tr>
+									<td>
+										<code>--verbose</code>
+									</td>
+									<td>Show detailed processing information</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<h3 id="cmd-usage">
+							<code>usage</code>
+						</h3>
+						<p>
+							Analyze skill telemetry events from JSONL or SQLite stores for usage patterns, cost
+							estimation, and policy compliance checking.
+						</p>
+						<pre>
+							<code>
+								{`# Analyze usage from a telemetry store
+npx skills-check usage --store ./telemetry.jsonl
+
+# Usage with policy compliance check
+npx skills-check usage --store ./telemetry.jsonl --check-policy
+
+# Filter by date range
+npx skills-check usage --store ./telemetry.jsonl --since 2026-01-01 --until 2026-03-01
+
+# JSON output
+npx skills-check usage --store ./telemetry.jsonl --json
+
+# CI mode with severity threshold
+npx skills-check usage --store ./telemetry.jsonl --ci --fail-on high`}
+							</code>
+						</pre>
+						<h4>Key options</h4>
+						<table>
+							<thead>
+								<tr>
+									<th>Option</th>
+									<th>Description</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										<code>--store &lt;path&gt;</code>
+									</td>
+									<td>Path to telemetry store (JSONL or SQLite)</td>
+								</tr>
+								<tr>
+									<td>
+										<code>--since &lt;date&gt;</code>
+									</td>
+									<td>Filter events after this date (ISO 8601)</td>
+								</tr>
+								<tr>
+									<td>
+										<code>--until &lt;date&gt;</code>
+									</td>
+									<td>Filter events before this date (ISO 8601)</td>
+								</tr>
+								<tr>
+									<td>
+										<code>--check-policy</code>
+									</td>
+									<td>Cross-reference usage against policy rules</td>
+								</tr>
+								<tr>
+									<td>
+										<code>--policy &lt;path&gt;</code>
+									</td>
+									<td>
+										Path to <code>.skill-policy.yml</code>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<code>--fail-on &lt;severity&gt;</code>
+									</td>
+									<td>
+										Exit 1 at threshold: <code>critical</code>, <code>high</code>,{" "}
+										<code>medium</code>, <code>low</code>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<code>--detailed</code>
+									</td>
+									<td>Show per-event breakdown</td>
 								</tr>
 							</tbody>
 						</table>

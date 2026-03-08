@@ -459,6 +459,116 @@ export const commands: CommandInfo[] = [
 			"Run test --ci after refresh to catch regressions. Use --update-baseline on main after verified changes so future PRs compare against the latest known-good results.",
 	},
 	{
+		slug: "fingerprint",
+		name: "fingerprint",
+		icon: "\u{1F5DD}",
+		tagline:
+			"Generate a fingerprint registry of installed skills with content hashes and watermarks.",
+		group: "Analysis & Verification",
+		description:
+			"Discover SKILL.md files, compute SHA-256 content hashes, extract or inject watermarks, and produce a FingerprintRegistry for integrity verification, runtime detection, and deduplication.",
+		whyItMatters:
+			"When agents load skills into context, you need to know exactly which skills are present and whether they've been tampered with. Fingerprint gives every skill a unique identity — a content hash that changes when the skill changes — enabling runtime detection, integrity verification, and deduplication across environments.",
+		whatItDoes: [
+			"Discovers all SKILL.md files in the target directory",
+			"Computes SHA-256 hashes for frontmatter, content body, and a combined prefix",
+			"Extracts existing watermarks or injects new ones into skill files",
+			"Produces a FingerprintRegistry mapping each skill to its content hashes",
+			"Outputs results in terminal, JSON, or machine-readable formats",
+		],
+		usage: "npx skills-check fingerprint [dir] [options]",
+		options: [
+			{ flag: "--output <path>", description: "Write fingerprint registry to a file" },
+			{ flag: "--inject-watermarks", description: "Inject watermarks into skill files" },
+			{ flag: "--json", description: "Output results as JSON" },
+			{ flag: "--ci", description: "CI mode with strict exit codes" },
+			{ flag: "--verbose", description: "Show detailed processing information" },
+			{ flag: "--quiet", description: "Suppress non-essential output" },
+		],
+		examples: [
+			{ label: "Fingerprint all skills", code: "npx skills-check fingerprint" },
+			{ label: "Inject watermarks", code: "npx skills-check fingerprint --inject-watermarks" },
+			{
+				label: "JSON output to file",
+				code: "npx skills-check fingerprint --json --output fingerprints.json",
+			},
+		],
+		whenToUse: [
+			"Before deploying skills to verify integrity",
+			"In CI to track skill identity across builds",
+			"For runtime telemetry integration and deduplication",
+		],
+		relatedCommands: [
+			{ slug: "audit", relationship: "Fingerprint identity, then audit content" },
+			{ slug: "budget", relationship: "Fingerprint skills, then measure their cost" },
+			{ slug: "usage", relationship: "Fingerprint skills, then track their usage" },
+		],
+		ciTip:
+			"Generate fingerprints in CI and compare against a known-good registry to detect unauthorized skill modifications. Use --inject-watermarks during build to enable runtime telemetry.",
+	},
+	{
+		slug: "usage",
+		name: "usage",
+		icon: "\u2593",
+		tagline:
+			"Analyze skill telemetry events for usage patterns, cost estimation, and policy compliance.",
+		group: "Analysis & Verification",
+		description:
+			"Read telemetry events from JSONL or SQLite stores to understand which skills are actually being used, how often, and at what cost. Cross-reference against organizational policies to detect unauthorized or non-compliant skill usage.",
+		whyItMatters:
+			"Installing and fingerprinting skills is only half the story — you also need to know which skills agents actually load at runtime, how much they cost, and whether usage complies with organizational policies. Usage closes the observability gap between skill installation and agent behavior.",
+		whatItDoes: [
+			"Reads telemetry events from JSONL or SQLite data stores",
+			"Deduplicates events and groups them by skill identity",
+			"Detects version drift between deployed and actually-used skill versions",
+			"Estimates token cost based on skill usage frequency and context window consumption",
+			"Cross-references usage against organizational policies for compliance checking",
+		],
+		usage: "npx skills-check usage [options]",
+		options: [
+			{ flag: "--store <path>", description: "Path to telemetry store (JSONL or SQLite)" },
+			{ flag: "--since <date>", description: "Filter events after this date (ISO 8601)" },
+			{ flag: "--until <date>", description: "Filter events before this date (ISO 8601)" },
+			{ flag: "--check-policy", description: "Cross-reference usage against policy rules" },
+			{ flag: "--policy <path>", description: "Path to .skill-policy.yml for compliance checks" },
+			{ flag: "--format <type>", description: "Output: terminal, json, or markdown" },
+			{ flag: "--json", description: "Shorthand for --format json" },
+			{ flag: "--markdown", description: "Shorthand for --format markdown" },
+			{ flag: "--output <path>", description: "Write report to a file" },
+			{ flag: "--ci", description: "CI mode with strict exit codes" },
+			{
+				flag: "--fail-on <severity>",
+				description: "Exit 1 at threshold: critical, high, medium, low",
+			},
+			{ flag: "--detailed", description: "Show per-event breakdown" },
+			{ flag: "--verbose", description: "Show detailed processing information" },
+			{ flag: "--quiet", description: "Suppress non-essential output" },
+		],
+		examples: [
+			{ label: "Analyze usage", code: "npx skills-check usage --store ./telemetry.jsonl" },
+			{
+				label: "Usage with policy check",
+				code: "npx skills-check usage --store ./telemetry.jsonl --check-policy",
+			},
+			{
+				label: "Filter by date range",
+				code: "npx skills-check usage --store ./telemetry.jsonl --since 2026-01-01 --until 2026-03-01",
+			},
+		],
+		whenToUse: [
+			"For usage reporting and cost tracking across teams",
+			"In CI to enforce usage policies and detect anomalies",
+			"To detect unauthorized or non-compliant skill usage",
+		],
+		relatedCommands: [
+			{ slug: "fingerprint", relationship: "Fingerprint skills, then track their usage" },
+			{ slug: "policy", relationship: "Analyze usage, then enforce policy rules" },
+			{ slug: "budget", relationship: "Measure theoretical cost, then track actual usage" },
+		],
+		ciTip:
+			"Run usage --check-policy in CI to catch unauthorized skill usage before it reaches production. Use --fail-on to set severity thresholds for policy violations.",
+	},
+	{
 		slug: "init",
 		name: "init",
 		icon: "\u279C",

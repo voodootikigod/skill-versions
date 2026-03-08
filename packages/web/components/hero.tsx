@@ -13,7 +13,7 @@ export function Hero() {
 				The missing quality toolkit for Agent Skills
 				<br />
 				<span className={styles.dim}>
-					Freshness, security, quality, and efficiency &mdash; 10 commands, one toolkit
+					Freshness, security, quality, and efficiency &mdash; 12 commands, one toolkit
 				</span>
 			</p>
 			<div className={styles.install}>
