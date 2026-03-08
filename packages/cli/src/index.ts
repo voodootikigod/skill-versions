@@ -11,6 +11,7 @@ import { policyCheckCommand, policyInitCommand, policyValidateCommand } from "./
 import { refreshCommand } from "./commands/refresh.js";
 import { reportCommand } from "./commands/report.js";
 import { testCommand } from "./commands/test.js";
+import { usageCommand } from "./commands/usage.js";
 import { verifyCommand } from "./commands/verify.js";
 
 const require = createRequire(import.meta.url);
@@ -306,6 +307,33 @@ program
 	.action(async (dir, options) => {
 		try {
 			const code = await testCommand(dir, options);
+			process.exit(code);
+		} catch (error) {
+			console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
+			process.exit(2);
+		}
+	});
+
+program
+	.command("usage")
+	.description("Analyze skill usage from telemetry events")
+	.option("--store <uri>", "telemetry store URI (file://, sqlite://)")
+	.option("--since <date>", "start date (ISO 8601)")
+	.option("--until <date>", "end date (ISO 8601)")
+	.option("--check-policy", "cross-check against .skill-policy.yml")
+	.option("--policy <path>", "path to policy file")
+	.option("--detailed", "include per-model and per-user breakdown")
+	.option("-f, --format <type>", "output format: terminal, json, or markdown", "terminal")
+	.option("-o, --output <path>", "write report to file")
+	.option("--json", "output as JSON")
+	.option("--markdown", "output as markdown")
+	.option("--ci", "strict exit codes")
+	.option("--fail-on <severity>", "exit code 1 threshold")
+	.option("--verbose", "show progress and details")
+	.option("--quiet", "suppress output, exit code only")
+	.action(async (options) => {
+		try {
+			const code = await usageCommand(options);
 			process.exit(code);
 		} catch (error) {
 			console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
