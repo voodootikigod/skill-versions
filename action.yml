@@ -34,6 +34,12 @@ inputs:
   test:
     description: "Run the test command (eval test suites)"
     default: "false"
+  fingerprint:
+    description: "Run the fingerprint command (generate skill fingerprint registry)"
+    default: "false"
+  usage:
+    description: "Run the usage command (analyze skill usage from telemetry)"
+    default: "false"
 
   # ── Command-specific thresholds ────────────────────────────────────
   audit-fail-on:
@@ -51,6 +57,12 @@ inputs:
   policy-fail-on:
     description: "Policy severity threshold: blocked, violation, warning"
     default: "blocked"
+  usage-store:
+    description: "Telemetry store URI for the usage command (e.g. file://telemetry.jsonl or sqlite://telemetry.db)"
+    default: ""
+  usage-check-policy:
+    description: "Cross-reference usage data against skill policy"
+    default: "false"
 
   # ── Shared options ─────────────────────────────────────────────────
   skills-dir:
@@ -109,6 +121,12 @@ outputs:
   test-failed:
     description: "Number of failed test cases"
     value: ${{ steps.test.outputs.failed_count }}
+  fingerprint-skills:
+    description: "Number of skills fingerprinted"
+    value: ${{ steps.fingerprint.outputs.skill_count }}
+  usage-calls:
+    description: "Total number of skill usage calls"
+    value: ${{ steps.usage.outputs.total_calls }}
 
 runs:
   using: "composite"
@@ -132,6 +150,8 @@ runs:
         INPUT_POLICY: ${{ inputs.policy }}
         INPUT_VERIFY: ${{ inputs.verify }}
         INPUT_TEST: ${{ inputs.test }}
+        INPUT_FINGERPRINT: ${{ inputs.fingerprint }}
+        INPUT_USAGE: ${{ inputs.usage }}
       run: |
         if [ -n "$INPUT_COMMANDS" ]; then
           # Parse comma-separated list into individual flags
@@ -141,13 +161,15 @@ runs:
           done
         else
           # Use individual toggle inputs
-          [ "$INPUT_CHECK" = "true" ]  && echo "run_check=true"  >> "$GITHUB_OUTPUT"
-          [ "$INPUT_AUDIT" = "true" ]  && echo "run_audit=true"  >> "$GITHUB_OUTPUT"
-          [ "$INPUT_LINT" = "true" ]   && echo "run_lint=true"   >> "$GITHUB_OUTPUT"
-          [ "$INPUT_BUDGET" = "true" ] && echo "run_budget=true" >> "$GITHUB_OUTPUT"
-          [ "$INPUT_POLICY" = "true" ] && echo "run_policy=true" >> "$GITHUB_OUTPUT"
-          [ "$INPUT_VERIFY" = "true" ] && echo "run_verify=true" >> "$GITHUB_OUTPUT"
-          [ "$INPUT_TEST" = "true" ]   && echo "run_test=true"   >> "$GITHUB_OUTPUT"
+          [ "$INPUT_CHECK" = "true" ]       && echo "run_check=true"       >> "$GITHUB_OUTPUT"
+          [ "$INPUT_AUDIT" = "true" ]       && echo "run_audit=true"       >> "$GITHUB_OUTPUT"
+          [ "$INPUT_LINT" = "true" ]        && echo "run_lint=true"        >> "$GITHUB_OUTPUT"
+          [ "$INPUT_BUDGET" = "true" ]      && echo "run_budget=true"      >> "$GITHUB_OUTPUT"
+          [ "$INPUT_POLICY" = "true" ]      && echo "run_policy=true"      >> "$GITHUB_OUTPUT"
+          [ "$INPUT_VERIFY" = "true" ]      && echo "run_verify=true"      >> "$GITHUB_OUTPUT"
+          [ "$INPUT_TEST" = "true" ]        && echo "run_test=true"        >> "$GITHUB_OUTPUT"
+          [ "$INPUT_FINGERPRINT" = "true" ] && echo "run_fingerprint=true" >> "$GITHUB_OUTPUT"
+          [ "$INPUT_USAGE" = "true" ]       && echo "run_usage=true"       >> "$GITHUB_OUTPUT"
         fi
 
     # ── Check ──────────────────────────────────────────────────────────
@@ -401,6 +423,71 @@ runs:
           exit 1
         fi
 
+    # ── Fingerprint ───────────────────────────────────────────────────
+    - name: Generate skill fingerprints
+      id: fingerprint
+      if: steps.resolve.outputs.run_fingerprint == 'true'
+      shell: bash
+      env:
+        INPUT_SKILLS_DIR: ${{ inputs.skills-dir }}
+      run: |
+        set +e
+        FP_OUTPUT=$(npx --yes skills-check fingerprint "$INPUT_SKILLS_DIR" --json 2>&1)
+        EXIT_CODE=$?
+        set -e
+
+        echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
+
+        # Extract skill count from JSON output
+        SKILL_COUNT=$(echo "$FP_OUTPUT" | jq '.skills | length // 0' 2>/dev/null || echo "0")
+        echo "skill_count=${SKILL_COUNT}" >> "$GITHUB_OUTPUT"
+
+        if [ "$EXIT_CODE" -eq 2 ]; then
+          echo "::error::skills-check fingerprint: configuration error"
+          exit 2
+        fi
+
+    # ── Usage ─────────────────────────────────────────────────────────
+    - name: Analyze skill usage
+      id: usage
+      if: steps.resolve.outputs.run_usage == 'true'
+      shell: bash
+      env:
+        INPUT_USAGE_STORE: ${{ inputs.usage-store }}
+        INPUT_USAGE_CHECK_POLICY: ${{ inputs.usage-check-policy }}
+        INPUT_POLICY_FILE: ${{ inputs.policy-file }}
+      run: |
+        USAGE_ARGS=(--format json)
+        if [ -n "$INPUT_USAGE_STORE" ]; then
+          USAGE_ARGS+=(--store "$INPUT_USAGE_STORE")
+        fi
+        if [ "$INPUT_USAGE_CHECK_POLICY" = "true" ]; then
+          USAGE_ARGS+=(--check-policy)
+          if [ -n "$INPUT_POLICY_FILE" ]; then
+            USAGE_ARGS+=(--policy "$INPUT_POLICY_FILE")
+          fi
+        fi
+
+        set +e
+        USAGE_OUTPUT=$(npx --yes skills-check usage "${USAGE_ARGS[@]}" 2>&1)
+        EXIT_CODE=$?
+        set -e
+
+        echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
+
+        # Extract total calls from JSON output
+        TOTAL_CALLS=$(echo "$USAGE_OUTPUT" | jq '.report.totalCalls // .totalCalls // 0' 2>/dev/null || echo "0")
+        echo "total_calls=${TOTAL_CALLS}" >> "$GITHUB_OUTPUT"
+
+        if [ "$EXIT_CODE" -eq 2 ]; then
+          echo "::error::skills-check usage: configuration error"
+          exit 2
+        fi
+        if [ "$EXIT_CODE" -eq 1 ]; then
+          echo "::error::skills-check usage: policy violations detected"
+          exit 1
+        fi
+
     # ── Summary ────────────────────────────────────────────────────────
     - name: Collect results
       id: summary
@@ -414,12 +501,14 @@ runs:
         CODE_POLICY: ${{ steps.policy.outputs.exit_code }}
         CODE_VERIFY: ${{ steps.verify.outputs.exit_code }}
         CODE_TEST: ${{ steps.test.outputs.exit_code }}
+        CODE_FINGERPRINT: ${{ steps.fingerprint.outputs.exit_code }}
+        CODE_USAGE: ${{ steps.usage.outputs.exit_code }}
       run: |
         # Build a JSON object of exit codes for each command that ran
         RESULTS="{"
         FIRST=true
 
-        for CMD in check audit lint budget policy verify test; do
+        for CMD in check audit lint budget policy verify test fingerprint usage; do
           # Read exit code from the corresponding env var
           VAR="CODE_$(echo "$CMD" | tr '[:lower:]' '[:upper:]')"
           CODE="${!VAR}"
