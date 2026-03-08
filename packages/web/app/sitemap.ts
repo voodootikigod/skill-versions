@@ -29,5 +29,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
 			changeFrequency: "monthly",
 			priority: 0.5,
 		},
+		{
+			url: "https://skillscheck.ai/llms.txt",
+			lastModified: new Date(),
+			changeFrequency: "monthly",
+			priority: 0.5,
+		},
+		{
+			url: "https://skillscheck.ai/llms-full.txt",
+			lastModified: new Date(),
+			changeFrequency: "monthly",
+			priority: 0.5,
+		},
 	];
 }

@@ -63,6 +63,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<html className={`${geistSans.variable} ${geistMono.variable}`} lang="en">
+			<head>
+				<link href="/llms.txt" rel="alternate" title="LLM-optimized content" type="text/plain" />
+			</head>
 			<body style={{ fontFamily: "var(--font-sans)" }}>
 				{children}
 				<Analytics />
