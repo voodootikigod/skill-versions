@@ -62,12 +62,16 @@ export default function DocsPage() {
 						<h2 id="commands">Commands</h2>
 
 						<p className={styles.commandNav}>
-							<strong>Jump to:</strong> <a href="#cmd-init">init</a> &middot;{" "}
-							<a href="#cmd-check">check</a> &middot; <a href="#cmd-report">report</a> &middot;{" "}
-							<a href="#cmd-refresh">refresh</a> &middot; <a href="#cmd-audit">audit</a> &middot;{" "}
-							<a href="#cmd-lint">lint</a> &middot; <a href="#cmd-budget">budget</a> &middot;{" "}
-							<a href="#cmd-verify">verify</a> &middot; <a href="#cmd-policy">policy</a> &middot;{" "}
-							<a href="#cmd-test">test</a>
+							<strong>Jump to:</strong> <a href="#cmd-init">init — set up your registry</a> &middot;{" "}
+							<a href="#cmd-check">check — detect version drift</a> &middot;{" "}
+							<a href="#cmd-report">report — generate staleness reports</a> &middot;{" "}
+							<a href="#cmd-refresh">refresh — AI-assisted skill updates</a> &middot;{" "}
+							<a href="#cmd-audit">audit — scan for security issues</a> &middot;{" "}
+							<a href="#cmd-lint">lint — validate skill metadata</a> &middot;{" "}
+							<a href="#cmd-budget">budget — measure token cost</a> &middot;{" "}
+							<a href="#cmd-verify">verify — validate semver bumps</a> &middot;{" "}
+							<a href="#cmd-policy">policy — enforce organizational rules</a> &middot;{" "}
+							<a href="#cmd-test">test — run eval test suites</a>
 						</p>
 
 						<h3 id="cmd-init">
@@ -553,7 +557,8 @@ npx skills-check test --update-baseline`}
 						<h2 id="registry">Registry Format</h2>
 						<p>
 							The <code>skills-check.json</code> file follows a{" "}
-							<Link href="/schema.json">JSON Schema</Link> that editors can validate against:
+							<Link href="/schema.json">skills-check registry JSON Schema</Link> that editors can
+							validate against:
 						</p>
 						<pre>
 							<code>

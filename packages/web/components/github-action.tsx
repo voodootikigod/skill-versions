@@ -38,7 +38,7 @@ export function GitHubAction() {
 						rel="noopener noreferrer"
 						target="_blank"
 					>
-						View on GitHub Marketplace &rarr;
+						Get the skills-check GitHub Action on Marketplace &rarr;
 					</a>
 				</div>
 

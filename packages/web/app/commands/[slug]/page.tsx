@@ -88,7 +88,7 @@ export default async function CommandPage({ params }: Props) {
 			<main className={styles.main}>
 				<article className={styles.article}>
 					<Link className={styles.backLink} href="/#commands">
-						&larr; All commands
+						&larr; Browse all 10 skills-check commands
 					</Link>
 
 					<div className={styles.header}>
@@ -162,7 +162,7 @@ export default async function CommandPage({ params }: Props) {
 					)}
 
 					<div className={styles.navLinks}>
-						<Link href="/docs#commands">Full CLI reference &rarr;</Link>
+						<Link href="/docs#commands">See complete CLI reference in docs &rarr;</Link>
 					</div>
 				</article>
 			</main>

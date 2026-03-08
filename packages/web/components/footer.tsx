@@ -14,10 +14,10 @@ export function Footer() {
 						rel="noopener noreferrer"
 						target="_blank"
 					>
-						GitHub
+						skills-check source on GitHub
 					</a>
-					<Link href="/docs">Docs</Link>
-					<Link href="/schema.json">Schema</Link>
+					<Link href="/docs">CLI documentation and reference</Link>
+					<Link href="/schema.json">Registry JSON Schema</Link>
 				</div>
 				<div className={styles.right}>
 					<a
@@ -25,14 +25,14 @@ export function Footer() {
 						rel="noopener noreferrer"
 						target="_blank"
 					>
-						GitHub Action
+						skills-check GitHub Action
 					</a>
 					<a
 						href="https://npmjs.com/package/skills-check"
 						rel="noopener noreferrer"
 						target="_blank"
 					>
-						npm
+						skills-check on npm
 					</a>
 				</div>
 			</div>
