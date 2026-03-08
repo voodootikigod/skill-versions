@@ -154,6 +154,42 @@ export default async function CommandPage({ params }: Props) {
 						))}
 					</section>
 
+					<section>
+						<h2>When to use this</h2>
+						<ul className={styles.list}>
+							{cmd.whenToUse.map((item) => (
+								<li key={item}>{item}</li>
+							))}
+						</ul>
+					</section>
+
+					<section>
+						<h2>Related commands</h2>
+						<ul className={styles.list}>
+							{cmd.relatedCommands.map((rel) => {
+								const related = getCommandBySlug(rel.slug);
+								return (
+									<li key={rel.slug}>
+										<Link href={`/commands/${rel.slug}`}>{related ? related.name : rel.slug}</Link>
+										{" \u2014 "}
+										{rel.relationship}
+									</li>
+								);
+							})}
+						</ul>
+					</section>
+
+					{cmd.commonFindings && cmd.commonFindings.length > 0 && (
+						<section>
+							<h2>Common findings</h2>
+							<ul className={styles.list}>
+								{cmd.commonFindings.map((finding) => (
+									<li key={finding}>{finding}</li>
+								))}
+							</ul>
+						</section>
+					)}
+
 					{cmd.ciTip && (
 						<section className={styles.ciTip}>
 							<h2>CI tip</h2>

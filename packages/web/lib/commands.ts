@@ -1,15 +1,18 @@
 export interface CommandInfo {
 	ciTip?: string;
+	commonFindings?: string[];
 	description: string;
 	examples: { label: string; code: string }[];
 	group: string;
 	icon: string;
 	name: string;
 	options: { flag: string; description: string }[];
+	relatedCommands: { slug: string; relationship: string }[];
 	slug: string;
 	tagline: string;
 	usage: string;
 	whatItDoes: string[];
+	whenToUse: string[];
 	whyItMatters: string;
 }
 
@@ -46,6 +49,16 @@ export const commands: CommandInfo[] = [
 			{ label: "JSON output for scripts", code: "npx skills-check check --json" },
 			{ label: "CI gate", code: "npx skills-check check --ci" },
 			{ label: "Check one product", code: "npx skills-check check -p ai-sdk" },
+		],
+		whenToUse: [
+			"After a major framework release",
+			"On a weekly CI schedule",
+			"When a skill stops working as expected",
+		],
+		relatedCommands: [
+			{ slug: "refresh", relationship: "Detect drift, then fix it" },
+			{ slug: "report", relationship: "Generate formatted output of check results" },
+			{ slug: "init", relationship: "Set up registry, then start checking" },
 		],
 		ciTip:
 			"Pair with the GitHub Action to automatically open issues when skills go stale. Set fail-on-stale: true to block merges until skills are updated.",
@@ -85,6 +98,15 @@ export const commands: CommandInfo[] = [
 				code: "npx skills-check refresh --provider anthropic --model claude-sonnet-4-20250514",
 			},
 		],
+		whenToUse: [
+			"After check detects version drift",
+			"When a product ships breaking changes",
+			"Before publishing an updated skill",
+		],
+		relatedCommands: [
+			{ slug: "check", relationship: "Detect drift, then fix it" },
+			{ slug: "test", relationship: "Refresh a skill, then verify behavior" },
+		],
 		ciTip:
 			"Run refresh in --dry-run mode as a CI check to surface which skills need updates, then handle updates in a separate PR workflow.",
 	},
@@ -112,6 +134,14 @@ export const commands: CommandInfo[] = [
 		examples: [
 			{ label: "Markdown report", code: "npx skills-check report" },
 			{ label: "JSON for automation", code: "npx skills-check report --format json" },
+		],
+		whenToUse: [
+			"To share freshness status with your team",
+			"In CI for PR comments",
+			"For periodic health dashboards",
+		],
+		relatedCommands: [
+			{ slug: "check", relationship: "Generate formatted output of check results" },
 		],
 		ciTip:
 			"The GitHub Action automatically generates a report and opens/updates a GitHub issue when staleness is detected. Use the report output for custom Slack or email notifications.",
@@ -161,6 +191,21 @@ export const commands: CommandInfo[] = [
 				code: "npx skills-check audit --isolation docker",
 			},
 		],
+		whenToUse: [
+			"Before publishing a skill to the registry",
+			"When reviewing a contributed SKILL.md",
+			"In CI before merge",
+		],
+		relatedCommands: [
+			{ slug: "policy", relationship: "Scan for issues, then enforce rules" },
+			{ slug: "lint", relationship: "Audit content, then validate format" },
+		],
+		commonFindings: [
+			"Hallucinated npm package — referenced package doesn't exist",
+			"Prompt injection pattern — override instructions detected",
+			"Dead URL — linked resource returns 404",
+			"Missing metadata — required frontmatter fields absent",
+		],
 		ciTip:
 			"Use --format sarif and upload to GitHub's code scanning to see findings inline on PRs. Combine with --fail-on high to block merges on critical issues.",
 	},
@@ -193,6 +238,20 @@ export const commands: CommandInfo[] = [
 			{ label: "Auto-fix from git", code: "npx skills-check lint --fix" },
 			{ label: "CI gate", code: "npx skills-check lint --ci --fail-on error" },
 			{ label: "JSON output", code: "npx skills-check lint --format json" },
+		],
+		whenToUse: [
+			"Before committing a new skill",
+			"After editing frontmatter metadata",
+			"To auto-fix missing fields from git context",
+		],
+		relatedCommands: [
+			{ slug: "verify", relationship: "Validate format, then validate semver" },
+			{ slug: "audit", relationship: "Validate format, then audit content" },
+		],
+		commonFindings: [
+			"Missing product-version — no version tracking possible",
+			"Invalid SPDX license — unrecognized license identifier",
+			"Missing author — skill has no attribution",
 		],
 		ciTip:
 			"Run lint --fix locally before committing to auto-populate metadata. Use lint --ci in CI to catch skills that slip through without proper frontmatter.",
@@ -228,6 +287,20 @@ export const commands: CommandInfo[] = [
 			{ label: "Initialize default policy", code: "npx skills-check policy init" },
 			{ label: "Validate policy file", code: "npx skills-check policy validate" },
 			{ label: "CI gate", code: "npx skills-check policy check --ci --fail-on violation" },
+		],
+		whenToUse: [
+			"When onboarding teams to agent skills",
+			"To enforce org-wide quality standards",
+			"In CI to gate skill changes",
+		],
+		relatedCommands: [
+			{ slug: "audit", relationship: "Scan for issues, then enforce rules" },
+			{ slug: "lint", relationship: "Enforce policy, then validate format" },
+		],
+		commonFindings: [
+			"Untrusted source — skill from non-allowed origin",
+			"Banned pattern — prohibited content detected",
+			"Stale skill — exceeds freshness limit",
 		],
 		ciTip:
 			"Commit .skill-policy.yml to your repo root. Policy discovery walks up directories, so monorepo subdirectories inherit the root policy automatically.",
@@ -268,6 +341,12 @@ export const commands: CommandInfo[] = [
 			{ label: "Save baseline", code: "npx skills-check budget --save baseline.json" },
 			{ label: "Compare to baseline", code: "npx skills-check budget --compare baseline.json" },
 		],
+		whenToUse: [
+			"When context window limits cause agent failures",
+			"To compare token cost before and after edits",
+			"To find redundancy across skills",
+		],
+		relatedCommands: [{ slug: "test", relationship: "Measure cost, then verify behavior" }],
 		ciTip:
 			"Set --max-tokens in CI to prevent skill bloat. Save a baseline in main and use --compare on PRs to catch token regressions before they merge.",
 	},
@@ -303,6 +382,16 @@ export const commands: CommandInfo[] = [
 			{ label: "Suggest correct bump", code: "npx skills-check verify --suggest" },
 			{ label: "Heuristic only", code: "npx skills-check verify --all --skip-llm" },
 			{ label: "One skill", code: "npx skills-check verify -s ./skills/ai-sdk-core.md" },
+		],
+		whenToUse: [
+			"After bumping a skill version",
+			"In CI to validate changelogs",
+			"Before publishing to the registry",
+		],
+		relatedCommands: [{ slug: "lint", relationship: "Validate format, then validate semver" }],
+		commonFindings: [
+			"Major change declared as patch — content changes too significant",
+			"Missing version bump — content changed but version unchanged",
 		],
 		ciTip:
 			"Run verify --all --skip-llm in CI for fast, deterministic checks. Use the full LLM-assisted mode locally for nuanced semantic analysis before publishing.",
@@ -357,6 +446,15 @@ export const commands: CommandInfo[] = [
 				code: "npx skills-check test --isolation auto",
 			},
 		],
+		whenToUse: [
+			"After refreshing a stale skill",
+			"To detect regressions in agent behavior",
+			"Before major version releases",
+		],
+		relatedCommands: [
+			{ slug: "budget", relationship: "Measure cost, then verify behavior" },
+			{ slug: "refresh", relationship: "Refresh a skill, then verify behavior" },
+		],
 		ciTip:
 			"Run test --ci after refresh to catch regressions. Use --update-baseline on main after verified changes so future PRs compare against the latest known-good results.",
 	},
@@ -391,6 +489,11 @@ export const commands: CommandInfo[] = [
 				code: "npx skills-check init ./skills -o config/registry.json",
 			},
 		],
+		whenToUse: [
+			"When starting a new project with agent skills",
+			"To set up skills-check in an existing repo",
+		],
+		relatedCommands: [{ slug: "check", relationship: "Set up registry, then start checking" }],
 		ciTip:
 			"Run init once locally, then commit skills-check.json to your repo. Other commands will find it automatically.",
 	},
