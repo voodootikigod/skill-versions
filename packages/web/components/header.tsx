@@ -11,6 +11,7 @@ export function Header() {
 				<div className={styles.links}>
 					<Link href="/docs">Docs</Link>
 					<Link href="/faq">FAQ</Link>
+					<Link href="/concepts">Concepts</Link>
 					<a
 						href="https://github.com/voodootikigod/skills-check"
 						rel="noopener noreferrer"

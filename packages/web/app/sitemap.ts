@@ -28,6 +28,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
 			changeFrequency: "monthly",
 			priority: 0.8,
 		},
+		{
+			url: "https://skillscheck.ai/concepts",
+			lastModified: new Date(),
+			changeFrequency: "monthly",
+			priority: 0.7,
+		},
 		...commandPages,
 		{
 			url: "https://skillscheck.ai/schema.json",
