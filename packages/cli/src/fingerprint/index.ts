@@ -9,13 +9,11 @@ import {
 	computePrefixHash,
 	extractRawFrontmatter,
 	extractWatermark,
-	generateWatermark,
+	injectWatermarkIntoContent,
 } from "./extractors/hashes.js";
 
 export interface FingerprintOptions {
-	algorithm?: string;
 	ci?: boolean;
-	includeContent?: boolean;
 	injectWatermarks?: boolean;
 	json?: boolean;
 	output?: string;
@@ -32,10 +30,8 @@ export interface FingerprintOptions {
  */
 export async function runFingerprint(
 	paths: string[],
-	options: FingerprintOptions = {},
+	options: FingerprintOptions = {}
 ): Promise<FingerprintRegistry> {
-	const algorithm = options.algorithm ?? "sha256";
-
 	// Discover all skill files
 	const allFiles: string[] = [];
 	for (const p of paths) {
@@ -63,11 +59,11 @@ export async function runFingerprint(
 
 		// Extract raw frontmatter for hashing
 		const rawFm = extractRawFrontmatter(skillFile.raw);
-		const frontmatterHash = rawFm ? computeFrontmatterHash(rawFm, algorithm) : computeFrontmatterHash("", algorithm);
+		const frontmatterHash = rawFm ? computeFrontmatterHash(rawFm) : computeFrontmatterHash("");
 
 		// Content hashes
-		const contentHash = computeContentHash(skillFile.raw, algorithm);
-		const prefixHash = computePrefixHash(skillFile.raw, algorithm);
+		const contentHash = computeContentHash(skillFile.raw);
+		const prefixHash = computePrefixHash(skillFile.raw);
 
 		// Watermark
 		const watermark = extractWatermark(skillFile.raw);
@@ -79,10 +75,11 @@ export async function runFingerprint(
 
 		// Inject watermark if requested and missing
 		if (options.injectWatermarks && !watermark) {
-			const wmComment = generateWatermark(name, version, source);
-			const injected = skillFile.raw.replace(/^(---[\s\S]*?---\r?\n)/, `$1${wmComment}\n`);
-			await writeSkillFile(filePath, injected);
-			watermarkStr = `skill:${name}/${version}${source ? ` ${source}` : ""}`;
+			const result = injectWatermarkIntoContent(skillFile.raw, name, version, source);
+			if (result.injected) {
+				await writeSkillFile(filePath, result.content);
+				watermarkStr = `skill:${name}/${version}${source ? ` ${source}` : ""}`;
+			}
 		}
 
 		const tokenCount = countTokens(skillFile.raw);

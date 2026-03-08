@@ -1,8 +1,5 @@
 import { stat } from "node:fs/promises";
-import {
-	extractWatermark,
-	generateWatermark,
-} from "../fingerprint/extractors/hashes.js";
+import { extractWatermark, injectWatermarkIntoContent } from "../fingerprint/extractors/hashes.js";
 import { discoverSkillFiles } from "../shared/discovery.js";
 import { readSkillFile, writeSkillFile } from "../skill-io.js";
 import { autofix } from "./autofix.js";
@@ -94,9 +91,11 @@ export async function runLint(paths: string[], options: LintOptions = {}): Promi
 						(skillFile.frontmatter["product-version"] as string) ??
 						"0.0.0";
 					const source = skillFile.frontmatter.source as string | undefined;
-					const wm = generateWatermark(name, version, source);
-					content = content.replace(/^(---[\s\S]*?---\r?\n)/, `$1${wm}\n`);
-					totalFixed += 1;
+					const wmResult = injectWatermarkIntoContent(content, name, version, source);
+					if (wmResult.injected) {
+						content = wmResult.content;
+						totalFixed += 1;
+					}
 				}
 				await writeSkillFile(filePath, content);
 				totalFixed += result.fixed.length;
@@ -119,10 +118,11 @@ export async function runLint(paths: string[], options: LintOptions = {}): Promi
 				(skillFile.frontmatter["product-version"] as string) ??
 				"0.0.0";
 			const source = skillFile.frontmatter.source as string | undefined;
-			const wm = generateWatermark(name, version, source);
-			const injected = skillFile.raw.replace(/^(---[\s\S]*?---\r?\n)/, `$1${wm}\n`);
-			await writeSkillFile(filePath, injected);
-			totalFixed += 1;
+			const wmResult = injectWatermarkIntoContent(skillFile.raw, name, version, source);
+			if (wmResult.injected) {
+				await writeSkillFile(filePath, wmResult.content);
+				totalFixed += 1;
+			}
 		}
 
 		allFindings.push(...deduped);

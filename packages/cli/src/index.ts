@@ -2,8 +2,8 @@ import { createRequire } from "node:module";
 import { Command } from "commander";
 import { auditCommand } from "./commands/audit.js";
 import { budgetCommand } from "./commands/budget.js";
-import { fingerprintCommand } from "./commands/fingerprint.js";
 import { checkCommand } from "./commands/check.js";
+import { fingerprintCommand } from "./commands/fingerprint.js";
 import { healthCommand } from "./commands/health.js";
 import { initCommand } from "./commands/init.js";
 import { lintCommand } from "./commands/lint.js";
@@ -146,8 +146,6 @@ program
 	.argument("[dir]", "directory to analyze", ".")
 	.option("-o, --output <path>", "write registry to file")
 	.option("--inject-watermarks", "add watermark comments to skills that lack them")
-	.option("--algorithm <algo>", "hash algorithm: sha256, sha384, sha512", "sha256")
-	.option("--include-content", "include full skill content in registry")
 	.option("--json", "output as JSON")
 	.option("--ci", "strict exit codes")
 	.option("--verbose", "show progress and details")

@@ -1,13 +1,11 @@
 import chalk from "chalk";
-import { runFingerprint } from "../fingerprint/index.js";
 import type { FingerprintOptions } from "../fingerprint/index.js";
+import { runFingerprint } from "../fingerprint/index.js";
 import { formatAndOutput } from "../shared/index.js";
 
 interface FingerprintCommandOptions {
-	algorithm?: string;
 	ci?: boolean;
 	format?: "terminal" | "json";
-	includeContent?: boolean;
 	injectWatermarks?: boolean;
 	json?: boolean;
 	output?: string;
@@ -36,14 +34,14 @@ function formatFingerprintTerminal(registry: Record<string, unknown>): string {
 	}
 
 	lines.push(
-		`  ${chalk.dim("Skill".padEnd(25))}${chalk.dim("Version".padEnd(12))}${chalk.dim("Watermark".padEnd(12))}${chalk.dim("Tokens")}`,
+		`  ${chalk.dim("Skill".padEnd(25))}${chalk.dim("Version".padEnd(12))}${chalk.dim("Watermark".padEnd(12))}${chalk.dim("Tokens")}`
 	);
 	lines.push(`  ${"─".repeat(25)}${"─".repeat(12)}${"─".repeat(12)}${"─".repeat(8)}`);
 
 	for (const skill of reg.skills) {
 		const wm = skill.fingerprints.watermark ? chalk.green("✓") : chalk.dim("—");
 		lines.push(
-			`  ${skill.name.padEnd(25)}${skill.version.padEnd(12)}${wm.padEnd(12)}${skill.token_count.toLocaleString()}`,
+			`  ${skill.name.padEnd(25)}${skill.version.padEnd(12)}${wm.padEnd(12)}${skill.token_count.toLocaleString()}`
 		);
 	}
 
@@ -58,7 +56,7 @@ function formatFingerprintJson(registry: Record<string, unknown>): string {
 
 export async function fingerprintCommand(
 	dir: string,
-	options: FingerprintCommandOptions,
+	options: FingerprintCommandOptions
 ): Promise<number> {
 	if (options.verbose && options.quiet) {
 		console.error(chalk.red("Cannot use --verbose and --quiet together."));
@@ -66,9 +64,7 @@ export async function fingerprintCommand(
 	}
 
 	const fpOptions: FingerprintOptions = {
-		algorithm: options.algorithm,
 		ci: options.ci,
-		includeContent: options.includeContent,
 		injectWatermarks: options.injectWatermarks,
 		json: options.json,
 		output: options.output,
@@ -83,7 +79,7 @@ export async function fingerprintCommand(
 		{
 			terminal: formatFingerprintTerminal,
 			json: formatFingerprintJson,
-		},
+		}
 	);
 
 	return 0;
