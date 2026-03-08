@@ -5,7 +5,7 @@ import { createGenerator } from "ts-json-schema-generator";
 const config = {
 	path: resolve(import.meta.dirname, "types.ts"),
 	tsconfig: resolve(import.meta.dirname, "../tsconfig.json"),
-	type: "Registry",
+	type: "*",
 };
 
 const generator = createGenerator(config);
