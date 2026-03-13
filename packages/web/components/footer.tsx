@@ -40,7 +40,7 @@ export function Footer() {
 				<span className={styles.authorText}>Made with love from</span>
 				<a
 					className={styles.authorLink}
-					href="https://github.com/voodootikigod"
+					href="https://www.voodootikigod.com"
 					rel="noopener noreferrer"
 					target="_blank"
 				>
