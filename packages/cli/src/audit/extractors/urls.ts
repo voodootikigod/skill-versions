@@ -7,6 +7,9 @@ const MD_LINK_RE = /\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g;
 const BARE_URL_RE = /(?<!\]\()https?:\/\/[^\s)>]+/g;
 
 export function extractUrls(content: string): ExtractedUrl[] {
+	if (!content.includes("http")) {
+		return [];
+	}
 	const results: ExtractedUrl[] = [];
 	const seen = new Set<string>();
 	const lines = content.split("\n");

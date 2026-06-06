@@ -1,18 +1,5 @@
 import { createRequire } from "node:module";
 import { Command } from "commander";
-import { auditCommand } from "./commands/audit.js";
-import { budgetCommand } from "./commands/budget.js";
-import { checkCommand } from "./commands/check.js";
-import { fingerprintCommand } from "./commands/fingerprint.js";
-import { healthCommand } from "./commands/health.js";
-import { initCommand } from "./commands/init.js";
-import { lintCommand } from "./commands/lint.js";
-import { policyCheckCommand, policyInitCommand, policyValidateCommand } from "./commands/policy.js";
-import { refreshCommand } from "./commands/refresh.js";
-import { reportCommand } from "./commands/report.js";
-import { testCommand } from "./commands/test.js";
-import { usageCommand } from "./commands/usage.js";
-import { verifyCommand } from "./commands/verify.js";
 
 const require = createRequire(import.meta.url);
 const { version } = require("../package.json") as { version: string };
@@ -37,6 +24,7 @@ program
 	.option("--ci", "exit code 1 if any stale products found")
 	.action(async (options) => {
 		try {
+			const { checkCommand } = await import("./commands/check.js");
 			const code = await checkCommand(options);
 			process.exit(code);
 		} catch (error) {
@@ -53,6 +41,7 @@ program
 	.option("-o, --output <path>", "output path for registry file")
 	.action(async (dir, options) => {
 		try {
+			const { initCommand } = await import("./commands/init.js");
 			const code = await initCommand(dir, options);
 			process.exit(code);
 		} catch (error) {
@@ -73,6 +62,7 @@ program
 	.option("--dry-run", "show proposed changes, write nothing")
 	.action(async (skillsDir, options) => {
 		try {
+			const { refreshCommand } = await import("./commands/refresh.js");
 			const code = await refreshCommand(skillsDir, options);
 			process.exit(code);
 		} catch (error) {
@@ -107,6 +97,7 @@ program
 	.option("--no-cache", "disable cache reads and writes")
 	.action(async (dir, options) => {
 		try {
+			const { auditCommand } = await import("./commands/audit.js");
 			const code = await auditCommand(dir, options);
 			process.exit(code);
 		} catch (error) {
@@ -134,6 +125,7 @@ program
 	.option("--quiet", "suppress output, exit code only")
 	.action(async (dir, options) => {
 		try {
+			const { budgetCommand } = await import("./commands/budget.js");
 			const code = await budgetCommand(dir, options);
 			process.exit(code);
 		} catch (error) {
@@ -154,6 +146,7 @@ program
 	.option("--quiet", "suppress output, exit code only")
 	.action(async (dir, options) => {
 		try {
+			const { fingerprintCommand } = await import("./commands/fingerprint.js");
 			const code = await fingerprintCommand(dir, options);
 			process.exit(code);
 		} catch (error) {
@@ -176,6 +169,7 @@ program
 	.option("--quiet", "suppress output, exit code only")
 	.action(async (dir, options) => {
 		try {
+			const { lintCommand } = await import("./commands/lint.js");
 			const code = await lintCommand(dir, options);
 			process.exit(code);
 		} catch (error) {
@@ -191,6 +185,7 @@ program
 	.option("-f, --format <type>", "output format: json or markdown", "markdown")
 	.action(async (options) => {
 		try {
+			const { reportCommand } = await import("./commands/report.js");
 			const code = await reportCommand(options);
 			process.exit(code);
 		} catch (error) {
@@ -216,6 +211,7 @@ program
 	.option("--quiet", "suppress output, exit code only")
 	.action(async (options) => {
 		try {
+			const { verifyCommand } = await import("./commands/verify.js");
 			const code = await verifyCommand(options);
 			process.exit(code);
 		} catch (error) {
@@ -242,6 +238,7 @@ policyCmd
 	.option("--quiet", "suppress output, exit code only")
 	.action(async (dir, options) => {
 		try {
+			const { policyCheckCommand } = await import("./commands/policy.js");
 			const code = await policyCheckCommand(dir, options);
 			process.exit(code);
 		} catch (error) {
@@ -256,6 +253,7 @@ policyCmd
 	.option("-o, --output <path>", "output path for policy file")
 	.action(async (options) => {
 		try {
+			const { policyInitCommand } = await import("./commands/policy.js");
 			const code = await policyInitCommand(options);
 			process.exit(code);
 		} catch (error) {
@@ -270,6 +268,7 @@ policyCmd
 	.option("--policy <path>", "path to .skill-policy.yml")
 	.action(async (options) => {
 		try {
+			const { policyValidateCommand } = await import("./commands/policy.js");
 			const code = await policyValidateCommand(options);
 			process.exit(code);
 		} catch (error) {
@@ -307,6 +306,7 @@ program
 	.option("--allow-unsafe-local", "allow CI to run without isolation (unsafe)")
 	.action(async (dir, options) => {
 		try {
+			const { testCommand } = await import("./commands/test.js");
 			const code = await testCommand(dir, options);
 			process.exit(code);
 		} catch (error) {
@@ -334,6 +334,7 @@ program
 	.option("--quiet", "suppress output, exit code only")
 	.action(async (options) => {
 		try {
+			const { usageCommand } = await import("./commands/usage.js");
 			const code = await usageCommand(options);
 			process.exit(code);
 		} catch (error) {
@@ -389,6 +390,7 @@ program
 	.option("--quiet", "suppress output, exit code only")
 	.action(async (dir, options) => {
 		try {
+			const { healthCommand } = await import("./commands/health.js");
 			const code = await healthCommand(dir, options);
 			process.exit(code);
 		} catch (error) {

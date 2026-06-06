@@ -64,6 +64,8 @@ async function checkCratesExists(name: string): Promise<RegistryCheckResult> {
 	}
 }
 
+const activeRegistryChecks = new Map<string, Promise<RegistryCheckResult>>();
+
 async function checkExists(pkg: ExtractedPackage): Promise<RegistryCheckResult> {
 	const key = cacheKey(pkg);
 
@@ -73,34 +75,49 @@ async function checkExists(pkg: ExtractedPackage): Promise<RegistryCheckResult> 
 		return { status: memoryCached ? "exists" : "missing" };
 	}
 
-	// Check persistent disk cache
-	const diskCached = await getCached(pkg.ecosystem, pkg.name);
-	if (diskCached !== undefined) {
-		memoryCache.set(key, diskCached);
-		return { status: diskCached ? "exists" : "missing" };
+	const active = activeRegistryChecks.get(key);
+	if (active) {
+		return active;
 	}
 
-	let result: RegistryCheckResult = { status: "exists" };
-	switch (pkg.ecosystem) {
-		case "npm":
-			result = await checkNpmExists(pkg.name);
-			break;
-		case "pypi":
-			result = await checkPypiExists(pkg.name);
-			break;
-		case "crates":
-			result = await checkCratesExists(pkg.name);
-			break;
-		default:
-			break;
-	}
+	const promise = (async (): Promise<RegistryCheckResult> => {
+		// Check persistent disk cache
+		const diskCached = await getCached(pkg.ecosystem, pkg.name);
+		if (diskCached !== undefined) {
+			memoryCache.set(key, diskCached);
+			return { status: diskCached ? "exists" : "missing" };
+		}
 
-	if (result.status !== "error") {
-		const exists = result.status === "exists";
-		memoryCache.set(key, exists);
-		await setCached(pkg.ecosystem, pkg.name, exists);
+		let result: RegistryCheckResult = { status: "exists" };
+		switch (pkg.ecosystem) {
+			case "npm":
+				result = await checkNpmExists(pkg.name);
+				break;
+			case "pypi":
+				result = await checkPypiExists(pkg.name);
+				break;
+			case "crates":
+				result = await checkCratesExists(pkg.name);
+				break;
+			default:
+				break;
+		}
+
+		if (result.status !== "error") {
+			const exists = result.status === "exists";
+			memoryCache.set(key, exists);
+			await setCached(pkg.ecosystem, pkg.name, exists);
+		}
+		return result;
+	})();
+
+	activeRegistryChecks.set(key, promise);
+
+	try {
+		return await promise;
+	} finally {
+		activeRegistryChecks.delete(key);
 	}
-	return result;
 }
 
 function withConcurrencyLimit<T>(

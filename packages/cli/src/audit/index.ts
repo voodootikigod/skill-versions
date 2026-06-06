@@ -1,5 +1,5 @@
-import { readdir, stat } from "node:fs/promises";
-import { join } from "node:path";
+import { stat } from "node:fs/promises";
+import { discoverSkillFiles } from "../shared/discovery.js";
 import { readSkillFile } from "../skill-io.js";
 import type { AllowedTool } from "../types.js";
 import { configureCache } from "./cache.js";
@@ -26,42 +26,26 @@ import type {
 const ALLOWED_TOOLS_SPLIT_RE = /\s+/;
 const ALLOWED_TOOL_DECLARATION_RE = /^([A-Z][a-zA-Z0-9]*)(?:\(([^)]*)\))?$/;
 
-async function discoverSkillFiles(dir: string): Promise<string[]> {
-	const files: string[] = [];
+async function mapConcurrent<T, R>(
+	items: T[],
+	limit: number,
+	fn: (item: T) => Promise<R>
+): Promise<R[]> {
+	const results: R[] = new Array(items.length);
+	let index = 0;
 
-	let entries: string[];
-	try {
-		entries = await readdir(dir);
-	} catch {
-		throw new Error(`Cannot read directory: ${dir}`);
-	}
-
-	for (const entry of entries) {
-		const fullPath = join(dir, entry);
-		try {
-			const info = await stat(fullPath);
-			if (info.isDirectory()) {
-				const skillPath = join(fullPath, "SKILL.md");
-				try {
-					await stat(skillPath);
-					files.push(skillPath);
-				} catch {
-					// No SKILL.md here — recurse deeper
-					const nested = await discoverSkillFiles(fullPath);
-					files.push(...nested);
-				}
-			} else if (entry === "SKILL.md") {
-				files.push(fullPath);
-			}
-		} catch {
-			// skip inaccessible entries
+	async function worker(): Promise<void> {
+		while (index < items.length) {
+			const currentIndex = index++;
+			results[currentIndex] = await fn(items[currentIndex]);
 		}
 	}
 
-	return files.sort();
+	const workers = Array.from({ length: Math.min(limit, items.length) }, () => worker());
+	await Promise.all(workers);
+	return results;
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
 export async function runAudit(paths: string[], options: AuditOptions = {}): Promise<AuditReport> {
 	configureCache({ force: options.force, noCache: options.noCache });
 	// Discover all skill files
@@ -116,10 +100,8 @@ export async function runAudit(paths: string[], options: AuditOptions = {}): Pro
 		}
 	}
 
-	const allFindings: AuditFinding[] = [];
-	const registryAudits: RegistryAuditResult[] = [];
-
-	for (const filePath of allFiles) {
+	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestrator function
+	const fileResults = await mapConcurrent(allFiles, 10, async (filePath) => {
 		// Read and parse
 		const skillFile = await readSkillFile(filePath);
 
@@ -160,13 +142,16 @@ export async function runAudit(paths: string[], options: AuditOptions = {}): Pro
 			allowedToolsList,
 		};
 
+		const fileFindings: AuditFinding[] = [];
+		let fileRegistryAudit: RegistryAuditResult | undefined;
+
 		// Run all checkers
 		for (const checker of checkers) {
 			const findings = await checker.check(context);
 			// Filter out ignored findings
 			for (const finding of findings) {
 				if (!shouldIgnore(finding, ignoreRules, skillFile.raw)) {
-					allFindings.push(finding);
+					fileFindings.push(finding);
 				}
 			}
 		}
@@ -175,13 +160,28 @@ export async function runAudit(paths: string[], options: AuditOptions = {}): Pro
 		if (options.includeRegistryAudits) {
 			const result = await fetchRegistryAudit(context);
 			if (result.registryAudit) {
-				registryAudits.push(result.registryAudit);
+				fileRegistryAudit = result.registryAudit;
 			}
 			for (const finding of result.findings) {
 				if (!shouldIgnore(finding, ignoreRules, skillFile.raw)) {
-					allFindings.push(finding);
+					fileFindings.push(finding);
 				}
 			}
+		}
+
+		return {
+			findings: fileFindings,
+			registryAudit: fileRegistryAudit,
+		};
+	});
+
+	const allFindings: AuditFinding[] = [];
+	const registryAudits: RegistryAuditResult[] = [];
+
+	for (const res of fileResults) {
+		allFindings.push(...res.findings);
+		if (res.registryAudit) {
+			registryAudits.push(res.registryAudit);
 		}
 	}
 
