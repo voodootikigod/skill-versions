@@ -5,7 +5,7 @@ import { clearRegistryCache, registryChecker } from "./registry.js";
 // Mock the npm module
 vi.mock("../../npm.js", () => {
 	class NotFoundError extends Error {
-		constructor(msg) {
+		constructor(msg: string) {
 			super(msg);
 			this.name = "NotFoundError";
 		}

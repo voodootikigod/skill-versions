@@ -83,9 +83,9 @@ export async function fetchLatestVersion(packageName: string): Promise<string> {
 
 	if (!response.ok) {
 		if (response.status === 404) {
-			throw new Error(`Package "${packageName}" not found on npm`);
+			throw new NotFoundError(packageName);
 		}
-		throw new Error(`npm registry returned ${response.status} for "${packageName}"`);
+		throw new NetworkError(`npm registry returned ${response.status} for "${packageName}"`);
 	}
 
 	const data = (await response.json()) as { "dist-tags": NpmDistTags };
