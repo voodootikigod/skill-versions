@@ -12,6 +12,9 @@ function stripPrompt(line: string): string {
 }
 
 export function extractCommands(content: string): ExtractedCommand[] {
+	if (!content.includes("```")) {
+		return [];
+	}
 	const results: ExtractedCommand[] = [];
 	const lines = content.split("\n");
 

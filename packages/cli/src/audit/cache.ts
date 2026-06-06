@@ -4,6 +4,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 
 const DEFAULT_TTL_MS = 60 * 60 * 1000; // 1 hour
+const MAX_MEM_CACHE_SIZE = 1000;
 
 let bypassCache = false;
 let disableCache = false;
@@ -26,10 +27,30 @@ interface CacheEntry {
 	value: boolean;
 }
 
+interface JsonCacheEntry {
+	data: unknown;
+	timestamp: number;
+}
+
+const booleanMemoryCache = new Map<string, CacheEntry>();
+const jsonMemoryCache = new Map<string, JsonCacheEntry>();
+
 let dirEnsured = false;
 
 export function resetCacheState(): void {
 	dirEnsured = false;
+	booleanMemoryCache.clear();
+	jsonMemoryCache.clear();
+}
+
+function addToMemCache<K, V>(map: Map<K, V>, key: K, value: V): void {
+	if (map.size >= MAX_MEM_CACHE_SIZE) {
+		const firstKey = map.keys().next().value;
+		if (firstKey !== undefined) {
+			map.delete(firstKey);
+		}
+	}
+	map.set(key, value);
 }
 
 async function ensureCacheDir(): Promise<void> {
@@ -57,6 +78,16 @@ export async function getCached(
 	if (disableCache || bypassCache) {
 		return undefined;
 	}
+	const cacheKey = `${ecosystem}:${name}`;
+	const memoryEntry = process.env.VITEST ? undefined : booleanMemoryCache.get(cacheKey);
+	if (memoryEntry !== undefined) {
+		if (Date.now() - memoryEntry.timestamp >= ttlMs) {
+			booleanMemoryCache.delete(cacheKey);
+			return undefined; // expired
+		}
+		return memoryEntry.value;
+	}
+
 	const path = cacheFilePath(ecosystem, name);
 	let raw: string;
 	try {
@@ -70,6 +101,7 @@ export async function getCached(
 		if (Date.now() - entry.timestamp >= ttlMs) {
 			return undefined; // expired
 		}
+		addToMemCache(booleanMemoryCache, cacheKey, entry);
 		return entry.value;
 	} catch (_err) {
 		try {
@@ -85,19 +117,17 @@ export async function setCached(ecosystem: string, name: string, value: boolean)
 	if (disableCache) {
 		return;
 	}
+	const cacheKey = `${ecosystem}:${name}`;
+	const entry: CacheEntry = { value, timestamp: Date.now() };
+	addToMemCache(booleanMemoryCache, cacheKey, entry);
+
 	await ensureCacheDir();
 	try {
 		const path = cacheFilePath(ecosystem, name);
-		const entry: CacheEntry = { value, timestamp: Date.now() };
 		await writeFile(path, JSON.stringify(entry), "utf-8");
 	} catch {
 		// Silently fail — cache is advisory
 	}
-}
-
-interface JsonCacheEntry {
-	data: unknown;
-	timestamp: number;
 }
 
 export async function getJsonCached(
@@ -108,6 +138,16 @@ export async function getJsonCached(
 	if (disableCache || bypassCache) {
 		return undefined;
 	}
+	const cacheKey = `${ecosystem}:${name}`;
+	const memoryEntry = process.env.VITEST ? undefined : jsonMemoryCache.get(cacheKey);
+	if (memoryEntry !== undefined) {
+		if (Date.now() - memoryEntry.timestamp >= ttlMs) {
+			jsonMemoryCache.delete(cacheKey);
+			return undefined; // expired
+		}
+		return memoryEntry.data;
+	}
+
 	const path = cacheFilePath(ecosystem, name);
 	let raw: string;
 	try {
@@ -121,6 +161,7 @@ export async function getJsonCached(
 		if (Date.now() - entry.timestamp >= ttlMs) {
 			return undefined; // expired
 		}
+		addToMemCache(jsonMemoryCache, cacheKey, entry);
 		return entry.data;
 	} catch (_err) {
 		try {
@@ -136,10 +177,13 @@ export async function setJsonCached(ecosystem: string, name: string, data: unkno
 	if (disableCache) {
 		return;
 	}
+	const cacheKey = `${ecosystem}:${name}`;
+	const entry: JsonCacheEntry = { data, timestamp: Date.now() };
+	addToMemCache(jsonMemoryCache, cacheKey, entry);
+
 	await ensureCacheDir();
 	try {
 		const path = cacheFilePath(ecosystem, name);
-		const entry: JsonCacheEntry = { data, timestamp: Date.now() };
 		await writeFile(path, JSON.stringify(entry), "utf-8");
 	} catch {
 		// Silently fail — cache is advisory

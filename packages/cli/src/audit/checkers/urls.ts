@@ -104,14 +104,31 @@ async function isSafeUrl(url: string): Promise<boolean> {
 	}
 }
 
+const activeChecks = new Map<string, Promise<{ ok: boolean; status?: number }>>();
+
 async function checkUrlLivenessCached(url: string): Promise<{ ok: boolean; status?: number }> {
-	const cached = await getCached("url-liveness", url, URL_TTL_MS);
-	if (cached !== undefined) {
-		return { ok: cached };
+	const active = activeChecks.get(url);
+	if (active) {
+		return active;
 	}
-	const result = await checkUrlLiveness(url);
-	await setCached("url-liveness", url, result.ok);
-	return result;
+
+	const promise = (async () => {
+		const cached = await getCached("url-liveness", url, URL_TTL_MS);
+		if (cached !== undefined) {
+			return { ok: cached };
+		}
+		const result = await checkUrlLiveness(url);
+		await setCached("url-liveness", url, result.ok);
+		return result;
+	})();
+
+	activeChecks.set(url, promise);
+
+	try {
+		return await promise;
+	} finally {
+		activeChecks.delete(url);
+	}
 }
 
 async function checkUrlLiveness(url: string): Promise<{ ok: boolean; status?: number }> {

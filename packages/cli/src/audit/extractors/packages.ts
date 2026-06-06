@@ -2,6 +2,8 @@ import type { ExtractedPackage } from "../types.js";
 
 const PIP_VERSION_SPLIT_RE = /[=<>!~]/;
 
+const QUICK_CHECK_RE = /(?:install|add|npm|npx|pnpm|yarn|bunx|bun|pip|cargo)/;
+
 // npm/pnpm/yarn/bun package name: @scope/name or name, followed by optional @version
 const NPM_PKG = /(?:@[\w.-]+\/)?[\w.-]+/;
 
@@ -31,6 +33,9 @@ function isFlag(token: string): boolean {
 }
 
 export function extractPackages(content: string): ExtractedPackage[] {
+	if (!QUICK_CHECK_RE.test(content)) {
+		return [];
+	}
 	const results: ExtractedPackage[] = [];
 	const lines = content.split("\n");
 
