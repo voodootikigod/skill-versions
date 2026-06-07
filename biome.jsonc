@@ -10,7 +10,8 @@
     "rules": {
       "correctness": {
         // This project ships ESM and intentionally uses .js specifiers in TS source.
-        "useImportExtensions": "off"
+        "useImportExtensions": "off",
+        "noUnresolvedImports": "off"
       }
     }
   },

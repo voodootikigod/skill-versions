@@ -19,7 +19,6 @@ export class SQLiteReader implements TelemetryReader {
 			return this.db as never;
 		}
 		try {
-			// biome-ignore lint/correctness/noUnresolvedImports: node:sqlite is provided by Node.js 22 at runtime
 			const { DatabaseSync } = await import("node:sqlite");
 			this.db = new DatabaseSync(this.dbPath, { readOnly: true });
 			return this.db as never;
