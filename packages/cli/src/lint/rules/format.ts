@@ -1,3 +1,4 @@
+import { basename, dirname } from "node:path";
 import { valid as semverValid, validRange as semverValidRange } from "semver";
 import { parseCompatibility } from "../../compatibility/index.js";
 import type { SkillFile } from "../../skill-io.js";
@@ -60,7 +61,7 @@ export function checkFormats(file: SkillFile): LintFinding[] {
 		}
 
 		// Directory name match check
-		const dirName = file.path.split("/").filter(Boolean).at(-2);
+		const dirName = basename(dirname(file.path));
 		if (dirName && dirName !== normalized) {
 			findings.push({
 				file: file.path,

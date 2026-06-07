@@ -1,5 +1,6 @@
 import { extractVersionedPackages, parseCompatibility } from "../../compatibility/index.js";
 import { detectsProduct } from "../../lint/detection/product-refs.js";
+import { resolveField } from "../../lint/field-resolver.js";
 import type { SkillFile } from "../../skill-io.js";
 import type { PolicyFinding, SkillPolicy } from "../types.js";
 
@@ -17,7 +18,7 @@ export function checkFreshness(file: SkillFile, policy: SkillPolicy): PolicyFind
 
 	// Check max_age_days against last-verified
 	if (policy.freshness.max_age_days !== undefined) {
-		const lastVerified = fm["last-verified"];
+		const lastVerified = resolveField(fm, "last-verified");
 		if (typeof lastVerified === "string") {
 			const verifiedDate = new Date(lastVerified);
 			if (!Number.isNaN(verifiedDate.getTime())) {
@@ -47,14 +48,14 @@ export function checkFreshness(file: SkillFile, policy: SkillPolicy): PolicyFind
 		policy.freshness.require_version_tracking ?? policy.freshness.require_product_version;
 
 	if (requireVersionTracking) {
+		const productVersion = resolveField(fm, "product-version");
 		const hasProductVersion =
-			fm["product-version"] !== undefined &&
-			fm["product-version"] !== null &&
-			fm["product-version"] !== "";
+			productVersion !== undefined && productVersion !== null && productVersion !== "";
 
+		const compatibility = resolveField(fm, "compatibility");
 		const hasVersionedCompatibility =
-			typeof fm.compatibility === "string" &&
-			extractVersionedPackages(parseCompatibility(fm.compatibility)).length > 0;
+			typeof compatibility === "string" &&
+			extractVersionedPackages(parseCompatibility(compatibility)).length > 0;
 
 		if (!(hasProductVersion || hasVersionedCompatibility)) {
 			// Only flag if the skill references a product

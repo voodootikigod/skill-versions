@@ -1,3 +1,4 @@
+import { resolveField } from "../../lint/field-resolver.js";
 import { isValidSpdx } from "../../lint/spdx.js";
 import type { SkillFile } from "../../skill-io.js";
 import type { PolicyFinding, SkillPolicy } from "../types.js";
@@ -16,7 +17,7 @@ export function checkMetadata(file: SkillFile, policy: SkillPolicy): PolicyFindi
 	// Check required fields
 	if (policy.metadata.required_fields) {
 		for (const field of policy.metadata.required_fields) {
-			const value = fm[field];
+			const value = resolveField(fm, field);
 			if (value === undefined || value === null || value === "") {
 				findings.push({
 					file: file.path,
@@ -30,7 +31,7 @@ export function checkMetadata(file: SkillFile, policy: SkillPolicy): PolicyFindi
 
 	// Check license requirement
 	if (policy.metadata.require_license) {
-		const license = fm.license;
+		const license = resolveField(fm, "license");
 		if (typeof license !== "string" || license.length === 0) {
 			findings.push({
 				file: file.path,
@@ -50,7 +51,7 @@ export function checkMetadata(file: SkillFile, policy: SkillPolicy): PolicyFindi
 
 	// Check allowed licenses
 	if (policy.metadata.allowed_licenses && policy.metadata.allowed_licenses.length > 0) {
-		const license = fm.license;
+		const license = resolveField(fm, "license");
 		if (
 			typeof license === "string" &&
 			license.length > 0 &&

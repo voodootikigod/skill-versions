@@ -1,3 +1,4 @@
+import { resolveField } from "../../lint/field-resolver.js";
 import type { SkillFile } from "../../skill-io.js";
 import type { SkillPolicy } from "../types.js";
 
@@ -27,10 +28,12 @@ export function checkRequired(
 			// If source is specified in the requirement, also match source
 			if (req.source) {
 				let fileSource: string | null = null;
-				if (typeof file.frontmatter.source === "string") {
-					fileSource = file.frontmatter.source;
-				} else if (typeof file.frontmatter.repository === "string") {
-					fileSource = file.frontmatter.repository;
+				const sourceVal = resolveField(file.frontmatter, "source");
+				const repoVal = resolveField(file.frontmatter, "repository");
+				if (typeof sourceVal === "string") {
+					fileSource = sourceVal;
+				} else if (typeof repoVal === "string") {
+					fileSource = repoVal;
 				}
 				if (fileSource !== req.source) {
 					return false;

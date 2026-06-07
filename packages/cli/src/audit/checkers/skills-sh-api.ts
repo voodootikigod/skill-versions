@@ -1,4 +1,6 @@
+import { resolveField } from "../../lint/field-resolver.js";
 import { getJsonCached, setJsonCached } from "../cache.js";
+
 import type {
 	AuditFinding,
 	AuditSeverity,
@@ -87,8 +89,8 @@ export async function fetchRegistryAudit(
 	context: CheckContext
 ): Promise<{ findings: AuditFinding[]; registryAudit: RegistryAuditResult | null }> {
 	const skillName =
-		(context.file.frontmatter.name as string) ??
-		(context.file.frontmatter.repository as string) ??
+		(resolveField(context.file.frontmatter, "name") as string) ??
+		(resolveField(context.file.frontmatter, "repository") as string) ??
 		null;
 
 	if (!skillName) {

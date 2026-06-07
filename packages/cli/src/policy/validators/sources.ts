@@ -1,3 +1,4 @@
+import { resolveField } from "../../lint/field-resolver.js";
 import type { SkillFile } from "../../skill-io.js";
 import type { PolicyFinding, SkillPolicy } from "../types.js";
 
@@ -19,11 +20,13 @@ function matchesGlob(source: string, pattern: string): boolean {
  */
 function extractSource(file: SkillFile): string | null {
 	const fm = file.frontmatter;
-	if (typeof fm.source === "string" && fm.source.length > 0) {
-		return fm.source;
+	const sourceVal = resolveField(fm, "source");
+	const repoVal = resolveField(fm, "repository");
+	if (typeof sourceVal === "string" && sourceVal.length > 0) {
+		return sourceVal;
 	}
-	if (typeof fm.repository === "string" && fm.repository.length > 0) {
-		return fm.repository;
+	if (typeof repoVal === "string" && repoVal.length > 0) {
+		return repoVal;
 	}
 	return null;
 }
