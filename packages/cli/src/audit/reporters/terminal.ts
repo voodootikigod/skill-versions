@@ -54,6 +54,13 @@ export function formatTerminal(report: AuditReport): string {
 		lines.push(chalk.green("No findings. All skill files look clean."));
 		lines.push("");
 		lines.push(`  ${report.files} file(s) scanned`);
+		if (report.suppressed > 0) {
+			lines.push(
+				chalk.yellow(
+					`  ${report.suppressed} finding(s) suppressed by ignore rules — re-run with --strict to reveal them.`
+				)
+			);
+		}
 		lines.push("");
 		return lines.join("\n");
 	}
@@ -139,6 +146,13 @@ export function formatTerminal(report: AuditReport): string {
 	lines.push(`  Total:    ${summary.total}`);
 	lines.push("");
 	lines.push(`  ${report.files} file(s) scanned`);
+	if (report.suppressed > 0) {
+		lines.push(
+			chalk.yellow(
+				`  ${report.suppressed} finding(s) suppressed by ignore rules — re-run with --strict to reveal them.`
+			)
+		);
+	}
 	lines.push("");
 
 	// Tip footer when registry audits are not included but injection/command findings exist

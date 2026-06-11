@@ -136,6 +136,7 @@ export async function runTests(
 					testsDir: entry.testsDir,
 					providerFlag: options.provider,
 					modelFlag: options.model,
+					allowCustomGraders: options.allowCustomGraders,
 				});
 				caseResults.push(result);
 			}

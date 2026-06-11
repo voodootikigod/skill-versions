@@ -31,6 +31,7 @@ describe("checkAuditClean", () => {
 			findings: [],
 			summary: { critical: 0, high: 0, medium: 0, low: 0, total: 0 },
 			generatedAt: new Date().toISOString(),
+			suppressed: 0,
 		});
 
 		const policy: SkillPolicy = {
@@ -64,6 +65,7 @@ describe("checkAuditClean", () => {
 			],
 			summary: { critical: 1, high: 0, medium: 0, low: 1, total: 2 },
 			generatedAt: new Date().toISOString(),
+			suppressed: 0,
 		});
 
 		const policy: SkillPolicy = {
@@ -93,6 +95,7 @@ describe("checkAuditClean", () => {
 			],
 			summary: { critical: 0, high: 0, medium: 1, low: 0, total: 1 },
 			generatedAt: new Date().toISOString(),
+			suppressed: 0,
 		});
 
 		const policy: SkillPolicy = {

@@ -32,6 +32,12 @@ export function formatMarkdown(report: AuditReport): string {
 	lines.push("");
 	lines.push(`Files scanned: ${report.files}`);
 	lines.push("");
+	if (report.suppressed > 0) {
+		lines.push(
+			`> ⚠️ ${report.suppressed} finding(s) suppressed by ignore rules. Re-run with \`--strict\` to reveal them.`
+		);
+		lines.push("");
+	}
 
 	if (report.findings.length === 0) {
 		lines.push("No findings. All skill files look clean.");

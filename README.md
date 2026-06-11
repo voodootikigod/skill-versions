@@ -112,6 +112,7 @@ Security audit and hallucination detection for skill files. Scans for hallucinat
 | `--unique-only` | Skip injection and command checkers (use when Snyk/Socket/Gen cover these) |
 | `--include-registry-audits` | Fetch Snyk/Socket/Gen results from skills.sh |
 | `--ignore <path>` | Path to `.skills-checkignore` file |
+| `--strict` | Disable all suppression (`.skills-checkignore` + inline `audit-ignore`); report every finding |
 | `--force` | Force run and ignore cached verification results |
 | `--no-cache` | Disable loading from or saving to the persistent disk cache |
 | `--verbose` | Show progress and scan details |
@@ -156,6 +157,8 @@ This line's findings will be suppressed.
 <!-- audit-ignore:dangerous-command -->
 This line's dangerous-command findings only will be suppressed.
 ```
+
+Suppression is never silent: every report (terminal, JSON, Markdown) includes a `suppressed` count of findings hidden by ignore rules or inline comments. In CI, run with `--strict` to disable all suppression and report every finding — this prevents a skill author from self-silencing the auditor via an inline `audit-ignore` comment or a checked-in `.skills-checkignore`.
 
 **Caching:**
 
@@ -361,6 +364,10 @@ Run eval test suites declared in skill `tests/` directories. Supports multiple a
 | `--ci` | Strict exit codes (exit 1 on regressions) |
 | `--provider <name>` | LLM provider for rubric grading: `anthropic`, `openai`, `google` |
 | `--model <id>` | Model for rubric grading |
+| `--isolation <provider>` | Run in an isolated environment (`auto`, `docker`, `podman`, `vercel`, ...) |
+| `--no-isolation` | Force local execution (skip isolation detection) |
+| `--allow-unsafe-local` | Permit running without isolation in CI (unsafe) |
+| `--allow-custom-graders` | Permit `custom` graders to execute arbitrary code (disabled by default) |
 | `--verbose` | Show per-grader results |
 
 ```bash
@@ -848,7 +855,7 @@ Not all commands carry the same risk profile. Understanding which commands are l
 
 **LLM-assisted:** `refresh`, `verify` (with heuristic fallback when no key is set), and `test` (the `llm-rubric` grader). All LLM-assisted features degrade gracefully without API keys.
 
-**External code execution:** The `test` command executes shell commands through agent harnesses (Claude Code CLI or a generic shell). Test cases can run arbitrary commands defined in `cases.yaml`. Use `--isolation` when running tests against untrusted skills to sandbox execution in a container.
+**External code execution:** The `test` command executes shell commands through agent harnesses (Claude Code CLI or a generic shell). Test cases can run arbitrary commands defined in `cases.yaml`. Use `--isolation` when running tests against untrusted skills to sandbox execution in a container. The `custom` grader — which imports and runs a skill-author-supplied JS module in-process — is **disabled by default** (fail-closed) and runs only when you pass `--allow-custom-graders`; never enable it for skills you don't trust.
 
 ## Complementary Tools
 

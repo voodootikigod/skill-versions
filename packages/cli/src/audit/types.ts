@@ -51,6 +51,8 @@ export interface AuditReport {
 	generatedAt: string;
 	registryAudits?: RegistryAuditResult[];
 	summary: AuditSummary;
+	/** Count of findings hidden by .skills-checkignore rules or inline audit-ignore comments. */
+	suppressed: number;
 }
 
 export interface ExtractedPackage {
@@ -95,6 +97,8 @@ export interface AuditOptions {
 	output?: string;
 	packagesOnly?: boolean;
 	skipUrls?: boolean;
+	/** Disable all in-band suppression (.skills-checkignore + inline audit-ignore). */
+	strict?: boolean;
 	uniqueOnly?: boolean;
 }
 

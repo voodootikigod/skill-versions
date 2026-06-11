@@ -9,6 +9,7 @@ describe("formatJson", () => {
 			findings: [],
 			summary: { critical: 0, high: 0, medium: 0, low: 0, total: 0 },
 			generatedAt: "2026-03-03T00:00:00.000Z",
+			suppressed: 0,
 		};
 		const output = formatJson(report);
 		expect(() => JSON.parse(output)).not.toThrow();
@@ -20,6 +21,7 @@ describe("formatJson", () => {
 			findings: [],
 			summary: { critical: 0, high: 0, medium: 0, low: 0, total: 0 },
 			generatedAt: "2026-03-03T00:00:00.000Z",
+			suppressed: 0,
 		};
 		const output = formatJson(report);
 		expect(output).toBe(JSON.stringify(report, null, 2));
@@ -40,6 +42,7 @@ describe("formatJson", () => {
 			],
 			summary: { critical: 1, high: 0, medium: 0, low: 0, total: 1 },
 			generatedAt: "2026-03-03T00:00:00.000Z",
+			suppressed: 0,
 		};
 		const output = formatJson(report);
 		const parsed = JSON.parse(output);

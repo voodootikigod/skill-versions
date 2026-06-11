@@ -23,6 +23,7 @@ function getLocalBuildPath(): string {
 interface TestCommandOptions {
 	agent?: string;
 	agentCmd?: string;
+	allowCustomGraders?: boolean;
 	allowUnsafeLocal?: boolean;
 	ci?: boolean;
 	dry?: boolean;
@@ -66,6 +67,7 @@ export async function testCommand(dir: string, options: TestCommandOptions): Pro
 		provider: options.provider,
 		model: options.model,
 		verbose: options.verbose,
+		allowCustomGraders: options.allowCustomGraders,
 	};
 
 	// Resolve isolation preference (--no-isolation sets it to false)
@@ -190,6 +192,9 @@ export async function testCommand(dir: string, options: TestCommandOptions): Pro
 			}
 			if (options.model) {
 				argv.push("--model", options.model);
+			}
+			if (options.allowCustomGraders) {
+				argv.push("--allow-custom-graders");
 			}
 			if (options.verbose) {
 				argv.push("--verbose");

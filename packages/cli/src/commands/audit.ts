@@ -20,6 +20,7 @@ interface AuditCommandOptions {
 	packagesOnly?: boolean;
 	quiet?: boolean;
 	skipUrls?: boolean;
+	strict?: boolean;
 	uniqueOnly?: boolean;
 	verbose?: boolean;
 }
@@ -97,6 +98,9 @@ export async function auditCommand(dir: string, options: AuditCommandOptions): P
 			if (options.ignore) {
 				cmdParts.push("--ignore", options.ignore);
 			}
+			if (options.strict) {
+				cmdParts.push("--strict");
+			}
 			if (options.verbose) {
 				cmdParts.push("--verbose");
 			}
@@ -160,6 +164,7 @@ export async function auditCommand(dir: string, options: AuditCommandOptions): P
 		includeRegistryAudits: options.includeRegistryAudits,
 		force: options.force,
 		noCache: options.cache === false,
+		strict: options.strict,
 	};
 
 	const report = await runAudit([dir], auditOptions);

@@ -73,6 +73,7 @@ export interface AgentExecution {
 export interface TestOptions {
 	agent?: string;
 	agentCmd?: string;
+	allowCustomGraders?: boolean;
 	ci?: boolean;
 	dry?: boolean;
 	format?: "terminal" | "json" | "markdown" | "sarif";

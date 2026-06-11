@@ -10,6 +10,7 @@ function makeReport(overrides?: Partial<AuditReport>): AuditReport {
 		findings: [],
 		summary: { critical: 0, high: 0, medium: 0, low: 0, total: 0 },
 		generatedAt: "2026-03-03T00:00:00.000Z",
+		suppressed: 0,
 		...overrides,
 	};
 }

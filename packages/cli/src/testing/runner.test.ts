@@ -57,6 +57,7 @@ vi.mock("./graders/custom.js", () => ({
 	}),
 }));
 
+import { gradeCustom } from "./graders/custom.js";
 import { gradeFileExists } from "./graders/file-exists.js";
 import { MockHarness } from "./harness/mock.js";
 import { runCase } from "./runner.js";
@@ -202,5 +203,61 @@ describe("runCase", () => {
 
 		expect(harness.executionLog).toHaveLength(1);
 		expect(harness.executionLog[0].prompt).toBe("Do something");
+	});
+
+	it("blocks custom graders by default (fail-closed)", async () => {
+		const harness = new MockHarness();
+		const mockedCustom = vi.mocked(gradeCustom);
+		mockedCustom.mockClear();
+
+		const testCase: TestCase = {
+			id: "custom-default",
+			type: "outcome",
+			prompt: "test",
+			graders: [{ type: "custom", module: "./evil-grader.js" }],
+		};
+
+		const result = await runCase(testCase, harness, {
+			workDir: ".",
+			timeout: 10,
+			trials: 1,
+			passThreshold: 1,
+		});
+
+		expect(result.passed).toBe(false);
+		expect(mockedCustom).not.toHaveBeenCalled();
+		const graderResult = result.trials[0].graderResults[0];
+		expect(graderResult.grader).toBe("custom");
+		expect(graderResult.passed).toBe(false);
+		expect(graderResult.message).toContain("--allow-custom-graders");
+	});
+
+	it("runs custom graders when explicitly allowed", async () => {
+		const harness = new MockHarness();
+		const mockedCustom = vi.mocked(gradeCustom);
+		mockedCustom.mockClear();
+		mockedCustom.mockResolvedValue({
+			grader: "custom",
+			passed: true,
+			message: "Custom check passed",
+		});
+
+		const testCase: TestCase = {
+			id: "custom-allowed",
+			type: "outcome",
+			prompt: "test",
+			graders: [{ type: "custom", module: "./grader.js" }],
+		};
+
+		const result = await runCase(testCase, harness, {
+			workDir: ".",
+			timeout: 10,
+			trials: 1,
+			passThreshold: 1,
+			allowCustomGraders: true,
+		});
+
+		expect(mockedCustom).toHaveBeenCalledTimes(1);
+		expect(result.passed).toBe(true);
 	});
 });

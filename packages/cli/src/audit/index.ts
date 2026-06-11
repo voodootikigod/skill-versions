@@ -67,14 +67,18 @@ export async function runAudit(paths: string[], options: AuditOptions = {}): Pro
 		findings: [],
 		summary: { critical: 0, high: 0, medium: 0, low: 0, total: 0 },
 		generatedAt: new Date().toISOString(),
+		suppressed: 0,
 	};
 
 	if (allFiles.length === 0) {
 		return emptyReport;
 	}
 
-	// Load ignore rules
-	const ignoreRules = await loadIgnoreRules(options.ignorePath);
+	// Load ignore rules. In strict mode, all in-band suppression is disabled, so
+	// rules are never consulted and every finding is reported.
+	const ignoreRules = options.strict ? [] : await loadIgnoreRules(options.ignorePath);
+	const isSuppressed = (finding: AuditFinding, raw: string): boolean =>
+		!options.strict && shouldIgnore(finding, ignoreRules, raw);
 
 	// Select checkers based on options
 	let checkers: AuditChecker[];
@@ -142,14 +146,17 @@ export async function runAudit(paths: string[], options: AuditOptions = {}): Pro
 		};
 
 		const fileFindings: AuditFinding[] = [];
+		let fileSuppressed = 0;
 		let fileRegistryAudit: RegistryAuditResult | undefined;
 
 		// Run all checkers
 		for (const checker of checkers) {
 			const findings = await checker.check(context);
-			// Filter out ignored findings
+			// Filter out ignored findings, counting how many were suppressed
 			for (const finding of findings) {
-				if (!shouldIgnore(finding, ignoreRules, skillFile.raw)) {
+				if (isSuppressed(finding, skillFile.raw)) {
+					fileSuppressed++;
+				} else {
 					fileFindings.push(finding);
 				}
 			}
@@ -162,7 +169,9 @@ export async function runAudit(paths: string[], options: AuditOptions = {}): Pro
 				fileRegistryAudit = result.registryAudit;
 			}
 			for (const finding of result.findings) {
-				if (!shouldIgnore(finding, ignoreRules, skillFile.raw)) {
+				if (isSuppressed(finding, skillFile.raw)) {
+					fileSuppressed++;
+				} else {
 					fileFindings.push(finding);
 				}
 			}
@@ -170,15 +179,18 @@ export async function runAudit(paths: string[], options: AuditOptions = {}): Pro
 
 		return {
 			findings: fileFindings,
+			suppressed: fileSuppressed,
 			registryAudit: fileRegistryAudit,
 		};
 	});
 
 	const allFindings: AuditFinding[] = [];
 	const registryAudits: RegistryAuditResult[] = [];
+	let suppressed = 0;
 
 	for (const res of fileResults) {
 		allFindings.push(...res.findings);
+		suppressed += res.suppressed;
 		if (res.registryAudit) {
 			registryAudits.push(res.registryAudit);
 		}
@@ -198,6 +210,7 @@ export async function runAudit(paths: string[], options: AuditOptions = {}): Pro
 		findings: allFindings,
 		summary,
 		generatedAt: new Date().toISOString(),
+		suppressed,
 		...(registryAudits.length > 0 ? { registryAudits } : {}),
 	};
 }

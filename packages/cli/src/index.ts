@@ -86,6 +86,7 @@ program
 	)
 	.option("--include-registry-audits", "fetch Snyk/Socket/Gen results from skills.sh")
 	.option("--ignore <path>", "path to .skills-checkignore file")
+	.option("--strict", "disable all suppression (.skills-checkignore + inline audit-ignore)")
 	.option("--verbose", "show progress and scan details")
 	.option("--quiet", "suppress output, exit code only")
 	.option(
@@ -304,6 +305,10 @@ program
 	)
 	.option("--no-isolation", "force local execution (skip isolation detection)")
 	.option("--allow-unsafe-local", "allow CI to run without isolation (unsafe)")
+	.option(
+		"--allow-custom-graders",
+		"permit custom graders to execute arbitrary code (disabled by default)"
+	)
 	.action(async (dir, options) => {
 		try {
 			const { testCommand } = await import("./commands/test.js");

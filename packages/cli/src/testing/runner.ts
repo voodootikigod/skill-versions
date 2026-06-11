@@ -13,6 +13,7 @@ import { safePath } from "./safe-path.js";
 import type { CaseResult, GraderConfig, GraderResult, TestCase, TrialResult } from "./types.js";
 
 export interface RunCaseOptions {
+	allowCustomGraders?: boolean;
 	modelFlag?: string;
 	passThreshold: number;
 	providerFlag?: string;
@@ -170,6 +171,16 @@ async function runSingleGrader(
 		}
 
 		case "custom": {
+			// Default-deny: custom graders import and execute skill-author-supplied
+			// code in this process (full env, network, filesystem). Gating this behind
+			// an explicit opt-in keeps `test` fail-closed against untrusted skills.
+			if (!options.allowCustomGraders) {
+				return {
+					grader: "custom",
+					passed: false,
+					message: `Custom grader "${grader.module}" blocked: custom graders execute arbitrary code and are disabled by default. Re-run with --allow-custom-graders to enable.`,
+				};
+			}
 			let modulePath: string;
 			if (options.testsDir) {
 				const skillDir = resolve(options.testsDir, "..");

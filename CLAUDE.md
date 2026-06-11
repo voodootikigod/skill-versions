@@ -171,7 +171,7 @@ audit/
     sarif.ts                       # SARIF 2.1.0 for GitHub Security tab
 ```
 
-Key design: extractors run once per file, checkers consume extracted data. Findings pass through `.skills-checkignore` + inline comment filtering. Registry lookups use layered caching (in-memory Map + disk with TTL).
+Key design: extractors run once per file, checkers consume extracted data. Findings pass through `.skills-checkignore` + inline comment filtering. Suppression is never silent — the report carries a `suppressed` count surfaced by every reporter, and `--strict` (in `runAudit` via `AuditOptions.strict`) disables all in-band suppression so a malicious skill author cannot self-silence findings via inline `audit-ignore` comments or a checked-in `.skills-checkignore`. Registry lookups use layered caching (in-memory Map + disk with TTL).
 
 **This extractor/checker/reporter pattern is the template used by all commands.** Each command follows the same architecture: parse SKILL.md → extract relevant data → run checks → filter → report. Extractors and reporters are reused across commands where possible.
 
@@ -205,7 +205,7 @@ Policy-as-code enforcement via `.skill-policy.yml`. Seven validators: source all
 
 ### Testing (`packages/cli/src/testing/`)
 
-Eval test runner with `cases.yaml` declarative test suites. Agent harness abstraction with Claude Code and generic shell implementations. Seven built-in graders: file-exists, command (exit code), contains/not-contains (regex), json-match, package-has, llm-rubric (via Vercel AI SDK with graceful degradation), and custom (dynamic module import). Trial-based execution with configurable pass threshold and flaky test detection. Baseline storage for regression tracking.
+Eval test runner with `cases.yaml` declarative test suites. Agent harness abstraction with Claude Code and generic shell implementations. Seven built-in graders: file-exists, command (exit code), contains/not-contains (regex), json-match, package-has, llm-rubric (via Vercel AI SDK with graceful degradation), and custom (dynamic module import). The custom grader imports and executes skill-author-supplied code in-process, so it is **default-deny**: blocked unless `--allow-custom-graders` is passed (threaded via `TestOptions.allowCustomGraders` → `RunCaseOptions`). Trial-based execution with configurable pass threshold and flaky test detection. Baseline storage for regression tracking.
 
 ### Fingerprint (`packages/cli/src/fingerprint/`)
 
