@@ -1,8 +1,9 @@
-import { stat } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import type { FingerprintEntry, FingerprintRegistry } from "@skills-check/schema";
 import { countTokens } from "../budget/tokenizer.js";
 import { extractVersionedPackages, parseCompatibility } from "../compatibility/index.js";
 import { discoverSkillFiles } from "../shared/discovery.js";
+import { signObject, verifyObject } from "../signing/index.js";
 import { readSkillFile, writeSkillFile } from "../skill-io.js";
 import {
 	computeContentHash,
@@ -17,7 +18,11 @@ export interface FingerprintOptions {
 	ci?: boolean;
 	injectWatermarks?: boolean;
 	json?: boolean;
+	/** Identifier recorded in the registry's `signedBy` field. */
+	keyId?: string;
 	output?: string;
+	/** Path to an Ed25519 PKCS#8 PEM private key; when set, the registry is signed. */
+	signKeyPath?: string;
 }
 
 /**
@@ -119,9 +124,33 @@ export async function runFingerprint(
 		});
 	}
 
-	return {
+	const registry: FingerprintRegistry = {
 		version: 1,
 		generatedAt: new Date().toISOString(),
 		entries,
 	};
+
+	// Sign the registry so consumers can detect tampering in transit or at rest.
+	if (options.signKeyPath) {
+		const privateKey = await readFile(options.signKeyPath, "utf-8");
+		const keyId = options.keyId ?? "default";
+		return signObject(
+			registry as unknown as Record<string, unknown>,
+			privateKey,
+			keyId
+		) as unknown as FingerprintRegistry;
+	}
+
+	return registry;
+}
+
+/**
+ * Verify the Ed25519 signature on a fingerprint registry against a public key.
+ * Returns false if the registry is unsigned or the signature does not match.
+ */
+export function verifyFingerprintRegistry(
+	registry: FingerprintRegistry,
+	publicKeyPem: string
+): boolean {
+	return verifyObject(registry as unknown as Record<string, unknown>, publicKeyPem);
 }

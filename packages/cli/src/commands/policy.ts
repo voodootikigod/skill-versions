@@ -16,9 +16,41 @@ interface PolicyCheckCommandOptions {
 	format?: "terminal" | "json" | "markdown" | "sarif";
 	output?: string;
 	policy?: string;
+	pubkey?: string;
 	quiet?: boolean;
+	requireSignature?: boolean;
 	skill?: string;
 	verbose?: boolean;
+}
+
+/**
+ * Verify a policy file's detached signature when required. Returns an exit code
+ * to short-circuit with (fail-closed), or null when verification passes / is
+ * not requested.
+ */
+async function verifyPolicySignatureGate(
+	policyPath: string,
+	options: PolicyCheckCommandOptions
+): Promise<number | null> {
+	if (!options.requireSignature) {
+		return null;
+	}
+	if (!options.pubkey) {
+		console.error(chalk.red("--require-signature requires --pubkey <path>"));
+		return 2;
+	}
+	const { readFile } = await import("node:fs/promises");
+	const { verifyPolicyFile } = await import("../policy/signature.js");
+	const publicKey = await readFile(options.pubkey, "utf-8");
+	const result = await verifyPolicyFile(policyPath, publicKey);
+	if (!result.valid) {
+		console.error(chalk.red(`Policy signature verification failed: ${result.reason}`));
+		return 2;
+	}
+	if (options.verbose) {
+		console.error(chalk.dim(`Policy signature valid (signed by ${result.keyId ?? "unknown"})`));
+	}
+	return null;
 }
 
 /**
@@ -56,6 +88,13 @@ export async function policyCheckCommand(
 			return 2;
 		}
 		policyPath = discovered;
+	}
+
+	// Fail-closed signature verification: when required, the policy must carry a
+	// valid detached signature before any of its rules are trusted.
+	const sigGate = await verifyPolicySignatureGate(policyPath, options);
+	if (sigGate !== null) {
+		return sigGate;
 	}
 
 	let policy: SkillPolicy;
@@ -153,4 +192,37 @@ export async function policyValidateCommand(options: { policy?: string }): Promi
 
 	console.log(chalk.green(`${policyPath} is valid.`));
 	return 0;
+}
+
+/**
+ * `skills-check policy sign` — produce a detached signature for a policy file.
+ */
+export async function policySignCommand(options: {
+	policy?: string;
+	signKey?: string;
+	keyId?: string;
+	quiet?: boolean;
+}): Promise<number> {
+	const policyPath = options.policy ?? ".skill-policy.yml";
+	if (!options.signKey) {
+		console.error(chalk.red("policy sign requires --sign-key <path>"));
+		return 2;
+	}
+
+	const { readFile } = await import("node:fs/promises");
+	const { signPolicyFile } = await import("../policy/signature.js");
+
+	try {
+		const privateKey = await readFile(options.signKey, "utf-8");
+		const sigPath = await signPolicyFile(policyPath, privateKey, options.keyId ?? "default");
+		if (!options.quiet) {
+			console.log(chalk.green(`Signed ${policyPath} → ${sigPath}`));
+		}
+		return 0;
+	} catch (err) {
+		console.error(
+			chalk.red(`Failed to sign policy: ${err instanceof Error ? err.message : String(err)}`)
+		);
+		return 2;
+	}
 }

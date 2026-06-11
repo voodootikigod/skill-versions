@@ -77,6 +77,7 @@ When implementing features, always check the relevant PRD first. When a PRD is t
 | `policy` | ✅ Shipped | Enforce organizational rules: trusted sources, banned patterns, required metadata, staleness limits, audit cleanliness. Policy-as-code via `.skill-policy.yml` |
 | `fingerprint` | ✅ Shipped | Generate skill fingerprint registry with content hashes and watermarks for integrity verification and runtime detection |
 | `usage` | ✅ Shipped | Analyze skill telemetry events: usage frequency, version drift, cost estimation, and policy cross-referencing |
+| `keygen` | ✅ Shipped | Generate an Ed25519 key pair for signing fingerprint registries and policy files |
 
 ## Monorepo Structure
 
@@ -85,7 +86,7 @@ pnpm workspaces monorepo with three packages orchestrated by Turborepo:
 | Package | Published As | Purpose |
 |---------|-------------|---------|
 | `packages/schema` | `@skills-check/schema` | TypeScript types + generated JSON Schema for the registry format |
-| `packages/cli` | `skills-check` (npm) | CLI tool — 12 commands: `init`, `check`, `report`, `refresh`, `audit`, `budget`, `verify`, `lint`, `policy`, `test`, `fingerprint`, `usage` |
+| `packages/cli` | `skills-check` (npm) | CLI tool — 13 commands: `init`, `check`, `report`, `refresh`, `audit`, `budget`, `verify`, `lint`, `policy`, `test`, `fingerprint`, `usage`, `keygen` |
 | `packages/web` | Private (Vercel) | Next.js 16 marketing/docs site at skillscheck.ai |
 
 **Build order matters**: `schema` must build first (produces `dist/schema.json` and type declarations), then `cli` and `web` consume it. Turbo handles this via `"dependsOn": ["^build"]`.
@@ -201,15 +202,19 @@ Metadata validation with four rule sets: required fields (name, description), pu
 
 ### Policy (`packages/cli/src/policy/`)
 
-Policy-as-code enforcement via `.skill-policy.yml`. Seven validators: source allow/deny with glob matching, required skills verification, banned skills, metadata requirements (reuses lint's SPDX validation), content deny/require patterns with line numbers, freshness/staleness limits, and audit integration (cross-command: runs `runAudit()` when `audit.require_clean` is configured). Policy file discovery walks up directories for monorepo support.
+Policy-as-code enforcement via `.skill-policy.yml`. Seven validators: source allow/deny with glob matching, required skills verification, banned skills, metadata requirements (reuses lint's SPDX validation), content deny/require patterns with line numbers, freshness/staleness limits, and audit integration (cross-command: runs `runAudit()` when `audit.require_clean` is configured). Policy file discovery walks up directories for monorepo support. `policy/signature.ts` provides detached Ed25519 signatures (sidecar `.skill-policy.yml.sig` over the raw file bytes): `policy sign` writes the sidecar, and `policy check --require-signature --pubkey <key>` verifies it **fail-closed** (a missing or mismatched signature aborts the check with exit 2 before any rule is trusted).
 
 ### Testing (`packages/cli/src/testing/`)
 
-Eval test runner with `cases.yaml` declarative test suites. Agent harness abstraction with Claude Code and generic shell implementations. Seven built-in graders: file-exists, command (exit code), contains/not-contains (regex), json-match, package-has, llm-rubric (via Vercel AI SDK with graceful degradation), and custom (dynamic module import). The custom grader imports and executes skill-author-supplied code in-process, so it is **default-deny**: blocked unless `--allow-custom-graders` is passed (threaded via `TestOptions.allowCustomGraders` → `RunCaseOptions`). Trial-based execution with configurable pass threshold and flaky test detection. Baseline storage for regression tracking.
+Eval test runner with `cases.yaml` declarative test suites. Agent harness abstraction with Claude Code and generic shell implementations. Seven built-in graders: file-exists, command (exit code), contains/not-contains (regex), json-match, package-has, llm-rubric (via Vercel AI SDK with graceful degradation), and custom (dynamic module import). The custom grader imports and executes skill-author-supplied code, so it is **default-deny**: blocked unless `--allow-custom-graders` is passed (threaded via `TestOptions.allowCustomGraders` → `RunCaseOptions`). When allowed, it runs in a `node:worker_threads` worker with a **dropped environment** (`env: {}`, no API keys reach author code), a bounded heap, and an enforced timeout — defense-in-depth; full filesystem/network isolation still requires `--isolation` (a container). Trial-based execution with configurable pass threshold and flaky test detection. Baseline storage for regression tracking.
 
 ### Fingerprint (`packages/cli/src/fingerprint/`)
 
-Skill identity and integrity pipeline. Discovers SKILL.md files, extracts frontmatter and content, computes SHA-256 hashes at three granularities (frontmatter, full content, 500-token prefix), and detects/injects HTML comment watermarks (`<!-- skill:name/version source -->`). Uses `js-tiktoken` via `budget/tokenizer.ts` for prefix token counting. Shared `injectWatermarkIntoContent()` function used by both `fingerprint` and `lint --inject-watermarks`.
+Skill identity and integrity pipeline. Discovers SKILL.md files, extracts frontmatter and content, computes SHA-256 hashes at three granularities (frontmatter, full content, 500-token prefix), and detects/injects HTML comment watermarks (`<!-- skill:name/version source -->`). Uses `js-tiktoken` via `budget/tokenizer.ts` for prefix token counting. Shared `injectWatermarkIntoContent()` function used by both `fingerprint` and `lint --inject-watermarks`. The registry is optionally Ed25519-signed: `fingerprint --sign-key <key> --key-id <id>` populates the `signature`/`signedBy` fields (in-band, over a canonical serialization), and `fingerprint --verify <registry.json> --pubkey <key>` checks it (exit 1 on mismatch or unsigned).
+
+### Signing (`packages/cli/src/signing/`)
+
+Cryptographic integrity primitives built on Node's built-in `node:crypto` (no new dependency). Ed25519 key generation, deterministic `stableStringify` (recursively key-sorted JSON for canonical signing), in-band object signing/verification (`signObject`/`verifyObject` — used by the fingerprint registry; the `keyId` is bound into the signed payload so it cannot be swapped), detached byte signing (`signBytes`/`verifyBytes` — used by policy sidecars), and HMAC-SHA256 helpers (`computeHmac`/`verifyHmac`, constant-time) available for watermark integrity. The `keygen` command writes a PKCS#8 private key (mode 0600) and SPKI public key. Verification helpers never throw — they return `false` on malformed input.
 
 ```
 fingerprint/

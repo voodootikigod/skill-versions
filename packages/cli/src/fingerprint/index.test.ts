@@ -17,9 +17,13 @@ vi.mock("../skill-io.js", () => ({
 	writeSkillFile: vi.fn(),
 }));
 
+import { mkdtemp, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { discoverSkillFiles } from "../shared/discovery.js";
+import { generateKeyPair } from "../signing/index.js";
 import { readSkillFile, writeSkillFile } from "../skill-io.js";
-import { runFingerprint } from "./index.js";
+import { runFingerprint, verifyFingerprintRegistry } from "./index.js";
 
 const mockDiscover = vi.mocked(discoverSkillFiles);
 const mockRead = vi.mocked(readSkillFile);
@@ -143,5 +147,56 @@ describe("runFingerprint", () => {
 
 		const result = await runFingerprint(["."]);
 		expect(result.entries[0].version).toBe("19.1.0");
+	});
+});
+
+describe("fingerprint registry signing", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	function mockOneSkill(): void {
+		const raw = makeRaw("react", "19.1.0");
+		mockDiscover.mockResolvedValue(["/skills/react/SKILL.md"]);
+		mockRead.mockResolvedValue({
+			path: "/skills/react/SKILL.md",
+			frontmatter: { name: "react", version: "19.1.0" },
+			content: "# Test\n\nSome content.",
+			raw,
+		});
+	}
+
+	it("leaves the registry unsigned by default", async () => {
+		mockOneSkill();
+		const result = await runFingerprint(["."]);
+		expect(result.signature).toBeUndefined();
+		expect(result.signedBy).toBeUndefined();
+	});
+
+	it("signs the registry and verifies under the public key", async () => {
+		const { publicKey, privateKey } = generateKeyPair();
+		const dir = await mkdtemp(join(tmpdir(), "fp-sign-"));
+		const keyPath = join(dir, "signing.key");
+		await writeFile(keyPath, privateKey, "utf-8");
+
+		mockOneSkill();
+		const result = await runFingerprint(["."], { signKeyPath: keyPath, keyId: "ci-key" });
+
+		expect(typeof result.signature).toBe("string");
+		expect(result.signedBy).toBe("ci-key");
+		expect(verifyFingerprintRegistry(result, publicKey)).toBe(true);
+	});
+
+	it("fails verification when the registry is tampered", async () => {
+		const { publicKey, privateKey } = generateKeyPair();
+		const dir = await mkdtemp(join(tmpdir(), "fp-sign-"));
+		const keyPath = join(dir, "signing.key");
+		await writeFile(keyPath, privateKey, "utf-8");
+
+		mockOneSkill();
+		const result = await runFingerprint(["."], { signKeyPath: keyPath, keyId: "ci-key" });
+		result.entries[0].contentHash = "0".repeat(64);
+
+		expect(verifyFingerprintRegistry(result, publicKey)).toBe(false);
 	});
 });

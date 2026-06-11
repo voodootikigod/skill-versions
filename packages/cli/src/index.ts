@@ -141,6 +141,10 @@ program
 	.argument("[dir]", "directory to analyze", ".")
 	.option("-o, --output <path>", "write registry to file")
 	.option("--inject-watermarks", "add watermark comments to skills that lack them")
+	.option("--sign-key <path>", "Ed25519 private key (PEM) to sign the registry")
+	.option("--key-id <id>", "identifier recorded in the registry's signedBy field")
+	.option("--verify <path>", "verify the signature of an existing registry JSON file")
+	.option("--pubkey <path>", "Ed25519 public key (PEM) used with --verify")
 	.option("--json", "output as JSON")
 	.option("--ci", "strict exit codes")
 	.option("--verbose", "show progress and details")
@@ -149,6 +153,23 @@ program
 		try {
 			const { fingerprintCommand } = await import("./commands/fingerprint.js");
 			const code = await fingerprintCommand(dir, options);
+			process.exit(code);
+		} catch (error) {
+			console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
+			process.exit(2);
+		}
+	});
+
+program
+	.command("keygen")
+	.description("Generate an Ed25519 key pair for signing registries and policies")
+	.option("--out-dir <dir>", "directory to write keys into", ".")
+	.option("--name <name>", "base filename for the key pair", "skills-check")
+	.option("--quiet", "suppress output, exit code only")
+	.action(async (options) => {
+		try {
+			const { keygenCommand } = await import("./commands/keygen.js");
+			const code = await keygenCommand(options);
 			process.exit(code);
 		} catch (error) {
 			console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
@@ -235,6 +256,8 @@ policyCmd
 	.option("-f, --format <type>", "output format: terminal, json, markdown, or sarif", "terminal")
 	.option("-o, --output <path>", "write report to file")
 	.option("--fail-on <severity>", "exit code 1 threshold: blocked, violation, warning", "blocked")
+	.option("--require-signature", "require a valid detached policy signature before trusting rules")
+	.option("--pubkey <path>", "Ed25519 public key (PEM) used with --require-signature")
 	.option("--verbose", "show progress and details")
 	.option("--quiet", "suppress output, exit code only")
 	.action(async (dir, options) => {
@@ -271,6 +294,24 @@ policyCmd
 		try {
 			const { policyValidateCommand } = await import("./commands/policy.js");
 			const code = await policyValidateCommand(options);
+			process.exit(code);
+		} catch (error) {
+			console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
+			process.exit(2);
+		}
+	});
+
+policyCmd
+	.command("sign")
+	.description("Generate a detached signature for a .skill-policy.yml file")
+	.option("--policy <path>", "path to .skill-policy.yml")
+	.option("--sign-key <path>", "Ed25519 private key (PEM) to sign with")
+	.option("--key-id <id>", "identifier recorded in the signature")
+	.option("--quiet", "suppress output, exit code only")
+	.action(async (options) => {
+		try {
+			const { policySignCommand } = await import("./commands/policy.js");
+			const code = await policySignCommand(options);
 			process.exit(code);
 		} catch (error) {
 			console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);

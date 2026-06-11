@@ -1,6 +1,8 @@
+import { readFile } from "node:fs/promises";
+import type { FingerprintRegistry } from "@skills-check/schema";
 import chalk from "chalk";
 import type { FingerprintOptions } from "../fingerprint/index.js";
-import { runFingerprint } from "../fingerprint/index.js";
+import { runFingerprint, verifyFingerprintRegistry } from "../fingerprint/index.js";
 import { formatAndOutput } from "../shared/index.js";
 
 interface FingerprintCommandOptions {
@@ -8,9 +10,13 @@ interface FingerprintCommandOptions {
 	format?: "terminal" | "json";
 	injectWatermarks?: boolean;
 	json?: boolean;
+	keyId?: string;
 	output?: string;
+	pubkey?: string;
 	quiet?: boolean;
+	signKey?: string;
 	verbose?: boolean;
+	verify?: string;
 }
 
 function formatFingerprintTerminal(registry: Record<string, unknown>): string {
@@ -63,11 +69,42 @@ export async function fingerprintCommand(
 		return 2;
 	}
 
+	// Verification mode: check the signature of an existing registry file.
+	if (options.verify) {
+		if (!options.pubkey) {
+			console.error(chalk.red("--verify requires --pubkey <path>"));
+			return 2;
+		}
+		let registry: FingerprintRegistry;
+		try {
+			registry = JSON.parse(await readFile(options.verify, "utf-8")) as FingerprintRegistry;
+		} catch (error) {
+			console.error(
+				chalk.red(
+					`Cannot read registry "${options.verify}": ${error instanceof Error ? error.message : String(error)}`
+				)
+			);
+			return 2;
+		}
+		const publicKey = await readFile(options.pubkey, "utf-8");
+		const ok = verifyFingerprintRegistry(registry, publicKey);
+		if (!options.quiet) {
+			console.log(
+				ok
+					? chalk.green(`✓ Signature valid (signed by ${registry.signedBy ?? "unknown"})`)
+					: chalk.red("✗ Signature invalid or registry unsigned")
+			);
+		}
+		return ok ? 0 : 1;
+	}
+
 	const fpOptions: FingerprintOptions = {
 		ci: options.ci,
 		injectWatermarks: options.injectWatermarks,
 		json: options.json,
 		output: options.output,
+		signKeyPath: options.signKey,
+		keyId: options.keyId,
 	};
 
 	const registry = await runFingerprint([dir], fpOptions);

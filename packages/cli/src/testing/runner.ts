@@ -188,7 +188,7 @@ async function runSingleGrader(
 			} else {
 				modulePath = grader.module;
 			}
-			return gradeCustom(workDir, modulePath);
+			return gradeCustom(workDir, modulePath, options.timeout * 1000);
 		}
 
 		default:

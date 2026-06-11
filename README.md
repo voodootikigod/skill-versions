@@ -309,6 +309,24 @@ Check all installed skills against organizational policy.
 | `-f, --format <type>` | Output format: `terminal` or `json` (default: `terminal`) |
 | `-o, --output <path>` | Write report to file |
 | `--fail-on <severity>` | Exit code 1 threshold: `blocked`, `violation`, `warning` (default: `blocked`) |
+| `--require-signature` | Require a valid detached policy signature before trusting rules (fail-closed) |
+| `--pubkey <path>` | Ed25519 public key (PEM) used with `--require-signature` |
+
+#### `skills-check policy sign`
+
+Generate a detached signature (`.skill-policy.yml.sig`) so the policy can be verified at enforcement time. Prevents a tampered or unauthenticated policy from being trusted in CI.
+
+| Flag | Description |
+|------|-------------|
+| `--policy <path>` | Path to `.skill-policy.yml` |
+| `--sign-key <path>` | Ed25519 private key (PEM) to sign with |
+| `--key-id <id>` | Identifier recorded in the signature |
+
+```bash
+skills-check keygen --name policy-signing
+skills-check policy sign --sign-key policy-signing.key --key-id policy-signing
+skills-check policy check --require-signature --pubkey policy-signing.pub
+```
 
 #### `skills-check policy init`
 
@@ -398,12 +416,24 @@ Generate a fingerprint registry of installed skills with content hashes and wate
 |------|-------------|
 | `-o, --output <path>` | Write registry to file |
 | `--inject-watermarks` | Add watermark comments to skills that lack them |
+| `--sign-key <path>` | Ed25519 private key (PEM) to sign the registry |
+| `--key-id <id>` | Identifier recorded in the registry's `signedBy` field |
+| `--verify <path>` | Verify the signature of an existing registry JSON file |
+| `--pubkey <path>` | Ed25519 public key (PEM) used with `--verify` |
 | `--json` | Output as JSON |
 | `--ci` | Strict exit codes |
 | `--verbose` | Show progress and details |
 | `--quiet` | Suppress output, exit code only |
 
-**Exit codes:** `0` = success, `2` = configuration error.
+**Exit codes:** `0` = success (or valid signature), `1` = invalid/unsigned registry with `--verify`, `2` = configuration error.
+
+**Signing:** Generate a key pair with `skills-check keygen`, then sign the registry so consumers can detect tampering in transit or at rest. The signature (Ed25519 over a canonical serialization) is embedded in the registry's `signature`/`signedBy` fields.
+
+```bash
+skills-check keygen --name ci-signing
+skills-check fingerprint --sign-key ci-signing.key --key-id ci-signing --json -o registry.json
+skills-check fingerprint --verify registry.json --pubkey ci-signing.pub
+```
 
 **Output format (JSON):**
 
@@ -441,6 +471,21 @@ skills-check fingerprint ./skills --inject-watermarks
 
 # Quiet mode for CI (exit code only)
 skills-check fingerprint --quiet
+```
+
+### `skills-check keygen`
+
+Generate an Ed25519 key pair for signing fingerprint registries and policy files. Writes a PKCS#8 private key (mode `0600`) and an SPKI public key. Keep the private key secret; distribute the public key to verifiers.
+
+| Flag | Description |
+|------|-------------|
+| `--out-dir <dir>` | Directory to write keys into (default: `.`) |
+| `--name <name>` | Base filename for the key pair (default: `skills-check`) |
+| `--quiet` | Suppress output, exit code only |
+
+```bash
+# Produces ci-signing.key (private) and ci-signing.pub (public)
+skills-check keygen --name ci-signing --out-dir ./keys
 ```
 
 ### `skills-check usage`
@@ -855,7 +900,9 @@ Not all commands carry the same risk profile. Understanding which commands are l
 
 **LLM-assisted:** `refresh`, `verify` (with heuristic fallback when no key is set), and `test` (the `llm-rubric` grader). All LLM-assisted features degrade gracefully without API keys.
 
-**External code execution:** The `test` command executes shell commands through agent harnesses (Claude Code CLI or a generic shell). Test cases can run arbitrary commands defined in `cases.yaml`. Use `--isolation` when running tests against untrusted skills to sandbox execution in a container. The `custom` grader — which imports and runs a skill-author-supplied JS module in-process — is **disabled by default** (fail-closed) and runs only when you pass `--allow-custom-graders`; never enable it for skills you don't trust.
+**External code execution:** The `test` command executes shell commands through agent harnesses (Claude Code CLI or a generic shell). Test cases can run arbitrary commands defined in `cases.yaml`. Use `--isolation` when running tests against untrusted skills to sandbox execution in a container. The `custom` grader — which imports and runs a skill-author-supplied JS module — is **disabled by default** (fail-closed) and runs only when you pass `--allow-custom-graders`. Even when allowed, it executes in a worker thread with a dropped environment (no API keys or secrets reach the module), a bounded heap, and an enforced timeout; for full filesystem/network isolation against untrusted skills, combine it with `--isolation`.
+
+**Integrity (signing):** Fingerprint registries and policy files can be Ed25519-signed (`skills-check keygen` to make keys; `fingerprint --sign-key` / `policy sign` to sign; `fingerprint --verify` / `policy check --require-signature` to verify). Signing detects tampering in transit or at rest and lets CI refuse to act on an unauthenticated policy. Verification is fail-closed: an unsigned or mismatched artifact fails rather than silently passing.
 
 ## Complementary Tools
 
