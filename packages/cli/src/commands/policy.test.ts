@@ -32,6 +32,7 @@ function makeReport(overrides?: Partial<PolicyReport>): PolicyReport {
 		policyFile: ".skill-policy.yml",
 		files: 1,
 		findings: [],
+		exempted: [],
 		required: [],
 		summary: { blocked: 0, violations: 0, warnings: 0 },
 		generatedAt: "2026-03-03T00:00:00.000Z",

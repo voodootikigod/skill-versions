@@ -2,7 +2,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { discoverPolicyFile, parsePolicy, validatePolicy } from "./parser.js";
+import { discoverPolicyFile, loadPolicyFile, parsePolicy, validatePolicy } from "./parser.js";
 
 describe("parsePolicy", () => {
 	it("parses a valid minimal policy", async () => {
@@ -183,5 +183,65 @@ describe("discoverPolicyFile", () => {
 	it("returns null when no policy file exists", async () => {
 		const found = await discoverPolicyFile(tempDir);
 		expect(found).toBeNull();
+	});
+});
+
+describe("loadPolicyFile inheritance", () => {
+	let tempDir: string;
+
+	beforeEach(async () => {
+		tempDir = await mkdtemp(join(tmpdir(), "policy-extends-"));
+	});
+
+	afterEach(async () => {
+		await rm(tempDir, { recursive: true, force: true });
+	});
+
+	it("loads a single file with no extends unchanged", async () => {
+		const p = join(tempDir, ".skill-policy.yml");
+		await writeFile(p, "version: 1\nsources:\n  allow:\n    - '@acme/*'\n");
+		const policy = await loadPolicyFile(p);
+		expect(policy.sources?.allow).toEqual(["@acme/*"]);
+		expect(policy.extends).toBeUndefined();
+	});
+
+	it("merges a base policy via extends with the child overriding scalars", async () => {
+		await writeFile(
+			join(tempDir, "base.yml"),
+			"version: 1\nsources:\n  allow:\n    - '@base/*'\naudit:\n  require_clean: true\n  min_severity_to_block: high\n"
+		);
+		await writeFile(
+			join(tempDir, ".skill-policy.yml"),
+			"version: 1\nextends: ./base.yml\nsources:\n  allow:\n    - '@child/*'\naudit:\n  min_severity_to_block: critical\n"
+		);
+		const policy = await loadPolicyFile(join(tempDir, ".skill-policy.yml"));
+		expect(policy.sources?.allow).toEqual(["@base/*", "@child/*"]);
+		expect(policy.audit?.require_clean).toBe(true);
+		expect(policy.audit?.min_severity_to_block).toBe("critical");
+		expect(policy.extends).toBeUndefined();
+	});
+
+	it("merges multiple bases left-to-right", async () => {
+		await writeFile(join(tempDir, "a.yml"), "version: 1\nbanned:\n  - skill: a\n");
+		await writeFile(join(tempDir, "b.yml"), "version: 1\nbanned:\n  - skill: b\n");
+		await writeFile(
+			join(tempDir, ".skill-policy.yml"),
+			"version: 1\nextends:\n  - ./a.yml\n  - ./b.yml\nbanned:\n  - skill: c\n"
+		);
+		const policy = await loadPolicyFile(join(tempDir, ".skill-policy.yml"));
+		expect(policy.banned?.map((x) => x.skill).sort()).toEqual(["a", "b", "c"]);
+	});
+
+	it("rejects circular inheritance", async () => {
+		await writeFile(join(tempDir, "a.yml"), "version: 1\nextends: ./b.yml\n");
+		await writeFile(join(tempDir, "b.yml"), "version: 1\nextends: ./a.yml\n");
+		await expect(loadPolicyFile(join(tempDir, "a.yml"))).rejects.toThrow("Circular");
+	});
+
+	it("reports a missing base policy clearly", async () => {
+		await writeFile(join(tempDir, ".skill-policy.yml"), "version: 1\nextends: ./nope.yml\n");
+		await expect(loadPolicyFile(join(tempDir, ".skill-policy.yml"))).rejects.toThrow(
+			"Failed to load base policy"
+		);
 	});
 });

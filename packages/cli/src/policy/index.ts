@@ -2,6 +2,7 @@ import { stat } from "node:fs/promises";
 import { discoverSkillFiles } from "../shared/discovery.js";
 import type { SkillFile } from "../skill-io.js";
 import { readSkillFile } from "../skill-io.js";
+import { applyExemptions } from "./exemptions.js";
 import type { PolicyFinding, PolicyOptions, PolicyReport, SkillPolicy } from "./types.js";
 import { checkAuditClean } from "./validators/audit-integration.js";
 import { checkBanned } from "./validators/banned.js";
@@ -101,17 +102,47 @@ export async function runPolicyCheck(
 		allFindings.push(...auditFindings);
 	}
 
-	// Compute summary
+	// Apply time-boxed exemptions. Map each finding's file to its skill name so
+	// skill-scoped waivers can be evaluated; suppressed findings are recorded,
+	// not silently dropped, and expired waivers stop suppressing.
+	const fileToSkill = new Map<string, string>();
+	for (const sf of allSkillFiles.length > 0 ? allSkillFiles : skillFiles) {
+		const skillName = sf.frontmatter.name;
+		if (typeof skillName === "string" && skillName.length > 0) {
+			fileToSkill.set(sf.path, skillName);
+		}
+	}
+	const { kept, exempted, expired } = applyExemptions(
+		allFindings,
+		policy.exemptions,
+		fileToSkill,
+		new Date()
+	);
+
+	// Surface expired exemptions so teams renew or remove them. Added after the
+	// exemption pass so an expired waiver cannot suppress its own warning.
+	for (const ex of expired) {
+		kept.push({
+			file: policyFile,
+			severity: "warning",
+			rule: "exemption.expired",
+			message: `Policy exemption for rule "${ex.rule}"${ex.skill ? ` (skill ${ex.skill})` : ""} expired on ${ex.expires}`,
+			detail: ex.reason,
+		});
+	}
+
+	// Compute summary from the findings still in force
 	const summary = {
-		blocked: allFindings.filter((f) => f.severity === "blocked").length,
-		violations: allFindings.filter((f) => f.severity === "violation").length,
-		warnings: allFindings.filter((f) => f.severity === "warning").length,
+		blocked: kept.filter((f) => f.severity === "blocked").length,
+		violations: kept.filter((f) => f.severity === "violation").length,
+		warnings: kept.filter((f) => f.severity === "warning").length,
 	};
 
 	return {
 		policyFile,
 		files: filesToCheck.length,
-		findings: allFindings,
+		findings: kept,
+		exempted,
 		required,
 		summary,
 		generatedAt: new Date().toISOString(),

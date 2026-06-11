@@ -1,3 +1,21 @@
+/**
+ * A time-boxed waiver that suppresses findings for a specific rule (and
+ * optionally a specific skill). Exemptions are never silent — suppressed
+ * findings are counted and reported, and expired exemptions stop suppressing.
+ */
+export interface PolicyExemption {
+	/** Person or team accountable for the waiver. */
+	approved_by?: string;
+	/** ISO 8601 date (YYYY-MM-DD or full timestamp). After this, the waiver is inert. */
+	expires?: string;
+	/** Why the waiver exists (required — no silent blanket waivers). */
+	reason: string;
+	/** Rule name to waive (e.g. "sources.allow", "banned") or "*" for any rule. */
+	rule: string;
+	/** Optional skill-name glob to scope the waiver; omitted = applies to any skill. */
+	skill?: string;
+}
+
 export interface SkillPolicy {
 	audit?: {
 		require_clean?: boolean;
@@ -8,6 +26,10 @@ export interface SkillPolicy {
 		deny_patterns?: Array<{ pattern: string; reason: string }>;
 		require_patterns?: Array<{ pattern: string; reason: string }>;
 	};
+	/** Time-boxed waivers that suppress matching findings. */
+	exemptions?: PolicyExemption[];
+	/** Paths to base policy files to inherit from (relative to this file). Child overrides. */
+	extends?: string | string[];
 	freshness?: {
 		max_age_days?: number;
 		max_version_drift?: "major" | "minor" | "patch";
@@ -37,6 +59,8 @@ export interface PolicyFinding {
 }
 
 export interface PolicyReport {
+	/** Findings suppressed by an active exemption (recorded, never silently dropped). */
+	exempted: PolicyFinding[];
 	files: number;
 	findings: PolicyFinding[];
 	generatedAt: string;

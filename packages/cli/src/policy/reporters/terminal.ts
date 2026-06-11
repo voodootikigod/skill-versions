@@ -93,6 +93,11 @@ export function formatPolicyTerminal(report: PolicyReport): string {
 		lines.push(chalk.green("All skills comply with policy."));
 		lines.push("");
 		lines.push(`  ${report.files} file(s) checked`);
+		if (report.exempted.length > 0) {
+			lines.push(
+				chalk.yellow(`  ${report.exempted.length} finding(s) waived by active exemptions.`)
+			);
+		}
 		lines.push("");
 		return lines.join("\n");
 	}
@@ -106,6 +111,9 @@ export function formatPolicyTerminal(report: PolicyReport): string {
 		`Summary: ${summary.blocked} blocked, ${summary.violations} violation(s), ${summary.warnings} warning(s). ` +
 			`Policy check ${passed ? chalk.green("PASSED") : chalk.red("FAILED")}.`
 	);
+	if (report.exempted.length > 0) {
+		lines.push(chalk.yellow(`${report.exempted.length} finding(s) waived by active exemptions.`));
+	}
 	lines.push("");
 
 	return lines.join("\n");

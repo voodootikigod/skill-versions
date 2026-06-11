@@ -1,6 +1,7 @@
 import { readFile, stat } from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 import { isSafeRegex } from "../shared/safe-regex.js";
+import { mergePolicies } from "./merge.js";
 import type { SkillPolicy } from "./types.js";
 
 /**
@@ -181,6 +182,32 @@ export function validatePolicy(policy: SkillPolicy): string[] {
 		);
 	}
 
+	// Validate exemptions
+	if (policy.exemptions) {
+		if (Array.isArray(policy.exemptions)) {
+			for (let i = 0; i < policy.exemptions.length; i++) {
+				const ex = policy.exemptions[i];
+				if (!ex.rule || typeof ex.rule !== "string") {
+					errors.push(`exemptions[${i}] must have a "rule" string field`);
+				}
+				if (!ex.reason || typeof ex.reason !== "string") {
+					errors.push(`exemptions[${i}] must have a "reason" string field`);
+				}
+				if (ex.skill !== undefined && typeof ex.skill !== "string") {
+					errors.push(`exemptions[${i}].skill must be a string`);
+				}
+				if (
+					ex.expires !== undefined &&
+					(typeof ex.expires !== "string" || Number.isNaN(new Date(ex.expires).getTime()))
+				) {
+					errors.push(`exemptions[${i}].expires must be a valid ISO date (got "${ex.expires}")`);
+				}
+			}
+		} else {
+			errors.push("exemptions must be an array");
+		}
+	}
+
 	return errors;
 }
 
@@ -211,9 +238,70 @@ export async function discoverPolicyFile(startDir: string): Promise<string | nul
 }
 
 /**
- * Load and parse a policy file from disk.
+ * Load and parse a policy file from disk, resolving any `extends` inheritance.
+ * Base policies are merged left-to-right with the child taking precedence
+ * (see {@link mergePolicies}). Circular inheritance is rejected.
  */
-export async function loadPolicyFile(filePath: string): Promise<SkillPolicy> {
-	const content = await readFile(filePath, "utf-8");
-	return parsePolicy(content);
+export function loadPolicyFile(filePath: string): Promise<SkillPolicy> {
+	return resolvePolicyInheritance(resolve(filePath), new Set());
+}
+
+function stripExtends(policy: SkillPolicy): SkillPolicy {
+	if (!policy.extends) {
+		return policy;
+	}
+	const { extends: _extends, ...rest } = policy;
+	return rest as SkillPolicy;
+}
+
+async function resolvePolicyInheritance(
+	absPath: string,
+	stack: ReadonlySet<string>
+): Promise<SkillPolicy> {
+	if (stack.has(absPath)) {
+		throw new Error(`Circular policy inheritance detected at ${absPath}`);
+	}
+
+	const content = await readFile(absPath, "utf-8");
+	const policy = await parsePolicy(content);
+
+	if (!policy.extends) {
+		return stripExtends(policy);
+	}
+
+	const refs = Array.isArray(policy.extends) ? policy.extends : [policy.extends];
+	for (const ref of refs) {
+		if (typeof ref !== "string") {
+			throw new Error(`Policy "extends" entries must be strings (in ${absPath})`);
+		}
+	}
+
+	const nextStack = new Set(stack).add(absPath);
+	const dir = dirname(absPath);
+	let mergedBase: SkillPolicy | undefined;
+	for (const ref of refs) {
+		const base = await loadBasePolicy(ref, dir, absPath, nextStack);
+		mergedBase = mergedBase ? mergePolicies(mergedBase, base) : base;
+	}
+
+	return mergedBase ? mergePolicies(mergedBase, stripExtends(policy)) : stripExtends(policy);
+}
+
+async function loadBasePolicy(
+	ref: string,
+	dir: string,
+	fromPath: string,
+	stack: ReadonlySet<string>
+): Promise<SkillPolicy> {
+	const basePath = isAbsolute(ref) ? ref : resolve(dir, ref);
+	try {
+		return await resolvePolicyInheritance(basePath, stack);
+	} catch (err) {
+		if (err instanceof Error && err.message.startsWith("Circular")) {
+			throw err;
+		}
+		throw new Error(
+			`Failed to load base policy "${ref}" from ${fromPath}: ${err instanceof Error ? err.message : String(err)}`
+		);
+	}
 }

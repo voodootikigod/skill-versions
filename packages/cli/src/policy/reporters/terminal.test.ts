@@ -7,6 +7,7 @@ function makeReport(overrides?: Partial<PolicyReport>): PolicyReport {
 		policyFile: ".skill-policy.yml",
 		files: 1,
 		findings: [],
+		exempted: [],
 		required: [],
 		summary: { blocked: 0, violations: 0, warnings: 0 },
 		generatedAt: new Date().toISOString(),

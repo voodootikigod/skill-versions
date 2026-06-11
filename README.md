@@ -295,7 +295,7 @@ skills-check lint --format json
 
 ### `skills-check policy <subcommand>`
 
-Enforce organizational policy rules for skill files via `.skill-policy.yml`. The policy command has three subcommands.
+Enforce organizational policy rules for skill files via `.skill-policy.yml`. The policy command has four subcommands (`check`, `sign`, `init`, `validate`).
 
 #### `skills-check policy check [dir]`
 
@@ -359,6 +359,38 @@ skills-check policy validate --policy .skill-policy.yml
 
 # CI mode
 skills-check policy check --ci --fail-on violation
+```
+
+#### Policy inheritance (`extends`)
+
+A policy can inherit from one or more base policies, so an org can publish a shared baseline and teams layer their own rules on top. Scalars and object flags are overridden by the child; arrays (source lists, banned, required, content patterns, exemptions) accumulate as a union. Circular inheritance is rejected.
+
+```yaml
+# team/.skill-policy.yml
+version: 1
+extends: ../org-base.yml      # string or array of paths, relative to this file
+sources:
+  allow:
+    - "@team/*"               # added on top of the base's allowlist
+audit:
+  min_severity_to_block: critical   # tightens the base's value
+```
+
+#### Exemptions (time-boxed waivers)
+
+Exemptions waive specific findings without forking the policy — useful for migration grace periods. Each needs a `reason`; `expires` and a `skill` glob are optional. Waivers are **never silent**: suppressed findings are counted in every report, and an **expired** waiver stops suppressing and surfaces an `exemption.expired` warning so it gets renewed or removed.
+
+```yaml
+version: 1
+banned:
+  - skill: legacy-deploy
+    reason: superseded by deploy-v2
+exemptions:
+  - rule: banned              # rule name, or "*" for any rule
+    skill: legacy-deploy      # optional skill-name glob; omit to apply to any skill
+    reason: "migration tracked in JIRA-1234"
+    approved_by: platform-team
+    expires: "2026-09-30"     # after this date the ban applies again
 ```
 
 ### `skills-check test [dir]`

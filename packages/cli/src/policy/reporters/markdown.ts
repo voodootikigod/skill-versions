@@ -23,6 +23,10 @@ export function formatPolicyMarkdown(report: PolicyReport): string {
 	lines.push("");
 	lines.push(`Files checked: ${report.files}`);
 	lines.push("");
+	if (report.exempted.length > 0) {
+		lines.push(`> ${report.exempted.length} finding(s) waived by active exemptions.`);
+		lines.push("");
+	}
 
 	if (report.findings.length === 0 && report.required.every((r) => r.satisfied)) {
 		lines.push("All skills comply with policy.");
