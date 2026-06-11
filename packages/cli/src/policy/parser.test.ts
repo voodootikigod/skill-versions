@@ -2,7 +2,13 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { discoverPolicyFile, loadPolicyFile, parsePolicy, validatePolicy } from "./parser.js";
+import {
+	collectPolicyFiles,
+	discoverPolicyFile,
+	loadPolicyFile,
+	parsePolicy,
+	validatePolicy,
+} from "./parser.js";
 
 describe("parsePolicy", () => {
 	it("parses a valid minimal policy", async () => {
@@ -243,5 +249,56 @@ describe("loadPolicyFile inheritance", () => {
 		await expect(loadPolicyFile(join(tempDir, ".skill-policy.yml"))).rejects.toThrow(
 			"Failed to load base policy"
 		);
+	});
+});
+
+describe("collectPolicyFiles", () => {
+	let tempDir: string;
+
+	beforeEach(async () => {
+		tempDir = await mkdtemp(join(tmpdir(), "policy-chain-"));
+	});
+
+	afterEach(async () => {
+		await rm(tempDir, { recursive: true, force: true });
+	});
+
+	it("returns just the file when there is no extends", async () => {
+		const p = join(tempDir, ".skill-policy.yml");
+		await writeFile(p, "version: 1\n");
+		const files = await collectPolicyFiles(p);
+		expect(files).toEqual([join(tempDir, ".skill-policy.yml")]);
+	});
+
+	it("includes the child and all transitive bases", async () => {
+		await writeFile(join(tempDir, "grand.yml"), "version: 1\n");
+		await writeFile(join(tempDir, "base.yml"), "version: 1\nextends: ./grand.yml\n");
+		await writeFile(join(tempDir, ".skill-policy.yml"), "version: 1\nextends: ./base.yml\n");
+		const files = await collectPolicyFiles(join(tempDir, ".skill-policy.yml"));
+		expect(files.sort()).toEqual(
+			[
+				join(tempDir, ".skill-policy.yml"),
+				join(tempDir, "base.yml"),
+				join(tempDir, "grand.yml"),
+			].sort()
+		);
+	});
+
+	it("deduplicates a diamond (same base via two paths)", async () => {
+		await writeFile(join(tempDir, "shared.yml"), "version: 1\n");
+		await writeFile(join(tempDir, "a.yml"), "version: 1\nextends: ./shared.yml\n");
+		await writeFile(join(tempDir, "b.yml"), "version: 1\nextends: ./shared.yml\n");
+		await writeFile(
+			join(tempDir, ".skill-policy.yml"),
+			"version: 1\nextends:\n  - ./a.yml\n  - ./b.yml\n"
+		);
+		const files = await collectPolicyFiles(join(tempDir, ".skill-policy.yml"));
+		expect(files.filter((f) => f.endsWith("shared.yml"))).toHaveLength(1);
+	});
+
+	it("rejects circular inheritance", async () => {
+		await writeFile(join(tempDir, "a.yml"), "version: 1\nextends: ./b.yml\n");
+		await writeFile(join(tempDir, "b.yml"), "version: 1\nextends: ./a.yml\n");
+		await expect(collectPolicyFiles(join(tempDir, "a.yml"))).rejects.toThrow("Circular");
 	});
 });

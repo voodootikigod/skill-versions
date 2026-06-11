@@ -41,14 +41,36 @@ async function verifyPolicySignatureGate(
 	}
 	const { readFile } = await import("node:fs/promises");
 	const { verifyPolicyFile } = await import("../policy/signature.js");
+	const { collectPolicyFiles } = await import("../policy/parser.js");
 	const publicKey = await readFile(options.pubkey, "utf-8");
-	const result = await verifyPolicyFile(policyPath, publicKey);
-	if (!result.valid) {
-		console.error(chalk.red(`Policy signature verification failed: ${result.reason}`));
+
+	// Verify the entire inheritance closure — every base policy must be signed,
+	// not just the leaf — so an unsigned/tampered base cannot be trusted.
+	let chain: string[];
+	try {
+		chain = await collectPolicyFiles(policyPath);
+	} catch (err) {
+		console.error(
+			chalk.red(
+				`Cannot resolve policy inheritance for verification: ${err instanceof Error ? err.message : String(err)}`
+			)
+		);
 		return 2;
 	}
-	if (options.verbose) {
-		console.error(chalk.dim(`Policy signature valid (signed by ${result.keyId ?? "unknown"})`));
+
+	for (const file of chain) {
+		const result = await verifyPolicyFile(file, publicKey);
+		if (!result.valid) {
+			console.error(
+				chalk.red(`Policy signature verification failed for ${file}: ${result.reason}`)
+			);
+			return 2;
+		}
+		if (options.verbose) {
+			console.error(
+				chalk.dim(`Policy signature valid: ${file} (signed by ${result.keyId ?? "unknown"})`)
+			);
+		}
 	}
 	return null;
 }

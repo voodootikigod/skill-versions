@@ -363,7 +363,7 @@ skills-check policy check --ci --fail-on violation
 
 #### Policy inheritance (`extends`)
 
-A policy can inherit from one or more base policies, so an org can publish a shared baseline and teams layer their own rules on top. Scalars and object flags are overridden by the child; arrays (source lists, banned, required, content patterns, exemptions) accumulate as a union. Circular inheritance is rejected.
+A policy can inherit from one or more base policies, so an org can publish a shared baseline and teams layer their own rules on top. Scalars and object flags are overridden by the child; arrays (source lists, banned, required, content patterns, exemptions) accumulate as a union. Circular inheritance is rejected. When combined with `--require-signature`, every file in the inheritance chain (the child and all bases) must be signed — sign each base with `policy sign` too, or an unsigned base fails the check.
 
 ```yaml
 # team/.skill-policy.yml

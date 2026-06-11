@@ -265,15 +265,9 @@ async function resolvePolicyInheritance(
 	const content = await readFile(absPath, "utf-8");
 	const policy = await parsePolicy(content);
 
-	if (!policy.extends) {
+	const refs = extendsRefs(policy, absPath);
+	if (refs.length === 0) {
 		return stripExtends(policy);
-	}
-
-	const refs = Array.isArray(policy.extends) ? policy.extends : [policy.extends];
-	for (const ref of refs) {
-		if (typeof ref !== "string") {
-			throw new Error(`Policy "extends" entries must be strings (in ${absPath})`);
-		}
 	}
 
 	const nextStack = new Set(stack).add(absPath);
@@ -303,5 +297,56 @@ async function loadBasePolicy(
 		throw new Error(
 			`Failed to load base policy "${ref}" from ${fromPath}: ${err instanceof Error ? err.message : String(err)}`
 		);
+	}
+}
+
+/** Normalize and validate a policy's `extends` field into an array of refs. */
+function extendsRefs(policy: SkillPolicy, absPath: string): string[] {
+	if (!policy.extends) {
+		return [];
+	}
+	const refs = Array.isArray(policy.extends) ? policy.extends : [policy.extends];
+	for (const ref of refs) {
+		if (typeof ref !== "string") {
+			throw new Error(`Policy "extends" entries must be strings (in ${absPath})`);
+		}
+	}
+	return refs;
+}
+
+/**
+ * Collect the absolute paths of every policy file in an inheritance closure —
+ * the file itself plus all transitively-included bases. Used to verify that the
+ * entire chain is signed, not just the leaf policy. Order is depth-first
+ * (child before bases), deduplicated; circular inheritance is rejected.
+ */
+export async function collectPolicyFiles(filePath: string): Promise<string[]> {
+	const acc: string[] = [];
+	await walkPolicyChain(resolve(filePath), new Set(), acc);
+	return [...new Set(acc)];
+}
+
+async function walkPolicyChain(
+	absPath: string,
+	stack: ReadonlySet<string>,
+	acc: string[]
+): Promise<void> {
+	if (stack.has(absPath)) {
+		throw new Error(`Circular policy inheritance detected at ${absPath}`);
+	}
+	acc.push(absPath);
+
+	const content = await readFile(absPath, "utf-8");
+	const policy = await parsePolicy(content);
+	const refs = extendsRefs(policy, absPath);
+	if (refs.length === 0) {
+		return;
+	}
+
+	const nextStack = new Set(stack).add(absPath);
+	const dir = dirname(absPath);
+	for (const ref of refs) {
+		const basePath = isAbsolute(ref) ? ref : resolve(dir, ref);
+		await walkPolicyChain(basePath, nextStack, acc);
 	}
 }
